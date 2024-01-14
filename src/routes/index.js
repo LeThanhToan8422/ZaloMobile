@@ -6,21 +6,24 @@ import { Message } from '../screens/Message';
 import { Contacts } from '../screens/Contacts';
 import AuthStack from './AuthStack';
 import AppStack from './AppStack';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 const Stack = createNativeStackNavigator();
 
 const Router = () => {
-   const [isLogin, setIsLogin] = useState(true);
+   const [isLogin, setIsLogin] = useState(false);
    return (
-      <NavigationContainer>
-         <Stack.Navigator>
-            {isLogin ? (
-               <Stack.Screen name="AppStack" component={AppStack} options={{ headerShown: false }} />
-            ) : (
-               <Stack.Screen name="AuthStack" component={AuthStack} options={{ headerShown: false }} />
-            )}
-         </Stack.Navigator>
-      </NavigationContainer>
+      <SafeAreaProvider>
+         <NavigationContainer>
+            <Stack.Navigator>
+               {isLogin ? (
+                  <Stack.Screen name="AppStack" component={AppStack} options={{ headerShown: false }} />
+               ) : (
+                  <Stack.Screen name="AuthStack" component={AuthStack} options={{ headerShown: false }} />
+               )}
+            </Stack.Navigator>
+         </NavigationContainer>
+      </SafeAreaProvider>
    );
 };
 
