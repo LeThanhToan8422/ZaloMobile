@@ -1,30 +1,28 @@
 {
-  "expo": {
-    "name": "ZaloMobile",
-    "slug": "ZaloMobile",
-    "version": "1.0.0",
-    "orientation": "portrait",
-    "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
-    "ios": {
-      "supportsTablet": true
-    },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+   "expo": {
+      "name": "Zalo",
+      "slug": "Zalo",
+      "version": "1.0.0",
+      "orientation": "portrait",
+      "icon": "src/assets/images/zalo_arc.png",
+      "userInterfaceStyle": "light",
+      "splash": {
+         "image": "src/assets/images/splash_image.png",
+         "resizeMode": "contain",
+         "backgroundColor": "#ffffff"
+      },
+      "assetBundlePatterns": ["**/*"],
+      "ios": {
+         "supportsTablet": true
+      },
+      "android": {
+         "adaptiveIcon": {
+            "foregroundImage": "src/assets/images/zalo_arc.png",
+            "backgroundColor": "#ffffff"
+         }
+      },
+      "web": {
+         "favicon": "src/assets/images/zalo_arc.png"
       }
-    },
-    "web": {
-      "favicon": "./assets/favicon.png"
-    }
-  }
+   }
 }
