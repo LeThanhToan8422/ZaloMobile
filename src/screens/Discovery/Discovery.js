@@ -1,10 +1,22 @@
 import { View, Text } from 'react-native';
 import React from 'react';
 import styles from './styles';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export const Discovery = () => {
+   const insets = useSafeAreaInsets();
    return (
-      <View style={styles}>
+      <View
+         style={[
+            styles.container,
+            {
+               paddingTop: insets.top,
+               paddingBottom: insets.bottom,
+               paddingHorizontal: insets.left,
+               paddingVertical: insets.right,
+            },
+         ]}
+      >
          <Text>Discovery</Text>
       </View>
    );
