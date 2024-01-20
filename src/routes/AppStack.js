@@ -1,14 +1,15 @@
 import { View, Text } from 'react-native';
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-// import Ionicons from 'react-native-vector-icons/Ionicons';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { SimpleLineIcons } from '@expo/vector-icons';
 import Message from '../screens/Message';
 import Contacts from '../screens/Contacts';
 import Discovery from '../screens/Discovery';
 import Timeline from '../screens/Timeline';
 import Personal from '../screens/Personal';
-import { StatusBar } from 'expo-status-bar';
+import HeaderApp from '../components/HeaderApp';
+import { useNavigation } from '@react-navigation/native';
 
 const Tab = createBottomTabNavigator();
 
@@ -32,14 +33,126 @@ const AppStack = () => {
                }
                return <Ionicons name={iconName} size={size} color={color} />;
             },
-            headerShown: false,
+            headerTitleAlign: 'left',
+            headerStyle: {
+               backgroundColor: '#4D9DF7',
+            },
          })}
       >
-         <Tab.Screen name="Tin nhắn" component={Message} />
-         <Tab.Screen name="Danh bạ" component={Contacts} />
-         <Tab.Screen name="Khám phá" component={Discovery} />
-         <Tab.Screen name="Nhật ký" component={Timeline} />
-         <Tab.Screen name="Cá nhân" component={Personal} />
+         <Tab.Screen
+            name="Tin nhắn"
+            component={Message}
+            options={{
+               headerTitle: (props) => (
+                  <HeaderApp
+                     {...props}
+                     children={[
+                        <Ionicons
+                           style={{ paddingHorizontal: 10 }}
+                           key={1}
+                           name="ios-qr-code-outline"
+                           size={20}
+                           color="white"
+                        />,
+                        <Ionicons
+                           style={{ paddingHorizontal: 10 }}
+                           key={2}
+                           name="ios-add-outline"
+                           size={32}
+                           color="white"
+                        />,
+                     ]}
+                  />
+               ),
+            }}
+         />
+         <Tab.Screen
+            name="Danh bạ"
+            component={Contacts}
+            options={{
+               headerTitle: (props) => (
+                  <HeaderApp
+                     {...props}
+                     children={[
+                        <Ionicons
+                           style={{ paddingHorizontal: 10 }}
+                           key={1}
+                           name="ios-person-add-outline"
+                           size={22}
+                           color="white"
+                        />,
+                     ]}
+                  />
+               ),
+            }}
+         />
+         <Tab.Screen
+            name="Khám phá"
+            component={Discovery}
+            options={{
+               headerTitle: (props) => (
+                  <HeaderApp
+                     {...props}
+                     children={[
+                        <Ionicons
+                           style={{ paddingHorizontal: 10 }}
+                           key={1}
+                           name="ios-qr-code-outline"
+                           size={20}
+                           color="white"
+                        />,
+                     ]}
+                  />
+               ),
+            }}
+         />
+         <Tab.Screen
+            name="Nhật ký"
+            component={Timeline}
+            options={{
+               headerTitle: (props) => (
+                  <HeaderApp
+                     {...props}
+                     children={[
+                        <SimpleLineIcons
+                           key={1}
+                           style={{ paddingHorizontal: 10 }}
+                           name="note"
+                           size={20}
+                           color="white"
+                        />,
+                        <SimpleLineIcons
+                           style={{ paddingHorizontal: 10 }}
+                           key={2}
+                           name="bell"
+                           size={20}
+                           color="white"
+                        />,
+                     ]}
+                  />
+               ),
+            }}
+         />
+         <Tab.Screen
+            name="Cá nhân"
+            component={Personal}
+            options={{
+               headerTitle: (props) => (
+                  <HeaderApp
+                     {...props}
+                     children={[
+                        <Ionicons
+                           style={{ paddingHorizontal: 10 }}
+                           key={1}
+                           name="ios-settings-outline"
+                           size={22}
+                           color="white"
+                        />,
+                     ]}
+                  />
+               ),
+            }}
+         />
       </Tab.Navigator>
    );
 };

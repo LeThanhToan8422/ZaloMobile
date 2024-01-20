@@ -11,7 +11,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 const Stack = createNativeStackNavigator();
 
 const Router = () => {
-   const [isLogin, setIsLogin] = useState(false);
+   const [isLogin, setIsLogin] = useState(true);
    return (
       <SafeAreaProvider>
          <NavigationContainer>
