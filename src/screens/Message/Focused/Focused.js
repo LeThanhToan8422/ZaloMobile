@@ -1,10 +1,7 @@
 import { View, Text } from 'react-native';
 import React from 'react';
+import ListChat from '../../../components/ListChat';
 
 export const Focused = () => {
-   return (
-      <View>
-         <Text>Focused</Text>
-      </View>
-   );
+   return <ListChat />;
 };

@@ -4,8 +4,11 @@ import styles from './styles';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import Focused from './Focused';
 import Other from './Other';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import Chat from '../Chat';
 
 const Tab = createMaterialTopTabNavigator();
+const Stack = createNativeStackNavigator();
 
 export const Message = () => {
    return (

@@ -9,9 +9,11 @@ import Discovery from '../screens/Discovery';
 import Timeline from '../screens/Timeline';
 import Personal from '../screens/Personal';
 import HeaderApp from '../components/HeaderApp';
-import { useNavigation } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import Chat from '../screens/Chat';
 
 const Tab = createBottomTabNavigator();
+const Stack = createNativeStackNavigator();
 
 const AppStack = () => {
    return (
