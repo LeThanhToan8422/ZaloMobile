@@ -4,7 +4,7 @@ import styles from './styles';
 
 export const Personal = () => {
    return (
-      <View style={styles}>
+      <View style={styles.container}>
          <Text>Personal</Text>
       </View>
    );

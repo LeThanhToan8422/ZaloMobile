@@ -4,7 +4,7 @@ import styles from './styles';
 
 export const Timeline = () => {
    return (
-      <View style={styles}>
+      <View style={styles.container}>
          <Text>Timeline</Text>
       </View>
    );

@@ -4,7 +4,7 @@ import styles from './styles';
 
 export const Discovery = () => {
    return (
-      <View style={styles}>
+      <View style={[styles.container]}>
          <Text>Discovery</Text>
       </View>
    );

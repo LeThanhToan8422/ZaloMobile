@@ -12,7 +12,24 @@ const AuthStack = () => {
       <Stack.Navigator initialRouteName="Authentication">
          <Stack.Screen name="Authentication" component={Authentication} options={{ headerShown: false }} />
          <Stack.Screen name="Login" component={Login} />
-         <Stack.Screen name="Register" component={Register} />
+         <Stack.Screen
+            name="Register"
+            component={Register}
+            options={{
+               headerTitle: 'Tạo tài khoản',
+               headerBackground: () => (
+                  <View
+                     style={{
+                        backgroundColor: '#4A8CFE',
+                        flex: 1,
+                        borderBottomWidth: 1,
+                        borderBottomColor: '#ddd',
+                     }}
+                  />
+               ),
+               headerTintColor: '#fff',
+            }}
+         />
       </Stack.Navigator>
    );
 };
