@@ -14,12 +14,6 @@ const styles = StyleSheet.create({
       backgroundColor: '#4D9DF7',
       paddingHorizontal: 5,
    },
-   text: {
-      color: 'white',
-      marginLeft: 16,
-      fontSize: 16,
-      paddingHorizontal: 15,
-   },
    containerIconRight: {
       flexDirection: 'row',
       alignItems: 'center',
