@@ -1,17 +1,13 @@
-import { View, Text, Dimensions, Pressable } from 'react-native';
+import { View, Text, Dimensions, Pressable, TextInput } from 'react-native';
 import React from 'react';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import styles from './styles';
 
-export const HeaderApp = ({ children }) => {
-   const paddingRightTextSearch = 0;
+export const HeaderApp = ({ left, right }) => {
    return (
       <View style={styles.container}>
-         <Pressable style={styles.containerSearch}>
-            <Ionicons name="ios-search-outline" size={22} color="white" />
-            <Text style={[styles.text, { paddingRight: paddingRightTextSearch }]}>Tìm kiếm</Text>
-         </Pressable>
-         <View style={styles.containerIconRight}>{children}</View>
+         <Pressable style={styles.containerSearch}>{left}</Pressable>
+         <View style={styles.containerIconRight}>{right}</View>
       </View>
    );
 };

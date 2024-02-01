@@ -1,20 +1,20 @@
 import { View, Text } from 'react-native';
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import Authentication from '../screens/Authentication';
-import Login from '../screens/Login';
-import Register from '../screens/Register';
+import AuthenticationScreen from '../screens/AuthenticationScreen';
+import LoginScreen from '../screens/LoginScreen';
+import RegisterScreen from '../screens/RegisterScreen';
 
 const Stack = createNativeStackNavigator();
 
 const AuthStack = () => {
    return (
       <Stack.Navigator initialRouteName="Authentication">
-         <Stack.Screen name="Authentication" component={Authentication} options={{ headerShown: false }} />
-         <Stack.Screen name="Login" component={Login} />
+         <Stack.Screen name="Authentication" component={AuthenticationScreen} options={{ headerShown: false }} />
+         <Stack.Screen name="Login" component={LoginScreen} />
          <Stack.Screen
             name="Register"
-            component={Register}
+            component={RegisterScreen}
             options={{
                headerTitle: 'Tạo tài khoản',
                headerBackground: () => (

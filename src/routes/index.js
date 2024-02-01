@@ -2,8 +2,6 @@ import { View, Text } from 'react-native';
 import React, { useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { Message } from '../screens/Message';
-import { Contacts } from '../screens/Contacts';
 import AuthStack from './AuthStack';
 import AppStack from './AppStack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
