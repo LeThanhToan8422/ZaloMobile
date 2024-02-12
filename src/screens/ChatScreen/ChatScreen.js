@@ -1,22 +1,129 @@
-import {
-   View,
-   Text,
-   KeyboardAvoidingView,
-   TextInput,
-   Platform,
-   Keyboard,
-   TouchableWithoutFeedback,
-} from 'react-native';
 import React, { useState } from 'react';
-import styles from '../ContactScreen/styles';
-import { Icon, IconButton } from 'react-native-paper';
+import {
+   FlatList,
+   Keyboard,
+   KeyboardAvoidingView,
+   Platform,
+   TextInput,
+   TouchableWithoutFeedback,
+   View,
+} from 'react-native';
+import { IconButton } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { ScrollView } from 'react-native-web';
+import Message from '../../components/Message';
+import styles from './styles';
 
+/**
+ * ChatScreen component. This component is used to render the chat screen.
+ *
+ * @param {Object} route - The route object containing navigation parameters.
+ * @returns {JSX.Element} The rendered ChatScreen component.
+ */
 export const ChatScreen = ({ route }) => {
-   const [messages, setMessages] = useState('');
+   const [message, setMessage] = useState('');
    const insets = useSafeAreaInsets();
-   const { name, message, time, avatar } = route.params;
+   const messages = [
+      {
+         user: 0,
+         time: '12:00',
+         content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit',
+      },
+      {
+         user: 0,
+         time: '12:01',
+         content: 'Hello, my name is Viet',
+      },
+      {
+         user: 1,
+         time: '12:00',
+         content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit',
+      },
+      {
+         user: 1,
+         time: '12:01',
+         content: 'Hello, my name is Viet',
+      },
+      {
+         user: 0,
+         time: '12:00',
+         content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit',
+      },
+      {
+         user: 0,
+         time: '12:01',
+         content: 'Hello, my name is Viet',
+      },
+      {
+         user: 1,
+         time: '12:00',
+         content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit',
+      },
+      {
+         user: 1,
+         time: '12:01',
+         content: 'Hello, my name is Viet',
+      },
+      {
+         user: 0,
+         time: '12:00',
+         content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit',
+      },
+      {
+         user: 0,
+         time: '12:01',
+         content: 'Hello, my name is Viet',
+      },
+      {
+         user: 1,
+         time: '12:00',
+         content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit',
+      },
+      {
+         user: 1,
+         time: '12:01',
+         content: 'Hello, my name is Viet',
+      },
+      {
+         user: 0,
+         time: '12:00',
+         content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit',
+      },
+      {
+         user: 0,
+         time: '12:01',
+         content: 'Hello, my name is Viet',
+      },
+      {
+         user: 1,
+         time: '12:00',
+         content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit',
+      },
+      {
+         user: 1,
+         time: '12:01',
+         content: 'Hello, my name is Viet',
+      },
+      {
+         user: 0,
+         time: '12:00',
+         content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit',
+      },
+      {
+         user: 0,
+         time: '12:01',
+         content: 'Hello, my name is Viet',
+      },
+      {
+         user: 1,
+         time: '12:00',
+         content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit',
+      },
+      {
+         user: 1,
+         time: '12:01',
+         content: 'Hello, my name is Viet',
+      },
+   ];
    return (
       <KeyboardAvoidingView
          enabled
@@ -26,18 +133,24 @@ export const ChatScreen = ({ route }) => {
       >
          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
             <View style={styles.container}>
-               <View style={{ flexGrow: 1, backgroundColor: '#E2E8F1' }}></View>
+               <FlatList
+                  inverted
+                  data={messages}
+                  style={{ flexGrow: 1, backgroundColor: '#E2E8F1' }}
+                  renderItem={({ item, index }) => <Message data={item} index={index} />}
+                  keyExtractor={(_, index) => index.toString()}
+               />
                <View style={[styles.chatContainer, { paddingBottom: insets.bottom }]}>
                   <IconButton icon="sticker-emoji" size={28} iconColor="#333" />
                   <TextInput
                      style={styles.input}
-                     value={messages}
-                     onChangeText={(text) => setMessages(text)}
+                     value={message}
+                     onChangeText={(text) => setMessage(text)}
                      placeholder="Message"
                      placeholderTextColor={'#888'}
                      underlineColorAndroid="transparent"
                   />
-                  {!messages ? (
+                  {!message ? (
                      <>
                         <IconButton icon="dots-horizontal" size={32} iconColor="#333" />
                         <IconButton icon="microphone-outline" size={32} iconColor="#333" />
