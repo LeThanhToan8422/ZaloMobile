@@ -11,14 +11,25 @@ export const ChatItem = ({ navigation, data }) => {
          <View style={styles.contentContainer}>
             <View style={{ flex: 1, marginLeft: 10, rowGap: 4 }}>
                <Text style={styles.name}>{name}</Text>
-               <Text style={styles.message}>{message}</Text>
+               <Text ellipsizeMode="tail" numberOfLines={1} style={styles.message}>
+                  {message}
+               </Text>
             </View>
             <View style={{ alignItems: 'center', rowGap: 4 }}>
                <Text style={styles.time}>{time}</Text>
+
                {numberMessageUnread ? (
-                  <Text numberOfLines={1} ellipsizeMode="tail" style={styles.qtyNotification}>
-                     {numberMessageUnread >= 5 ? '5+' : numberMessageUnread}
-                  </Text>
+                  <View
+                     style={{
+                        backgroundColor: '#EF4D48',
+                        borderRadius: 10,
+                        justifyContent: 'center',
+                        width: 28,
+                        height: 18,
+                     }}
+                  >
+                     <Text style={styles.qtyNotification}>{numberMessageUnread >= 5 ? '5+' : numberMessageUnread}</Text>
+                  </View>
                ) : (
                   ''
                )}
