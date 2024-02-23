@@ -1,6 +1,6 @@
 import { AntDesign, Entypo, Feather, Ionicons, SimpleLineIcons } from '@expo/vector-icons';
 import React from 'react';
-import { Platform, Text, View } from 'react-native';
+import { Platform, Text, TextInput, View } from 'react-native';
 import { Appbar } from 'react-native-paper';
 import styles from './styles';
 
@@ -11,7 +11,7 @@ import styles from './styles';
  * @param {string} type - The type of the header. Can be 'chat', 'message', 'contact', 'discovery', 'timeline', or 'personal'.
  * @returns {JSX.Element} The header component.
  */
-export const HeaderApp = ({ navigation, props, type, title }) => {
+export const HeaderApp = ({ navigation, props, type, title, member }) => {
    Platform.OS === 'ios' ? (height = 44) : (height = 56);
    return (
       <Appbar.Header {...props} mode="small" style={{ height: height, backgroundColor: '#4D9DF7' }}>
@@ -24,14 +24,23 @@ export const HeaderApp = ({ navigation, props, type, title }) => {
                   onPress={navigation.goBack}
                   animated={false}
                />
-               <Appbar.Content color="#fff" titleStyle={{ fontWeight: 500, fontSize: 20 }} title={title} />
-               <Appbar.Action
-                  color="#fff"
-                  size={24}
-                  icon={(props) => <Ionicons {...props} name="call-outline" />}
-                  animated={false}
-                  onPress={() => {}}
+               <Appbar.Content
+                  title={
+                     <>
+                        <Text style={{ color: '#fff', fontWeight: 500, fontSize: 20 }}>{title}</Text>
+                        {member ? <Text style={{ color: '#BBE5FE', fontWeight: '300' }}>{member} members</Text> : null}
+                     </>
+                  }
                />
+               {!member ? (
+                  <Appbar.Action
+                     color="#fff"
+                     size={24}
+                     icon={(props) => <Ionicons {...props} name="call-outline" />}
+                     animated={false}
+                     onPress={() => {}}
+                  />
+               ) : null}
                <Appbar.Action
                   color="#fff"
                   size={24}
@@ -39,6 +48,15 @@ export const HeaderApp = ({ navigation, props, type, title }) => {
                   animated={false}
                   onPress={() => {}}
                />
+               {member ? (
+                  <Appbar.Action
+                     color="#fff"
+                     size={24}
+                     icon={(props) => <Ionicons {...props} name="search" />}
+                     animated={false}
+                     onPress={() => {}}
+                  />
+               ) : null}
                <Appbar.Action
                   color="#fff"
                   size={24}
@@ -50,12 +68,10 @@ export const HeaderApp = ({ navigation, props, type, title }) => {
          ) : (
             <>
                <Appbar.Content
-                  color="#fff"
-                  titleStyle={{ fontWeight: 500, fontSize: 20 }}
                   title={
                      <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft: 12 }}>
                         <Ionicons name="ios-search-outline" size={22} color="white" />
-                        <Text style={[styles.text]}>Tìm kiếm</Text>
+                        <TextInput style={[styles.searchInput]} placeholder="Tìm kiếm" placeholderTextColor="#fff" />
                      </View>
                   }
                   onPress={() => {}}
