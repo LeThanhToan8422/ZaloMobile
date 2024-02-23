@@ -20,9 +20,9 @@ import styles from './styles';
  * @returns {JSX.Element} The rendered ChatScreen component.
  */
 export const ChatScreen = ({ route }) => {
-   const [message, setMessage] = useState('');
    const insets = useSafeAreaInsets();
-   const messages = [
+   const [message, setMessage] = useState('');
+   const [messages, setMessages] = useState([
       {
          user: 0,
          time: '12:00',
@@ -123,12 +123,15 @@ export const ChatScreen = ({ route }) => {
          time: '12:01',
          content: 'Hello, my name is Viet',
       },
-   ];
+   ]);
+   const sendMessage = () => {
+      setMessages([{ user: 0, time: '12:00', content: message.trim() }, ...messages]);
+      setMessage('');
+   };
    return (
       <KeyboardAvoidingView
          enabled
-         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-         keyboardVerticalOffset={60}
+         {...(Platform.OS === 'ios' && { behavior: 'padding', keyboardVerticalOffset: 60 })}
          style={{ flexGrow: 1 }}
       >
          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -143,12 +146,13 @@ export const ChatScreen = ({ route }) => {
                <View style={[styles.chatContainer, { paddingBottom: insets.bottom }]}>
                   <IconButton icon="sticker-emoji" size={28} iconColor="#333" />
                   <TextInput
+                     multiline
                      style={styles.input}
                      value={message}
-                     onChangeText={(text) => setMessage(text)}
                      placeholder="Message"
                      placeholderTextColor={'#888'}
                      underlineColorAndroid="transparent"
+                     onChangeText={(text) => setMessage(text)}
                   />
                   {!message ? (
                      <>
@@ -157,7 +161,7 @@ export const ChatScreen = ({ route }) => {
                         <IconButton icon="file-image" size={32} iconColor="#333" />
                      </>
                   ) : (
-                     <IconButton icon="send-circle" size={32} iconColor="#4D9DF7" />
+                     <IconButton icon="send-circle" size={32} iconColor="#4D9DF7" onPress={sendMessage} />
                   )}
                </View>
             </View>

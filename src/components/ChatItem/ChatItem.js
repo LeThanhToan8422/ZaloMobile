@@ -3,7 +3,7 @@ import { Image, Pressable, Text, View } from 'react-native';
 import styles from './styles';
 
 export const ChatItem = ({ navigation, data }) => {
-   const { name, message, time, avatar } = data;
+   const { name, member, message, time, avatar } = data;
    const [numberMessageUnread, setNumberMessageUnread] = useState(data.numberMessageUnread || 0);
    return (
       <Pressable style={styles.container} onPress={() => navigation.navigate('ChatScreen', data)}>

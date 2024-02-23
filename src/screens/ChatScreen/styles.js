@@ -10,7 +10,6 @@ const styles = StyleSheet.create({
       alignItems: 'center',
    },
    input: {
-      height: 40,
       fontSize: 16,
       flex: 1,
    },

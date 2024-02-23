@@ -18,7 +18,7 @@ const styles = StyleSheet.create({
    avatar: {
       width: 25,
       height: 25,
-      borderRadius: 10,
+      borderRadius: 25 / 2,
       marginRight: 10,
    },
    content: {},

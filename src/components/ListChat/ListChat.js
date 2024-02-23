@@ -23,7 +23,8 @@ export const ListChat = ({ navigation }) => {
       },
       {
          id: 3,
-         name: 'Nguyễn Văn C',
+         name: 'Zalo Fake',
+         member: 3,
          message: 'Hello',
          time: '10:00',
          avatar: 'https://picsum.photos/200',
@@ -39,7 +40,8 @@ export const ListChat = ({ navigation }) => {
       },
       {
          id: 5,
-         name: 'Nguyễn Văn E',
+         name: 'Tết đong đầy',
+         member: 7,
          message: 'Hello',
          time: '10:00',
          avatar: 'https://picsum.photos/200',

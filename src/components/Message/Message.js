@@ -19,10 +19,10 @@ export const Message = ({ data, index }) => {
    return (
       <TouchableOpacity>
          <View
-            style={[styles.container, user ? { alignSelf: 'flex-end' } : {}, index === 0 ? { marginBottom: 20 } : {}]}
+            style={[styles.container, !user ? { alignSelf: 'flex-end' } : {}, index === 0 ? { marginBottom: 20 } : {}]}
          >
-            {user ? null : <Image source={{ uri: avatar }} style={styles.avatar} />}
-            <View style={[styles.messageContainer, user ? { backgroundColor: '#CFF0FF' } : {}]}>
+            {user ? <Image source={{ uri: avatar }} style={styles.avatar} /> : null}
+            <View style={[styles.messageContainer, !user ? { backgroundColor: '#CFF0FF' } : {}]}>
                <Text style={styles.content}>{content}</Text>
                <Text style={styles.time}>{time}</Text>
             </View>

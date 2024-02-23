@@ -18,8 +18,9 @@ const styles = StyleSheet.create({
       flexDirection: 'row',
       alignItems: 'center',
    },
-   text: {
-      color: 'white',
+   searchInput: {
+      flex: 1,
+      backgroundColor: 'transparent',
       marginLeft: 8,
       fontSize: 16,
       paddingHorizontal: 15,
