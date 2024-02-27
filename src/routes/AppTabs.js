@@ -3,10 +3,8 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import React from 'react';
 import HeaderApp from '../components/HeaderApp';
 import ContactScreen from '../screens/ContactScreen';
-import DiscoveryScreen from '../screens/DiscoveryScreen';
 import MessageScreen from '../screens/MessageScreen';
 import PersonalScreen from '../screens/PersonalScreen';
-import TimelineScreen from '../screens/TimelineScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -21,10 +19,6 @@ const AppTabs = () => {
                   iconName = focused ? 'ios-chatbubbles' : 'ios-chatbubbles-outline';
                } else if (route.name === 'Danh bạ') {
                   iconName = focused ? 'ios-people' : 'ios-people-outline';
-               } else if (route.name === 'Khám phá') {
-                  iconName = focused ? 'ios-compass' : 'ios-compass-outline';
-               } else if (route.name === 'Nhật ký') {
-                  iconName = focused ? 'ios-time' : 'ios-time-outline';
                } else if (route.name === 'Cá nhân') {
                   iconName = focused ? 'ios-person' : 'ios-person-outline';
                }
@@ -48,20 +42,6 @@ const AppTabs = () => {
             component={ContactScreen}
             options={{
                header: (props) => <HeaderApp {...props} type="contact" />,
-            }}
-         />
-         <Tab.Screen
-            name="Khám phá"
-            component={DiscoveryScreen}
-            options={{
-               header: (props) => <HeaderApp {...props} type="discovery" />,
-            }}
-         />
-         <Tab.Screen
-            name="Nhật ký"
-            component={TimelineScreen}
-            options={{
-               header: (props) => <HeaderApp {...props} type="timeline" />,
             }}
          />
          <Tab.Screen
