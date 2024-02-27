@@ -7,22 +7,23 @@ const styles = StyleSheet.create({
       flexDirection: 'row',
       alignItems: 'center',
       width: '100%',
+      backgroundColor: '#4D9DF7',
    },
-   containerSearch: {
+   containerLeft: {
       flexDirection: 'row',
       alignItems: 'center',
-      backgroundColor: '#4D9DF7',
       paddingHorizontal: 5,
-   },
-   text: {
-      color: 'white',
-      marginLeft: 16,
-      fontSize: 16,
-      paddingHorizontal: 15,
    },
    containerIconRight: {
       flexDirection: 'row',
       alignItems: 'center',
+   },
+   searchInput: {
+      flex: 1,
+      backgroundColor: 'transparent',
+      marginLeft: 8,
+      fontSize: 16,
+      paddingHorizontal: 15,
    },
 });
 

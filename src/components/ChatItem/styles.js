@@ -37,15 +37,10 @@ const styles = StyleSheet.create({
       color: '#333',
    },
    qtyNotification: {
-      backgroundColor: '#EF4D48',
       fontSize: 12,
       color: '#fff',
-      width: 28,
-      height: 18,
-      borderRadius: 10,
       textAlign: 'center',
-      lineHeight: 18,
-      overflow: 'hidden',
+      textAlignVertical: 'center',
    },
 });
 
