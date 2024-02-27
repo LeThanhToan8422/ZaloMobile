@@ -3,11 +3,12 @@ import { Image, Pressable, Text, View } from 'react-native';
 import styles from './styles';
 
 export const ChatItem = ({ navigation, data }) => {
-   const { name, member, message, time, avatar } = data;
+   const { name, member, message, dateTimeSend } = data;
    const [numberMessageUnread, setNumberMessageUnread] = useState(data.numberMessageUnread || 0);
+   const image = 'https://picsum.photos/200';
    return (
       <Pressable style={styles.container} onPress={() => navigation.navigate('ChatScreen', data)}>
-         <Image source={{ uri: avatar }} style={styles.image} />
+         <Image source={{ uri: image }} style={styles.image} />
          <View style={styles.contentContainer}>
             <View style={{ flex: 1, marginLeft: 10, rowGap: 4 }}>
                <Text style={styles.name}>{name}</Text>
@@ -16,8 +17,7 @@ export const ChatItem = ({ navigation, data }) => {
                </Text>
             </View>
             <View style={{ alignItems: 'center', rowGap: 4 }}>
-               <Text style={styles.time}>{time}</Text>
-
+               <Text style={styles.time}>{dateTimeSend.split(' ')[1].split(':', 2).join(':')}</Text>
                {numberMessageUnread ? (
                   <View
                      style={{
