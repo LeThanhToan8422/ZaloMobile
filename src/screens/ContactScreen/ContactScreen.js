@@ -1,10 +1,7 @@
-import { View, Text } from 'react-native';
-import React from 'react';
-import styles from './styles';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
+import React from 'react';
 import Friend from './FriendTab';
 import Group from './GroupTab';
-import OA from './OA';
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -23,7 +20,6 @@ export const ContactScreen = () => {
       >
          <Tab.Screen name="Bạn bè" component={Friend} options={{ tabBarContentContainerStyle: { height: 40 } }} />
          <Tab.Screen name="Nhóm" component={Group} options={{ tabBarContentContainerStyle: { height: 40 } }} />
-         <Tab.Screen name="OA" component={OA} options={{ tabBarContentContainerStyle: { height: 40 } }} />
       </Tab.Navigator>
    );
 };
