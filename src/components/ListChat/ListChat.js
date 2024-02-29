@@ -4,6 +4,11 @@ import { FlatList } from 'react-native';
 import ChatItem from '../ChatItem';
 import axios from 'axios';
 
+/**
+ * Represents a component that displays a list of chats.
+ * @param {object} navigation - The navigation object used for navigating between screens.
+ * @returns {JSX.Element} The rendered ListChat component.
+ */
 export const ListChat = ({ navigation }) => {
    const [data, setData] = useState([]);
    useEffect(() => {
