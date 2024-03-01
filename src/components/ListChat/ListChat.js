@@ -9,21 +9,12 @@ import axios from 'axios';
  * @param {object} navigation - The navigation object used for navigating between screens.
  * @returns {JSX.Element} The rendered ListChat component.
  */
-export const ListChat = ({ navigation }) => {
-   const [data, setData] = useState([]);
-   useEffect(() => {
-      getApiChatsByUserId();
-   }, []);
-
-   // Func Call API to get data
-   const getApiChatsByUserId = async (userID) => {
-      const res = await axios.get(`http://localhost:8080/user/get-chats-by-id/1`);
-      setData(res.data);
-   };
+export const ListChat = ({ chats, navigation, ...props }) => {
+   // const { chats, navigation } = props;
    return (
-      <View>
+      <View {...props}>
          <FlatList
-            data={data}
+            data={chats}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => <ChatItem navigation={navigation} data={item} />}
          />

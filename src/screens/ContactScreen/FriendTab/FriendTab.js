@@ -1,45 +1,44 @@
 import { View, Text, SectionList } from 'react-native';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styles from './styles';
 import { ContactItem } from '../../../components/ContactItem/ContactItem';
+import axios from 'axios';
 
 export const FriendTab = () => {
-   const data = [
-      {
-         title: 'A',
-         data: [
-            { name: 'Anh Tuan', image: 'https://picsum.photos/200' },
-            { name: 'Anh Khang', image: 'https://picsum.photos/200' },
-         ],
-      },
-      {
-         title: 'B',
-         data: [
-            { name: 'Binh', image: 'https://picsum.photos/200' },
-            { name: 'Bao', image: 'https://picsum.photos/200' },
-            { name: 'Bang', image: 'https://picsum.photos/200' },
-         ],
-      },
-      {
-         title: 'C',
-         data: [
-            { name: 'Cuong', image: 'https://picsum.photos/200' },
-            { name: 'Chau', image: 'https://picsum.photos/200' },
-         ],
-      },
-      {
-         title: 'D',
-         data: [
-            { name: 'Dung', image: 'https://picsum.photos/200' },
-            { name: 'Duc', image: 'https://picsum.photos/200' },
-            { name: 'Dai', image: 'https://picsum.photos/200' },
-         ],
-      },
-   ];
+   // {
+   //    title: 'A',
+   //    data: [
+   //       { name: 'Anh Tuan', image: 'https://picsum.photos/200' },
+   //       { name: 'Anh Khang', image: 'https://picsum.photos/200' },
+   //    ],
+   // },
+   // {
+   //    title: 'A',
+   //    data: [
+   //       { name: 'Anh Tuan', image: 'https://picsum.photos/200' },
+   //       { name: 'Anh Khang', image: 'https://picsum.photos/200' },
+   //    ],
+   // },
+   const [contacts, setContacts] = useState([]);
+   useEffect(() => {
+      getContacts();
+   }, []);
+   const getContacts = async () => {
+      const res = await axios.get('http://localhost:8080/relationship/get-friends-of-1/');
+      const transformedData = res.data.reduce((acc, obj) => {
+         const title = obj.name.charAt(0).toUpperCase();
+         const existingTitle = acc.find((item) => item.title === title);
+         obj.image = 'https://picsum.photos/200';
+         if (existingTitle) existingTitle.data.push(obj);
+         else acc.push({ title, data: [obj] });
+         return acc;
+      }, []);
+      setContacts(transformedData);
+   };
    return (
       <View style={styles.container}>
          <SectionList
-            sections={data}
+            sections={contacts}
             renderItem={({ item }) => <ContactItem name={item.name} image={item.image} />}
             renderSectionHeader={({ section }) => <Text style={styles.title}>{section.title}</Text>}
             keyExtractor={(item, index) => item + index}

@@ -13,6 +13,8 @@ const styles = StyleSheet.create({
    addBtn: {
       borderRadius: 0,
       borderColor: '#4885FE',
+      marginBottom: 10,
+      backgroundColor: '#fff',
    },
    iconAdd: {
       padding: 10,
