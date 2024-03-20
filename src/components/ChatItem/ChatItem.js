@@ -2,6 +2,21 @@ import React, { useState } from 'react';
 import { Image, Pressable, Text, View } from 'react-native';
 import styles from './styles';
 
+/**
+ * Represents a chat item component.
+ *
+ * @component
+ * @param {Object} props
+ * @param {object} props.navigation - The navigation object.
+ * @param {object} props.data - The data object containing chat information.
+ * @param {number} props.data.id - The ID of the chat.
+ * @param {string} props.data.name - The name of the chat.
+ * @param {string} props.data.member - The member of the chat.
+ * @param {string} props.data.message - The message of the chat.
+ * @param {Date} props.data.dateTimeSend - The time when the message was sent.
+ * @param {number} props.data.numberMessageUnread - The number of unread messages.
+ * @returns {JSX.Element} The rendered chat item component.
+ */
 export const ChatItem = ({ navigation, data }) => {
    const { name, member, message, dateTimeSend } = data;
    const [numberMessageUnread, setNumberMessageUnread] = useState(data.numberMessageUnread || 0);

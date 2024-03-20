@@ -6,7 +6,7 @@ const styles = StyleSheet.create({
       height: '100%',
    },
    title: {
-      fontSize: 20,
+      fontSize: 16,
       fontWeight: 500,
    },
 });

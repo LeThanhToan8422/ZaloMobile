@@ -8,9 +8,9 @@ const styles = StyleSheet.create({
       alignItems: 'center',
    },
    image: {
-      width: 50,
-      height: 50,
-      borderRadius: 25,
+      width: 45,
+      height: 45,
+      borderRadius: 45 / 2,
    },
    name: {
       fontSize: 18,
