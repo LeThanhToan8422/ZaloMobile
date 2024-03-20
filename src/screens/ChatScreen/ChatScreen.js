@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
    FlatList,
    Keyboard,
@@ -12,6 +12,9 @@ import { IconButton } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Message from '../../components/Message';
 import styles from './styles';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getUserID } from '../../utils/storage';
 
 /**
  * ChatScreen component. This component is used to render the chat screen.
@@ -20,114 +23,41 @@ import styles from './styles';
  * @returns {JSX.Element} The rendered ChatScreen component.
  */
 export const ChatScreen = ({ route }) => {
+   const [id, setID] = useState();
+   const friendID = route.params.id;
+   const [messages, setMessages] = useState([]);
    const insets = useSafeAreaInsets();
    const [message, setMessage] = useState('');
-   const [messages, setMessages] = useState([
-      {
-         user: 0,
-         time: '12:00',
-         content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit',
-      },
-      {
-         user: 0,
-         time: '12:01',
-         content: 'Hello, my name is Viet',
-      },
-      {
-         user: 1,
-         time: '12:00',
-         content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit',
-      },
-      {
-         user: 1,
-         time: '12:01',
-         content: 'Hello, my name is Viet',
-      },
-      {
-         user: 0,
-         time: '12:00',
-         content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit',
-      },
-      {
-         user: 0,
-         time: '12:01',
-         content: 'Hello, my name is Viet',
-      },
-      {
-         user: 1,
-         time: '12:00',
-         content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit',
-      },
-      {
-         user: 1,
-         time: '12:01',
-         content: 'Hello, my name is Viet',
-      },
-      {
-         user: 0,
-         time: '12:00',
-         content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit',
-      },
-      {
-         user: 0,
-         time: '12:01',
-         content: 'Hello, my name is Viet',
-      },
-      {
-         user: 1,
-         time: '12:00',
-         content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit',
-      },
-      {
-         user: 1,
-         time: '12:01',
-         content: 'Hello, my name is Viet',
-      },
-      {
-         user: 0,
-         time: '12:00',
-         content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit',
-      },
-      {
-         user: 0,
-         time: '12:01',
-         content: 'Hello, my name is Viet',
-      },
-      {
-         user: 1,
-         time: '12:00',
-         content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit',
-      },
-      {
-         user: 1,
-         time: '12:01',
-         content: 'Hello, my name is Viet',
-      },
-      {
-         user: 0,
-         time: '12:00',
-         content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit',
-      },
-      {
-         user: 0,
-         time: '12:01',
-         content: 'Hello, my name is Viet',
-      },
-      {
-         user: 1,
-         time: '12:00',
-         content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit',
-      },
-      {
-         user: 1,
-         time: '12:01',
-         content: 'Hello, my name is Viet',
-      },
-   ]);
+
+   useEffect(() => {
+      getUserID().then((id) => {
+         getMessagesOfChat(id, friendID);
+         setID(id);
+      });
+   }, []);
+
+   /**
+    * Sends a message.
+    *
+    * @returns {void}
+    */
    const sendMessage = () => {
-      setMessages([{ user: 0, time: '12:00', content: message.trim() }, ...messages]);
+      setMessages([{ user: 0, time: Date.now(), content: message.trim() }, ...messages]);
       setMessage('');
    };
+
+   /**
+    * Gets the messages of a chat.
+    *
+    * @param {number} userID - The user ID.
+    * @param {number} friendID - The friend ID.
+    * @returns {void}
+    */
+   const getMessagesOfChat = async (userID, friendID) => {
+      let datas = await axios.get(`http://localhost:8080/chat/content-chats-between-users/${userID}-and-${friendID}`);
+      setMessages(datas.data);
+   };
+
    return (
       <KeyboardAvoidingView
          enabled
@@ -140,7 +70,7 @@ export const ChatScreen = ({ route }) => {
                   inverted
                   data={messages}
                   style={{ flexGrow: 1, backgroundColor: '#E2E8F1' }}
-                  renderItem={({ item, index }) => <Message data={item} index={index} />}
+                  renderItem={({ item, index }) => <Message data={item} index={index} localUserID={id} />}
                   keyExtractor={(_, index) => index.toString()}
                />
                <View style={[styles.chatContainer, { paddingBottom: insets.bottom }]}>
