@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
 import styles from './styles';
-import { getUserID } from '../../utils/storage';
 
 /**
  * Message component. This component is used to render a message.

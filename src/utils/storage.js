@@ -10,4 +10,21 @@ const getUserID = async () => {
    }
 };
 
+/**
+ * Store data in local, when user login
+ *
+ * @param {Object} value - The value to store.
+ * @param {string} value.phone - The phone number of the user.
+ * @param {string} value.password - The password of the user.
+ * @param {string} value.id - The id of the user.
+ */
+const storeData = async (value) => {
+   try {
+      const jsonValue = JSON.stringify(value);
+      await AsyncStorage.setItem('@user', jsonValue);
+   } catch (e) {
+      // saving error
+   }
+};
+
 export { getUserID };

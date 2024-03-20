@@ -13,8 +13,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Message from '../../components/Message';
 import styles from './styles';
 import axios from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getUserID } from '../../utils/storage';
+import client from '../../utils/socket';
 
 /**
  * ChatScreen component. This component is used to render the chat screen.
@@ -23,7 +23,7 @@ import { getUserID } from '../../utils/storage';
  * @returns {JSX.Element} The rendered ChatScreen component.
  */
 export const ChatScreen = ({ route }) => {
-   const [id, setID] = useState();
+   const [userID, setUserID] = useState();
    const friendID = route.params.id;
    const [messages, setMessages] = useState([]);
    const insets = useSafeAreaInsets();
@@ -32,9 +32,17 @@ export const ChatScreen = ({ route }) => {
    useEffect(() => {
       getUserID().then((id) => {
          getMessagesOfChat(id, friendID);
-         setID(id);
+         setUserID(id);
       });
-   }, []);
+
+      client.subscribe(
+         `/topic/messages/${userID < friendID ? `${userID}${friendID}` : `${friendID}${userID}`}`,
+         (message) => {
+            const receivedmessage = JSON.parse(message.body);
+            setMessages((prev) => [...prev, receivedmessage]);
+         }
+      );
+   }, [JSON.stringify(messages)]);
 
    /**
     * Sends a message.
@@ -42,7 +50,15 @@ export const ChatScreen = ({ route }) => {
     * @returns {void}
     */
    const sendMessage = () => {
-      setMessages([{ user: 0, time: Date.now(), content: message.trim() }, ...messages]);
+      client.send(
+         `/app/chat/${userID < friendID ? `${userID}${friendID}` : `${friendID}${userID}`}`,
+         {},
+         JSON.stringify({
+            message: message,
+            sender: userID,
+            receiver: friendID,
+         })
+      );
       setMessage('');
    };
 
@@ -70,7 +86,7 @@ export const ChatScreen = ({ route }) => {
                   inverted
                   data={messages}
                   style={{ flexGrow: 1, backgroundColor: '#E2E8F1' }}
-                  renderItem={({ item, index }) => <Message data={item} index={index} localUserID={id} />}
+                  renderItem={({ item, index }) => <Message data={item} index={index} localUserID={userID} />}
                   keyExtractor={(_, index) => index.toString()}
                />
                <View style={[styles.chatContainer, { paddingBottom: insets.bottom }]}>
