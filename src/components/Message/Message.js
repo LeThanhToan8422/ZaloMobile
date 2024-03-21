@@ -5,26 +5,33 @@ import styles from './styles';
 /**
  * Message component. This component is used to render a message.
  *
+ * @component
  * @param {Object} props - The props for the Message component.
  * @param {Object} props.data - The data for the message.
  * @param {string} props.data.user - The user who sent the message.
- * @param {string} props.data.time - The time when the message was sent.
- * @param {string} props.data.content - The content of the message.
+ * @param {Date} props.data.dateTimeSend - The time when the message was sent.
+ * @param {string} props.data.message - The content of the message.
  * @param {number} props.index - The index of the message.
  * @returns {JSX.Element} The rendered Message component.
  */
-export const Message = ({ data, index }) => {
-   const { user, time, content } = data;
+export const Message = ({ data, index, localUserID }) => {
+   const { dateTimeSend, message } = data;
+   const id = data.sender.id;
+
    const avatar = 'https://picsum.photos/200';
    return (
       <TouchableOpacity>
          <View
-            style={[styles.container, !user ? { alignSelf: 'flex-end' } : {}, index === 0 ? { marginBottom: 20 } : {}]}
+            style={[
+               styles.container,
+               id === localUserID ? { alignSelf: 'flex-end' } : {},
+               index === 0 ? { marginBottom: 20 } : {},
+            ]}
          >
-            {user ? <Image source={{ uri: avatar }} style={styles.avatar} /> : null}
-            <View style={[styles.messageContainer, !user ? { backgroundColor: '#CFF0FF' } : {}]}>
-               <Text style={styles.content}>{content}</Text>
-               <Text style={styles.time}>{time}</Text>
+            {id !== localUserID ? <Image source={{ uri: avatar }} style={styles.avatar} /> : null}
+            <View style={[styles.messageContainer, id === localUserID ? { backgroundColor: '#CFF0FF' } : {}]}>
+               <Text style={styles.content}>{message}</Text>
+               <Text style={styles.time}>{dateTimeSend.split('T')[1].split('.')[0].split(':', 2).join(':')}</Text>
             </View>
          </View>
       </TouchableOpacity>
