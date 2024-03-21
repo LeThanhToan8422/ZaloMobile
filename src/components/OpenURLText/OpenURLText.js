@@ -13,7 +13,7 @@ export const OpenURLText = ({ url, children }) => {
       }
    }, [url]);
    return (
-      <Text style={styles.link} onPress={handlePress}>
+      <Text style={[styles.link]} onPress={handlePress}>
          {children}
       </Text>
    );

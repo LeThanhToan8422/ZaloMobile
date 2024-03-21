@@ -1,1 +1,1 @@
-export { OpenURLText } from './OpenURLText';
+export { OpenURLText as default } from './OpenURLText';
