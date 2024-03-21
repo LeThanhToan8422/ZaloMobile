@@ -22,7 +22,7 @@ export const ChatItem = ({ navigation, data }) => {
    const [numberMessageUnread, setNumberMessageUnread] = useState(data.numberMessageUnread || 0);
    const image = 'https://picsum.photos/200';
    return (
-      <Pressable style={styles.container} onPress={() => navigation.navigate('ChatScreen', data)}>
+      <Pressable style={styles.container} onPress={() => navigation.push('ChatScreen', data)}>
          <Image source={{ uri: image }} style={styles.image} />
          <View style={styles.contentContainer}>
             <View style={{ flex: 1, marginLeft: 10, rowGap: 4 }}>

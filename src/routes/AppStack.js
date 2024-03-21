@@ -5,6 +5,7 @@ import React from 'react';
 import HeaderApp from '../components/HeaderApp';
 import ChatScreen from '../screens/ChatScreen';
 import AppTabs from './AppTabs';
+import SettingScreen from '../screens/SettingScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -25,6 +26,21 @@ const AppStack = ({ navigation }) => {
                      type="chat"
                      title={route.params.name}
                      member={route.params.member}
+                     headerHeight={headerHeight}
+                  />
+               ),
+            })}
+         />
+         <Stack.Screen
+            name="SettingScreen"
+            component={SettingScreen}
+            options={() => ({
+               header: (props) => (
+                  <HeaderApp
+                     {...props}
+                     navigation={navigation}
+                     type="settings"
+                     title="Cài đặt"
                      headerHeight={headerHeight}
                   />
                ),

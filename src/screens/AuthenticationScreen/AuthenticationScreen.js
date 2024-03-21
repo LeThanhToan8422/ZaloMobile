@@ -1,22 +1,19 @@
-import { View, Text, Image } from 'react-native';
-import React, { useState } from 'react';
-import styles from './styles';
-import IntroSlider from '../../components/IntroSlider';
+import React from 'react';
+import { Image, View } from 'react-native';
 import { Button } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import IntroSlider from '../../components/IntroSlider';
+import styles from './styles';
 
 export const AuthenticationScreen = ({ navigation }) => {
    const insets = useSafeAreaInsets();
-   const [isEnglish, setIsEnglish] = useState(false);
    return (
       <View
          style={[
             styles.container,
             {
-               paddingTop: insets.top,
-               paddingBottom: insets.bottom,
-               paddingHorizontal: insets.left,
-               paddingVertical: insets.right,
+               paddingTop: 2 * insets.top,
+               paddingBottom: insets.bottom ? 3 * insets.bottom : 30,
             },
          ]}
       >
@@ -28,7 +25,7 @@ export const AuthenticationScreen = ({ navigation }) => {
             <Button
                mode="contained"
                style={[styles.button, { backgroundColor: '#4A8CFE' }]}
-               contentStyle={styles.button}
+               contentStyle={{ width: '100%' }}
                onPress={() => navigation.navigate('Login')}
             >
                Đăng nhập
@@ -40,24 +37,6 @@ export const AuthenticationScreen = ({ navigation }) => {
                onPress={() => navigation.navigate('Register')}
             >
                Đăng ký
-            </Button>
-         </View>
-         <View style={styles.languageContainer}>
-            <Button
-               mode="text"
-               labelStyle={[styles.buttonText, !isEnglish ? styles.buttonActive : '']}
-               style={[styles.buttonLang, !isEnglish ? styles.buttonActive : '']}
-               onPress={() => setIsEnglish(false)}
-            >
-               Tiếng Việt
-            </Button>
-            <Button
-               mode="text"
-               labelStyle={[styles.buttonText, isEnglish ? styles.buttonActive : '']}
-               style={[styles.buttonLang, isEnglish ? styles.buttonActive : '']}
-               onPress={() => setIsEnglish(true)}
-            >
-               English
             </Button>
          </View>
       </View>

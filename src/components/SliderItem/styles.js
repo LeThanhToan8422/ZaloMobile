@@ -9,8 +9,9 @@ const styles = StyleSheet.create({
       rowGap: 30,
    },
    image: {
-      width: 100,
-      height: 33,
+      width: 200,
+      height: 200,
+      objectFit: 'contain',
    },
    title: {
       fontSize: 20,

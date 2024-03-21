@@ -14,13 +14,13 @@ const Router = () => {
    const [userID, setUserID] = useState(1);
    useEffect(() => {
       checkLogin();
-      // storeData({ phone: '123', password: '123', id: userID });
    }, []);
+
    const checkLogin = async () => {
       try {
          const jsonValue = await AsyncStorage.getItem('@user');
          const params = jsonValue != null ? JSON.parse(jsonValue) : null;
-         if (!params) setUserID(null);
+         if (!params) return setUserID(null);
          let res = await axios.post(`${SERVER_HOST}:${PORT}/account`, params);
          setUserID(res.data ? res.data.id : null);
       } catch (e) {
@@ -28,16 +28,12 @@ const Router = () => {
          console.error(e);
       }
    };
-
    return (
       <SafeAreaProvider>
          <NavigationContainer>
-            <Stack.Navigator>
-               {userID ? (
-                  <Stack.Screen name="AppStack" component={AppStack} options={{ headerShown: false }} />
-               ) : (
-                  <Stack.Screen name="AuthStack" component={AuthStack} options={{ headerShown: false }} />
-               )}
+            <Stack.Navigator initialRouteName={userID ? 'AppStack' : 'AuthStack'}>
+               <Stack.Screen name="AppStack" component={AppStack} options={{ headerShown: false }} />
+               <Stack.Screen name="AuthStack" component={AuthStack} options={{ headerShown: false }} />
             </Stack.Navigator>
          </NavigationContainer>
       </SafeAreaProvider>

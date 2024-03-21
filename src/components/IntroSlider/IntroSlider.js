@@ -11,19 +11,19 @@ export const IntroSlider = () => {
          id: 1,
          title: 'Chào mừng bạn đến với Zalo',
          description: 'Đăng nhập để bắt đầu',
-         image: require('../../assets/images/zalo.png'),
+         image: require('../../assets/images/slider1.png'),
       },
       {
          id: 2,
          title: 'Tìm bạn bè',
          description: 'Tìm bạn bè trên Zalo',
-         image: require('../../assets/images/zalo.png'),
+         image: require('../../assets/images/slider2.png'),
       },
       {
          id: 3,
          title: 'Chat',
          description: 'Chat với bạn bè',
-         image: require('../../assets/images/zalo.png'),
+         image: require('../../assets/images/slider3.png'),
       },
    ];
    // setInterval(() => {
