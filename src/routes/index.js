@@ -6,6 +6,7 @@ import React, { useEffect, useState } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import AppStack from './AppStack';
 import AuthStack from './AuthStack';
+import { SERVER_HOST, PORT } from '@env';
 
 const Stack = createNativeStackNavigator();
 
@@ -20,7 +21,7 @@ const Router = () => {
          const jsonValue = await AsyncStorage.getItem('@user');
          const params = jsonValue != null ? JSON.parse(jsonValue) : null;
          if (!params) setUserID(null);
-         let res = await axios.post('http://localhost:8080/account', params);
+         let res = await axios.post(`${SERVER_HOST}:${PORT}/account`, params);
          setUserID(res.data ? res.data.id : null);
       } catch (e) {
          setUserID(null);

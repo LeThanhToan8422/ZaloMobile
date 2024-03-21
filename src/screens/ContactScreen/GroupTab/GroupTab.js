@@ -5,6 +5,7 @@ import { View } from 'react-native';
 import { Button } from 'react-native-paper';
 import ListChat from '../../../components/ListChat';
 import styles from './styles';
+import { SERVER_HOST, PORT } from '@env';
 
 export const GroupTab = ({ navigation }) => {
    const [data, setData] = useState([]);
@@ -14,7 +15,7 @@ export const GroupTab = ({ navigation }) => {
 
    // Func Call API to get data
    const getApiChatsByUserId = async (userID) => {
-      const res = await axios.get(`http://localhost:8080/user/get-chats-by-id/2`);
+      const res = await axios.get(`${SERVER_HOST}:${PORT}/user/get-chats-by-id/2`);
       setData(res.data);
    };
    return (

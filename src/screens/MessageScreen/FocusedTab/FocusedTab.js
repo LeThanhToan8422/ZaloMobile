@@ -1,6 +1,8 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import ListChat from '../../../components/ListChat';
+import { getUserID } from '../../../utils/storage';
+import { SERVER_HOST, PORT } from '@env';
 
 /**
  * Represents the FocusedTab component.
@@ -13,7 +15,9 @@ export const FocusedTab = ({ navigation }) => {
    const [data, setData] = useState([]);
 
    useEffect(() => {
-      getApiChatsByUserId();
+      getUserID().then((userID) => {
+         getApiChatsByUserId(userID);
+      });
    }, []);
 
    /**
@@ -22,7 +26,7 @@ export const FocusedTab = ({ navigation }) => {
     * @returns {Promise<void>} A Promise that resolves when the API call is complete.
     */
    const getApiChatsByUserId = async (userID) => {
-      const res = await axios.get(`http://localhost:8080/user/get-chats-by-id/1`);
+      const res = await axios.get(`${SERVER_HOST}:${PORT}/user/get-chats-by-id/${userID}`);
       setData(res.data);
    };
 
