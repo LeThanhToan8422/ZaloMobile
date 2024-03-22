@@ -15,6 +15,7 @@ import styles from './styles';
 import axios from 'axios';
 import { getUserID } from '../../utils/storage';
 import client from '../../utils/socket';
+import { SERVER_HOST, PORT } from '@env';
 
 /**
  * ChatScreen component. This component is used to render the chat screen.
@@ -70,7 +71,7 @@ export const ChatScreen = ({ route }) => {
     * @returns {void}
     */
    const getMessagesOfChat = async (userID, friendID) => {
-      let datas = await axios.get(`http://localhost:8080/chat/content-chats-between-users/${userID}-and-${friendID}`);
+      let datas = await axios.get(`${SERVER_HOST}:${PORT}/chat/content-chats-between-users/${userID}-and-${friendID}`);
       setMessages(datas.data);
    };
 

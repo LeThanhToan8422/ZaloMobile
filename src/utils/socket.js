@@ -1,7 +1,8 @@
 import { Stomp } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
+import { SERVER_HOST, PORT } from '@env';
 
-const socket = new SockJS('http://localhost:8080/ws');
+const socket = new SockJS(`${SERVER_HOST}:${PORT}/ws`);
 const client = Stomp.over(() => socket);
 
 client.connect({}, () => {

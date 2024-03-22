@@ -27,4 +27,4 @@ const storeData = async (value) => {
    }
 };
 
-export { getUserID };
+export { getUserID, storeData };

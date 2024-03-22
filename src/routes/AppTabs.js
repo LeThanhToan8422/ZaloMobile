@@ -48,7 +48,7 @@ const AppTabs = () => {
             name="Cá nhân"
             component={PersonalScreen}
             options={{
-               header: (props) => <HeaderApp {...props} />,
+               header: (props) => <HeaderApp {...props} type="personal" />,
             }}
          />
       </Tab.Navigator>
