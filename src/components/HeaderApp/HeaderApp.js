@@ -21,7 +21,7 @@ export const HeaderApp = ({ navigation, props, type, title, member }) => {
                   color="#fff"
                   size={22}
                   icon={(props) => <Entypo {...props} name="chevron-thin-left" />}
-                  onPress={navigation.goBack}
+                  onPress={() => navigation.navigate('AppTabs')}
                   animated={false}
                />
                <Appbar.Content

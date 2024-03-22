@@ -50,7 +50,9 @@ export const LoginScreen = ({ navigation }) => {
                onChangeText={(text) => setPassword(text)}
                value={password}
             />
-            <Button textColor="cornflowerblue">Lấy lại mật khẩu</Button>
+            <Button textColor="cornflowerblue" onPress={() => navigation.navigate('RecoveryPass')}>
+               Lấy lại mật khẩu
+            </Button>
             <Button mode="contained" style={styles.btnStyle} onPress={handleLogin}>
                Đăng nhập
             </Button>
