@@ -17,19 +17,19 @@ import styles from './styles';
  * @returns {ReactNode} The rendered pressable item component.
  */
 
-export const PressableItem = ({ navigation, screenName, icon, title, subtitle, action, ...props }) => {
+export const PressableItem = ({ navigation, screenName, icon, iconStyle, title, subtitle, action, ...props }) => {
    return (
       <Pressable
          style={[props.style, styles.container]}
          onPress={() => (screenName ? navigation.navigate(screenName) : null)}
       >
-         <Icon source={icon} size={22} color="#375FD1" />
+         <Icon source={icon} size={22} color="#375FD1" {...iconStyle} />
          <View style={styles.textContainer}>
             <Text style={styles.title}>{title}</Text>
             {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
          </View>
          <View style={{ marginLeft: 'auto' }}>
-            {action ? action : <Icon source="chevron-right" size={22} color="#999" />}
+            {action === null ? null : action ? action : <Icon source="chevron-right" size={22} color="#999" />}
          </View>
       </Pressable>
    );

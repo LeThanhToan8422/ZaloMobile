@@ -5,7 +5,7 @@ import PhoneInput from 'react-native-phone-number-input';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import styles from './styles';
 
-export const PhoneNumberScreen = () => {
+export const PhoneNumberScreen = ({ navigation }) => {
    const [phone, setPhone] = useState('');
    const insets = useSafeAreaInsets();
    const [valid, setValid] = useState(true);
@@ -14,6 +14,9 @@ export const PhoneNumberScreen = () => {
    const handleRegister = () => {
       const checkValid = phoneInput.current?.isValidNumber(phone);
       setValid(checkValid);
+      if (checkValid) {
+         navigation.navigate('VerifyPhone', { phone });
+      }
    };
 
    return (

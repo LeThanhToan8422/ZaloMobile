@@ -1,10 +1,11 @@
-import { View, Text, SectionList } from 'react-native';
+import { View, Text, SectionList, Pressable } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import styles from './styles';
 import { ContactItem } from '../../../components/ContactItem/ContactItem';
 import axios from 'axios';
 import { SERVER_HOST, PORT } from '@env';
 import { getUserID } from '../../../utils/storage';
+import PressableItem from '../../../components/PressableItem';
 
 export const FriendTab = ({ navigation }) => {
    const [contacts, setContacts] = useState([]);
@@ -29,6 +30,19 @@ export const FriendTab = ({ navigation }) => {
 
    return (
       <View style={styles.container}>
+         <PressableItem
+            title="Lời mời kết bạn"
+            icon="account-multiple-outline"
+            iconStyle={{ size: 28 }}
+            action={null}
+         />
+         <PressableItem
+            title="Danh bạ máy"
+            subtitle="Liên hệ có cùng Zalo"
+            icon="contacts"
+            iconStyle={{ size: 26 }}
+            action={null}
+         />
          <SectionList
             sections={contacts}
             renderItem={({ item }) => <ContactItem navigation={navigation} data={item} />}
@@ -37,6 +51,7 @@ export const FriendTab = ({ navigation }) => {
             ItemSeparatorComponent={() => <View style={{ height: 20 }} />}
             SectionSeparatorComponent={() => <View style={{ height: 10 }} />}
             stickySectionHeadersEnabled={false}
+            style={{ paddingHorizontal: 12 }}
          />
       </View>
    );
