@@ -26,7 +26,7 @@ export const FocusedTab = ({ navigation }) => {
     * @returns {Promise<void>} A Promise that resolves when the API call is complete.
     */
    const getApiChatsByUserId = async (userID) => {
-      const res = await axios.get(`${SERVER_HOST}:${PORT}/user/get-chats-by-id/${userID}`);
+      const res = await axios.get(`${SERVER_HOST}:${PORT}/users/get-chats-by-id/${userID}`);
       setData(res.data);
    };
 

@@ -1,26 +1,6 @@
-import { Stomp } from '@stomp/stompjs';
-import SockJS from 'sockjs-client';
-import { SERVER_HOST, PORT } from '@env';
+import { io } from 'socket.io-client';
 
-const socket = new SockJS(`${SERVER_HOST}:${PORT}/ws`);
-const client = Stomp.over(() => socket);
+// "undefined" means the URL will be computed from the `window.location` object
+const URL = process.env.NODE_ENV === 'production' ? undefined : 'http://localhost:8080';
 
-client.connect({}, () => {
-   console.log('Connected');
-});
-
-client.onConnect = (frame) => {
-   setConnected(true);
-   console.log('Connected: ' + frame);
-};
-
-client.onWebSocketError = (error) => {
-   console.error('Error with websocket', error);
-};
-
-client.onStompError = (frame) => {
-   console.error('Broker reported error: ' + frame.headers['message']);
-   console.error('Additional details: ' + frame.body);
-};
-
-export default client;
+export const socket = io(URL);

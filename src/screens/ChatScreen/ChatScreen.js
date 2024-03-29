@@ -1,3 +1,5 @@
+import { PORT, SERVER_HOST } from '@env';
+import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import {
    FlatList,
@@ -11,11 +13,9 @@ import {
 import { IconButton } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Message from '../../components/Message';
-import styles from './styles';
-import axios from 'axios';
+import { socket } from '../../utils/socket';
 import { getUserID } from '../../utils/storage';
-import client from '../../utils/socket';
-import { SERVER_HOST, PORT } from '@env';
+import styles from './styles';
 
 /**
  * ChatScreen component. This component is used to render the chat screen.
@@ -24,7 +24,7 @@ import { SERVER_HOST, PORT } from '@env';
  * @returns {JSX.Element} The rendered ChatScreen component.
  */
 export const ChatScreen = ({ route }) => {
-   const [userID, setUserID] = useState();
+   const [userID, setUserID] = useState(1);
    const friendID = route.params.id;
    const [messages, setMessages] = useState([]);
    const insets = useSafeAreaInsets();
@@ -32,18 +32,20 @@ export const ChatScreen = ({ route }) => {
 
    useEffect(() => {
       getUserID().then((id) => {
-         getMessagesOfChat(id, friendID);
+         getMessagesOfChat(1, friendID);
          setUserID(id);
       });
+   }, [userID, friendID]);
 
-      client.subscribe(
-         `/topic/messages/${userID < friendID ? `${userID}${friendID}` : `${friendID}${userID}`}`,
-         (message) => {
-            const receivedmessage = JSON.parse(message.body);
-            setMessages((prev) => [...prev, receivedmessage]);
-         }
-      );
-   }, [JSON.stringify(messages)]);
+   useEffect(() => {
+      const onChatEvents = (res) => {
+         setMessages((prev) => [res.data, ...prev]);
+      };
+      const idRoom = userID < friendID ? `${userID}${friendID}` : `${friendID}${userID}`;
+
+      socket.on(`Server-Chat-Room-${idRoom}`, onChatEvents);
+      return () => socket.off(`Server-Chat-Room-${idRoom}`, onChatEvents);
+   }, [socket]);
 
    /**
     * Sends a message.
@@ -51,15 +53,13 @@ export const ChatScreen = ({ route }) => {
     * @returns {void}
     */
    const sendMessage = () => {
-      client.send(
-         `/app/chat/${userID < friendID ? `${userID}${friendID}` : `${friendID}${userID}`}`,
-         {},
-         JSON.stringify({
-            message: message,
-            sender: userID,
-            receiver: friendID,
-         })
-      );
+      socket.emit('Client-Chat-Room', {
+         chatRoom: userID < friendID ? `${userID}${friendID}` : `${friendID}${userID}`,
+         message: message.trim(),
+         dateTimeSend: new Date(),
+         sender: userID,
+         receiver: friendID,
+      });
       setMessage('');
    };
 
@@ -71,8 +71,8 @@ export const ChatScreen = ({ route }) => {
     * @returns {void}
     */
    const getMessagesOfChat = async (userID, friendID) => {
-      let datas = await axios.get(`${SERVER_HOST}:${PORT}/chat/content-chats-between-users/${userID}-and-${friendID}`);
-      setMessages(datas.data);
+      let datas = await axios.get(`${SERVER_HOST}:${PORT}/chats/content-chats-between-users/${userID}-and-${friendID}`);
+      setMessages(datas.data.sort((a, b) => new Date(b.dateTimeSend) - new Date(a.dateTimeSend)));
    };
 
    return (
