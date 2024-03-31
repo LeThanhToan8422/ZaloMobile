@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "619440363043",
+    "project_id": "zalo-764f9",
+    "storage_bucket": "zalo-764f9.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:619440363043:android:bc8ac6a4659b825385c396",
+        "android_client_info": {
+          "package_name": "fit.se.zalomobile"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCnXPcfWFP7tnTPDTacqp07OGYKYTTZaA8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
