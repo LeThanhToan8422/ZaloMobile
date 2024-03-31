@@ -4,7 +4,7 @@ import styles from './styles';
 import PhoneInput from 'react-native-phone-number-input';
 import { Button } from 'react-native-paper';
 
-export const RecoveryPassScreen = () => {
+export const RecoveryPassScreen = ({ navigation }) => {
    const [phone, setPhone] = useState('');
    const [valid, setValid] = useState(true);
    const phoneInput = useRef(null);
@@ -12,6 +12,9 @@ export const RecoveryPassScreen = () => {
    const handleRecovery = () => {
       const checkValid = phoneInput.current?.isValidNumber(phone);
       setValid(checkValid);
+      if (checkValid) {
+         navigation.navigate('VerifyPhone', { phone });
+      }
    };
 
    return (

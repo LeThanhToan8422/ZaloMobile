@@ -1,6 +1,7 @@
 import React from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
 import styles from './styles';
+import { formatTime } from '../../utils/func';
 
 /**
  * Message component. This component is used to render a message.
@@ -16,7 +17,8 @@ import styles from './styles';
  */
 export const Message = ({ data, index, localUserID }) => {
    const { dateTimeSend, message } = data;
-   const id = data.sender.id;
+   // console.log(data);
+   const id = data.sender;
 
    const avatar = 'https://picsum.photos/200';
    return (
@@ -31,7 +33,7 @@ export const Message = ({ data, index, localUserID }) => {
             {id !== localUserID ? <Image source={{ uri: avatar }} style={styles.avatar} /> : null}
             <View style={[styles.messageContainer, id === localUserID ? { backgroundColor: '#CFF0FF' } : {}]}>
                <Text style={styles.content}>{message}</Text>
-               <Text style={styles.time}>{dateTimeSend.split('T')[1].split('.')[0].split(':', 2).join(':')}</Text>
+               <Text style={styles.time}>{formatTime(dateTimeSend)}</Text>
             </View>
          </View>
       </TouchableOpacity>

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Image, Pressable, Text, View } from 'react-native';
 import styles from './styles';
+import { formatTime } from '../../utils/func';
 
 /**
  * Represents a chat item component.
@@ -32,7 +33,7 @@ export const ChatItem = ({ navigation, data }) => {
                </Text>
             </View>
             <View style={{ alignItems: 'center', rowGap: 4 }}>
-               <Text style={styles.time}>{dateTimeSend.split(' ')[1].split(':', 2).join(':')}</Text>
+               <Text style={styles.time}>{formatTime(dateTimeSend)}</Text>
                {numberMessageUnread ? (
                   <View
                      style={{

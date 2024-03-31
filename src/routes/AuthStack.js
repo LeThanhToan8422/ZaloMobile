@@ -6,6 +6,8 @@ import LoginScreen from '../screens/LoginScreen';
 import RegisterScreen from '../screens/RegisterScreen';
 import PhoneNumberScreen from '../screens/RegisterScreen/PhoneNumberScreen';
 import RecoveryPassScreen from '../screens/LoginScreen/RecoveryPassScreen';
+import { VerifyPhoneScreen } from '../screens/VerifyPhoneScreen';
+import PasswordScreen from '../screens/RegisterScreen/PasswordScreen';
 const Stack = createNativeStackNavigator();
 
 const AuthStack = () => {
@@ -64,6 +66,44 @@ const AuthStack = () => {
                   />
                ),
                headerTintColor: '#fff',
+            }}
+         />
+         <Stack.Screen
+            name="VerifyPhone"
+            component={VerifyPhoneScreen}
+            options={{
+               headerTitle: 'Xác thực mã OTP',
+               headerBackground: () => (
+                  <View
+                     style={{
+                        backgroundColor: '#4A8CFE',
+                        flex: 1,
+                        borderBottomWidth: 1,
+                        borderBottomColor: '#ddd',
+                     }}
+                  />
+               ),
+               headerTintColor: '#fff',
+               headerBackTitle: 'Lấy lại mật khẩu',
+            }}
+         />
+         <Stack.Screen
+            name="PasswordScreen"
+            component={PasswordScreen}
+            options={{
+               headerTitle: '',
+               headerBackground: () => (
+                  <View
+                     style={{
+                        backgroundColor: '#4A8CFE',
+                        flex: 1,
+                        borderBottomWidth: 1,
+                        borderBottomColor: '#ddd',
+                     }}
+                  />
+               ),
+               headerTintColor: '#fff',
+               headerBackTitle: '',
             }}
          />
          <Stack.Screen

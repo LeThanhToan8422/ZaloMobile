@@ -11,12 +11,13 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 export const LoginScreen = ({ navigation }) => {
    const [phone, setPhone] = useState('');
    const [password, setPassword] = useState('');
+   const [secPass, setSecPass] = useState(true);
    const insets = useSafeAreaInsets();
 
    const handleLogin = async () => {
       try {
          const params = { phone, password };
-         let res = await axios.post(`${SERVER_HOST}:${PORT}/account`, params);
+         let res = await axios.post(`${SERVER_HOST}:${PORT}/login`, params);
          if (res.data) {
             storeData({ phone, password, id: res.data.id });
             navigation.navigate('AppStack');
@@ -48,7 +49,16 @@ export const LoginScreen = ({ navigation }) => {
                activeUnderlineColor="skyblue"
                style={{ backgroundColor: '#fff' }}
                onChangeText={(text) => setPassword(text)}
+               secureTextEntry={secPass}
                value={password}
+               right={
+                  <TextInput.Icon
+                     icon={secPass ? 'eye-off' : 'eye'}
+                     onPress={() => {
+                        setSecPass(!secPass);
+                     }}
+                  />
+               }
             />
             <Button textColor="cornflowerblue" onPress={() => navigation.navigate('RecoveryPass')}>
                Lấy lại mật khẩu

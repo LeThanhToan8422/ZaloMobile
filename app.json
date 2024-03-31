@@ -13,10 +13,13 @@
       },
       "assetBundlePatterns": ["**/*"],
       "ios": {
-         "bundleIdentifier": "iuh.fit.se",
+         "bundleIdentifier": "fit.se.zalomobile",
+         "googleServicesFile": "./GoogleService-Info.plist",
          "supportsTablet": true
       },
       "android": {
+         "googleServicesFile": "./google-services.json",
+         "package": "fit.se.zalomobile",
          "adaptiveIcon": {
             "foregroundImage": "src/assets/images/zalo_arc.png",
             "backgroundColor": "#ffffff"
@@ -24,6 +27,23 @@
       },
       "web": {
          "favicon": "src/assets/images/zalo_arc.png"
+      },
+      "plugins": [
+         "@react-native-firebase/app",
+         "@react-native-firebase/auth",
+         [
+            "expo-build-properties",
+            {
+               "ios": {
+                  "useFrameworks": "static"
+               }
+            }
+         ]
+      ],
+      "extra": {
+         "eas": {
+            "projectId": "b811f300-26a6-45ff-bfbc-9614825f87fe"
+         }
       }
    }
 }

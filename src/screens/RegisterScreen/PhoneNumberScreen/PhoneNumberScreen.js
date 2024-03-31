@@ -1,11 +1,13 @@
-import React, { useRef, useState } from 'react';
-import { Keyboard, KeyboardAvoidingView, Platform, Text, TouchableWithoutFeedback, View } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { Keyboard, KeyboardAvoidingView, LogBox, Platform, Text, TouchableWithoutFeedback, View } from 'react-native';
 import { IconButton } from 'react-native-paper';
 import PhoneInput from 'react-native-phone-number-input';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import styles from './styles';
 
-export const PhoneNumberScreen = () => {
+LogBox.ignoreLogs(['Non-serializable values were found in the navigation state']);
+
+export const PhoneNumberScreen = ({ navigation, route }) => {
    const [phone, setPhone] = useState('');
    const insets = useSafeAreaInsets();
    const [valid, setValid] = useState(true);
@@ -14,7 +16,14 @@ export const PhoneNumberScreen = () => {
    const handleRegister = () => {
       const checkValid = phoneInput.current?.isValidNumber(phone);
       setValid(checkValid);
+      if (checkValid) {
+         navigation.navigate('VerifyPhone', { ...route.params, phone });
+      }
    };
+
+   useEffect(() => {
+      navigation.setOptions({});
+   });
 
    return (
       <KeyboardAvoidingView
