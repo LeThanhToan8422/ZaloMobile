@@ -4,9 +4,9 @@ import { Button, TextInput } from 'react-native-paper';
 import auth from '@react-native-firebase/auth';
 
 export const VerifyPhoneScreen = ({ navigation, route }) => {
-   const phoneNumber = route.params.phone;
    const [confirm, setConfirm] = useState(null);
    const [code, setCode] = useState('');
+   const phone = route.params?.phone;
 
    // Handle login
    function onAuthStateChanged(user) {
@@ -33,7 +33,7 @@ export const VerifyPhoneScreen = ({ navigation, route }) => {
    async function confirmCode() {
       try {
          await confirm.confirm(code);
-         navigation.navigate('AppStack');
+         navigation.navigate('PasswordScreen', { ...route.params });
       } catch (error) {
          console.log('Invalid code.');
       }

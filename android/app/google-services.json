@@ -1,26 +1,44 @@
 {
   "project_info": {
-    "project_number": "619440363043",
-    "project_id": "zalo-764f9",
-    "storage_bucket": "zalo-764f9.appspot.com"
+    "project_number": "850416716627",
+    "project_id": "zalo2-16113",
+    "storage_bucket": "zalo2-16113.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:619440363043:android:bc8ac6a4659b825385c396",
+        "mobilesdk_app_id": "1:850416716627:android:1a25c8215b937e63556fa6",
         "android_client_info": {
           "package_name": "fit.se.zalomobile"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "850416716627-ss9n6n7s6mvvddi4g4tqvnqjq7sk9tu0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "fit.se.zalomobile",
+            "certificate_hash": "b664434bf95689459107d21ff3828239ea24ccb2"
+          }
+        },
+        {
+          "client_id": "850416716627-sop80n95o9pfvgv6gd4ij2qgimffnkvh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
-          "current_key": "AIzaSyCnXPcfWFP7tnTPDTacqp07OGYKYTTZaA8"
+          "current_key": "AIzaSyDgXJoBO_fylvpgcrAF2Wju8WYnzZVV5C0"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "850416716627-sop80n95o9pfvgv6gd4ij2qgimffnkvh.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

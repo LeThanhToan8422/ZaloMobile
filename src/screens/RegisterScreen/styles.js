@@ -19,6 +19,10 @@ const styles = StyleSheet.create({
    inputContent: {
       paddingLeft: 0,
    },
+   radioButtonView: {
+      flexDirection: 'row',
+      alignItems: 'center',
+   },
    btnNext: {
       position: 'absolute',
       bottom: 20,

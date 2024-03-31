@@ -21,7 +21,7 @@ const Router = () => {
          const jsonValue = await AsyncStorage.getItem('@user');
          const params = jsonValue != null ? JSON.parse(jsonValue) : null;
          if (!params) return setUserID(null);
-         let res = await axios.post(`${SERVER_HOST}:${PORT}/account`, params);
+         let res = await axios.post(`${SERVER_HOST}:${PORT}/login`, params);
          setUserID(res.data ? res.data.id : null);
       } catch (e) {
          setUserID(null);
