@@ -1,9 +1,7 @@
-import { View, Text, Dimensions, Image, ScrollView } from 'react-native';
 import React, { useState } from 'react';
-import styles from './styles';
-import { SafeAreaView } from 'react-native';
-import { FlatList } from 'react-native';
+import { Dimensions, FlatList, SafeAreaView, View } from 'react-native';
 import SliderItem from '../SliderItem';
+import styles from './styles';
 
 export const IntroSlider = () => {
    const slide = [

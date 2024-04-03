@@ -1,8 +1,8 @@
-import { View, Text, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import React, { useRef, useState } from 'react';
-import styles from './styles';
-import PhoneInput from 'react-native-phone-number-input';
+import { Keyboard, KeyboardAvoidingView, Platform, Text, TouchableWithoutFeedback, View } from 'react-native';
 import { Button } from 'react-native-paper';
+import PhoneInput from 'react-native-phone-number-input';
+import styles from './styles';
 
 export const RecoveryPassScreen = ({ navigation }) => {
    const [phone, setPhone] = useState('');

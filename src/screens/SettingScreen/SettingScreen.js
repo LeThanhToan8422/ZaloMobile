@@ -1,7 +1,7 @@
-import { View, Text } from 'react-native';
 import React from 'react';
-import PressableItem from '../../components/PressableItem';
+import { View } from 'react-native';
 import { Button } from 'react-native-paper';
+import PressableItem from '../../components/PressableItem';
 import { storeData } from '../../utils/storage';
 
 export const SettingScreen = ({ navigation }) => {

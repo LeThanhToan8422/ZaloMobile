@@ -1,29 +1,34 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Keyboard, KeyboardAvoidingView, LogBox, Platform, Text, TouchableWithoutFeedback, View } from 'react-native';
+import { PORT, SERVER_HOST } from '@env';
+import axios from 'axios';
+import React, { useRef, useState } from 'react';
+import { Keyboard, KeyboardAvoidingView, Platform, Text, TouchableWithoutFeedback, View } from 'react-native';
 import { IconButton } from 'react-native-paper';
 import PhoneInput from 'react-native-phone-number-input';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Toast from 'react-native-toast-message';
 import styles from './styles';
 
-LogBox.ignoreLogs(['Non-serializable values were found in the navigation state']);
-
-export const PhoneNumberScreen = ({ navigation, route }) => {
+export const PhoneNumberScreen = ({ navigation, route }, props) => {
    const [phone, setPhone] = useState('');
+   const [code, setCode] = useState('+84');
    const insets = useSafeAreaInsets();
    const [valid, setValid] = useState(true);
    const phoneInput = useRef(null);
 
-   const handleRegister = () => {
+   const handleRegister = async () => {
       const checkValid = phoneInput.current?.isValidNumber(phone);
       setValid(checkValid);
-      if (checkValid) {
-         navigation.navigate('VerifyPhone', { ...route.params, phone });
+      if (!checkValid) {
+         Toast.show({ type: 'error', text1: 'Số điện thoại không hợp lệ', position: 'bottom' });
+         return;
       }
+      const checkPhone = await axios.get(`${SERVER_HOST}:${PORT}/accounts/phone/${phone}`);
+      if (checkPhone.data) {
+         Toast.show({ type: 'error', text1: 'Số điện thoại đã tồn tại', position: 'bottom' });
+         return;
+      }
+      navigation.navigate('VerifyPhone', { code, phone, ...route.params });
    };
-
-   useEffect(() => {
-      navigation.setOptions({});
-   });
 
    return (
       <KeyboardAvoidingView
@@ -43,10 +48,10 @@ export const PhoneNumberScreen = ({ navigation, route }) => {
                      onChangeText={(text) => setPhone(text)}
                      textContainerStyle={styles.phoneInputContainer}
                      flagButtonStyle={styles.phoneInputFlagButton}
+                     containerStyle={styles.phoneContainer}
+                     onChangeCountry={(country) => setCode('+' + country.callingCode[0])}
                      autoFocus
                   />
-
-                  <Text style={styles.textError}>{!valid ? 'Số điện thoại không hợp lệ' : null}</Text>
                </View>
                <IconButton
                   style={styles.btnNext}

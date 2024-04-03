@@ -1,4 +1,4 @@
-import { AntDesign, Entypo, Feather, Ionicons, SimpleLineIcons } from '@expo/vector-icons';
+import { AntDesign, Entypo, Feather, Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { Platform, Text, TextInput, View } from 'react-native';
 import { Appbar } from 'react-native-paper';

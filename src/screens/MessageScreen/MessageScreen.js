@@ -1,33 +1,27 @@
-import { View, Text } from 'react-native';
-import React from 'react';
-import styles from './styles';
-import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
-import FocusedTab from './FocusedTab';
-import OtherTab from './OtherTab';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import Chat from '../ChatScreen';
+import { PORT, SERVER_HOST } from '@env';
+import axios from 'axios';
+import React, { useEffect, useState } from 'react';
+import { ListChat } from '../../components/ListChat/ListChat';
+import { getUserID } from '../../utils/storage';
 
-const Tab = createMaterialTopTabNavigator();
-const Stack = createNativeStackNavigator();
+export const MessageScreen = ({ navigation }) => {
+   const [data, setData] = useState([]);
 
-export const MessageScreen = () => {
-   return (
-      <Tab.Navigator
-         screenOptions={{
-            swipeEnabled: false,
-            tabBarLabelStyle: {
-               fontSize: 14,
-               fontWeight: '600',
-               textTransform: 'none',
-               color: '#000',
-            },
-            tabBarItemStyle: {
-               width: 'auto',
-            },
-         }}
-      >
-         <Tab.Screen name="Ưu tiên" component={FocusedTab} options={{ tabBarContentContainerStyle: { height: 40 } }} />
-         <Tab.Screen name="Khác" component={OtherTab} options={{ tabBarContentContainerStyle: { height: 40 } }} />
-      </Tab.Navigator>
-   );
+   useEffect(() => {
+      getUserID().then((userID) => {
+         getApiChatsByUserId(userID);
+      });
+   }, []);
+
+   /**
+    * Calls the API to get chat data by user ID.
+    * @param {number} userID - The user ID.
+    * @returns {Promise<void>} A Promise that resolves when the API call is complete.
+    */
+   const getApiChatsByUserId = async (userID) => {
+      const res = await axios.get(`${SERVER_HOST}:${PORT}/users/get-chats-by-id/${userID}`);
+      setData(res.data);
+   };
+
+   return <ListChat style={{ height: '100%' }} navigation={navigation} chats={data} />;
 };

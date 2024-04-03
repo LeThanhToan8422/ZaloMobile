@@ -3,11 +3,11 @@ import React from 'react';
 import { View } from 'react-native';
 import AuthenticationScreen from '../screens/AuthenticationScreen';
 import LoginScreen from '../screens/LoginScreen';
-import RegisterScreen from '../screens/RegisterScreen';
-import PhoneNumberScreen from '../screens/RegisterScreen/PhoneNumberScreen';
 import RecoveryPassScreen from '../screens/LoginScreen/RecoveryPassScreen';
-import { VerifyPhoneScreen } from '../screens/VerifyPhoneScreen';
+import RegisterScreen from '../screens/RegisterScreen';
 import PasswordScreen from '../screens/RegisterScreen/PasswordScreen';
+import PhoneNumberScreen from '../screens/RegisterScreen/PhoneNumberScreen';
+import { VerifyPhoneScreen } from '../screens/VerifyPhoneScreen';
 const Stack = createNativeStackNavigator();
 
 const AuthStack = () => {

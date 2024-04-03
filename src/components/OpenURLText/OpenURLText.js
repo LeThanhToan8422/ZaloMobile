@@ -1,5 +1,6 @@
-import { View, Text, Linking, Alert } from 'react-native';
 import React, { useCallback } from 'react';
+import { Linking, Text } from 'react-native';
+import Toast from 'react-native-toast-message';
 import styles from './styles';
 
 export const OpenURLText = ({ url, children, ...props }) => {
@@ -9,7 +10,11 @@ export const OpenURLText = ({ url, children, ...props }) => {
       if (supported) {
          await Linking.openURL(url);
       } else {
-         // Alert.alert(`Don't know how to open this URL: ${url}`);
+         Toast.show({
+            type: 'error',
+            text1: 'Error',
+            text2: 'An error occurred while trying to open the link.',
+         });
       }
    }, [url]);
    return (

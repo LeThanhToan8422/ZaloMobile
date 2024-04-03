@@ -1,5 +1,5 @@
-import { View, Text, Pressable } from 'react-native';
 import React from 'react';
+import { Pressable, Text, View } from 'react-native';
 import { Icon } from 'react-native-paper';
 import styles from './styles';
 
