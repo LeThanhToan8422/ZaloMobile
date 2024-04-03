@@ -8,7 +8,7 @@ import styles from './styles';
  *
  * @param {object} props - The component props.
  * @param {object} props.navigation - The navigation object.
- * @param {string} props.screenName - The name of the screen to navigate to.
+ * @param {string} props.navParams - The params to pass to the next screen. Include the screen name and the params.
  * @param {string} props.icon - The source of the icon.
  * @param {string} props.title - The title of the item.
  * @param {string} props.subtitle - The subtitle of the item.
@@ -17,11 +17,11 @@ import styles from './styles';
  * @returns {ReactNode} The rendered pressable item component.
  */
 
-export const PressableItem = ({ navigation, screenName, icon, iconStyle, title, subtitle, action, ...props }) => {
+export const PressableItem = ({ navigation, navParams, icon, iconStyle, title, subtitle, action, ...props }) => {
    return (
       <Pressable
          style={[props.style, styles.container]}
-         onPress={() => (screenName ? navigation.navigate(screenName) : null)}
+         onPress={() => (navParams ? navigation.navigate(navParams.screen, navParams.params) : null)}
       >
          <Icon source={icon} size={22} color="#375FD1" {...iconStyle} />
          <View style={styles.textContainer}>
