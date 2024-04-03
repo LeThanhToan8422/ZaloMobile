@@ -3,21 +3,23 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>619440363043-q1cql75nt24ho54mg07vfkjus6d923bo.apps.googleusercontent.com</string>
+	<string>850416716627-1o5n360luembbueih92e9j65jjp298d0.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.619440363043-q1cql75nt24ho54mg07vfkjus6d923bo</string>
+	<string>com.googleusercontent.apps.850416716627-1o5n360luembbueih92e9j65jjp298d0</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>850416716627-ss9n6n7s6mvvddi4g4tqvnqjq7sk9tu0.apps.googleusercontent.com</string>
 	<key>API_KEY</key>
-	<string>AIzaSyCJxsHGpuugIVIPBXt_VSOqgYz8yVhE65k</string>
+	<string>AIzaSyDBYzKS_IUuU0zH8VwNkM0jyLi_e3HrP5U</string>
 	<key>GCM_SENDER_ID</key>
-	<string>619440363043</string>
+	<string>850416716627</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
 	<string>fit.se.zalomobile</string>
 	<key>PROJECT_ID</key>
-	<string>zalo-764f9</string>
+	<string>zalo2-16113</string>
 	<key>STORAGE_BUCKET</key>
-	<string>zalo-764f9.appspot.com</string>
+	<string>zalo2-16113.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -29,6 +31,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:619440363043:ios:9d4a0b588a3bd4cc85c396</string>
+	<string>1:850416716627:ios:039e57a3d975a915556fa6</string>
 </dict>
 </plist>

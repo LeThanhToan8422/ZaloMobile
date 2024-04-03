@@ -14,11 +14,19 @@
       },
       "oauth_client": [
         {
-          "client_id": "850416716627-ss9n6n7s6mvvddi4g4tqvnqjq7sk9tu0.apps.googleusercontent.com",
+          "client_id": "850416716627-qktstcs0b97m2goadg1dnutka7cr04n2.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "fit.se.zalomobile",
-            "certificate_hash": "b664434bf95689459107d21ff3828239ea24ccb2"
+            "certificate_hash": "e5a07a550ed2b622082635878ff0a8c395884ea7"
+          }
+        },
+        {
+          "client_id": "850416716627-r0kjia7ihg3ue63l8is570s19qsrb5dg.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "fit.se.zalomobile",
+            "certificate_hash": "e1a814c13e2ce0aa766b9ab114eadac382c346d6"
           }
         },
         {
@@ -37,6 +45,13 @@
             {
               "client_id": "850416716627-sop80n95o9pfvgv6gd4ij2qgimffnkvh.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "850416716627-1o5n360luembbueih92e9j65jjp298d0.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "fit.se.zalomobile"
+              }
             }
           ]
         }
