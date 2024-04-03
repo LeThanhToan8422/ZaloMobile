@@ -1,15 +1,20 @@
 # ZaloMobile
 
+## Install environment and reference source before build and run
+
+[Expo: Local app development](https://docs.expo.dev/guides/local-app-development/)
+
 ## Build
+
+npx expo prebuild
 
 ### ios
 
-1. npx expo prebuild
-2. npx expo run:ios
+npx expo run:ios
 
 ### android
 
-...updating
+npx expo run:android
 
 ## Run
 
@@ -21,4 +26,6 @@
 
 ### android
 
-...updating
+**npm:** npm run android
+
+**yarn:** yarn android

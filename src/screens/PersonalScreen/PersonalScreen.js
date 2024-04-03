@@ -1,11 +1,12 @@
 import { PORT, SERVER_HOST } from '@env';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { Image, View } from 'react-native';
-import { IconButton } from 'react-native-paper';
+import { Image, Pressable, View, Text } from 'react-native';
+import { Button, Icon, IconButton } from 'react-native-paper';
 import PressableItem from '../../components/PressableItem';
 import { getUserID } from '../../utils/storage';
 import styles from './styles';
+import { CommonActions } from '@react-navigation/native';
 
 export const PersonalScreen = ({ navigation }) => {
    const [profile, setProfile] = useState({});
@@ -29,7 +30,7 @@ export const PersonalScreen = ({ navigation }) => {
    };
 
    return (
-      <View style={styles.container}>
+      <View>
          <PressableItem
             navigation={navigation}
             icon={() => <Image style={styles.imageAvt} source={{ uri: profile.image }} />}
@@ -47,7 +48,33 @@ export const PersonalScreen = ({ navigation }) => {
             style={{ marginBottom: 8 }}
          />
          <PressableItem navigation={navigation} icon="security" title="Tài khoản và bảo mật" />
-         <PressableItem navigation={navigation} icon="lock" title="Quyền riêng tư" />
+         <PressableItem navigation={navigation} icon="lock" title="Quyền riêng tư" style={{ marginBottom: 8 }} />
+         <PressableItem icon="bell-outline" title="Thông báo" />
+         <PressableItem icon="chat-processing-outline" title="Tin nhắn" />
+         <PressableItem icon="contacts-outline" title="Danh bạ" style={{ marginBottom: 8 }} />
+         <PressableItem
+            navigation={navigation}
+            navParams={{ screen: 'ChangePassScreen', params: { phone: profile.phone } }}
+            icon="onepassword"
+            title="Đổi mật khẩu"
+         />
+         <PressableItem icon="help-circle-outline" title="Trợ giúp" />
+         <PressableItem icon="information-outline" title="Thông tin về Zalo" style={{ marginBottom: 8 }} />
+         <Button
+            mode="contained"
+            icon="logout"
+            contentStyle={{ flexDirection: 'row-reverse' }}
+            style={{ margin: 8, backgroundColor: '#666' }}
+            onPress={() => {
+               storeData(null);
+               navigation.reset({
+                  index: 0,
+                  routes: [{ name: 'AuthStack' }],
+               });
+            }}
+         >
+            Đăng xuất
+         </Button>
       </View>
    );
 };
