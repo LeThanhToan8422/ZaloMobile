@@ -33,7 +33,13 @@
       <dict>
         <key>CFBundleURLSchemes</key>
         <array>
-          <string>com.googleusercontent.apps.619440363043-q1cql75nt24ho54mg07vfkjus6d923bo</string>
+          <string>com.googleusercontent.apps.850416716627-1o5n360luembbueih92e9j65jjp298d0</string>
+        </array>
+      </dict>
+      <dict>
+        <key>CFBundleURLSchemes</key>
+        <array>
+          <string>exp+zalo</string>
         </array>
       </dict>
     </array>

@@ -1,15 +1,28 @@
+import dayjs from 'dayjs';
 import React, { useState } from 'react';
 import { Keyboard, KeyboardAvoidingView, Platform, Text, TouchableWithoutFeedback, View } from 'react-native';
 import { IconButton, RadioButton, TextInput } from 'react-native-paper';
+import Toast from 'react-native-toast-message';
+import DateTimePicker from 'react-native-ui-datepicker';
 import { OpenURLText } from '../../components/OpenURLText/OpenURLText';
 import styles from './styles';
-import DateTimePicker from 'react-native-ui-datepicker';
-import dayjs from 'dayjs';
 
 export const RegisterScreen = ({ navigation }) => {
    const [name, setName] = useState('');
    const [value, setValue] = useState(0);
    const [date, setDate] = useState(dayjs());
+
+   const handleNext = () => {
+      if (dayjs().diff(date, 'year') < 16) {
+         Toast.show({
+            type: 'error',
+            text1: 'Bạn chưa đủ 16 tuổi để sử dụng Zalo ',
+            position: 'bottom',
+         });
+         return;
+      }
+      navigation.navigate('PhoneNumber', { name, gender: value, dob: date.format('YYYY-MM-DD') });
+   };
 
    return (
       <KeyboardAvoidingView
@@ -33,11 +46,11 @@ export const RegisterScreen = ({ navigation }) => {
                <RadioButton.Group onValueChange={(newValue) => setValue(newValue)} value={value}>
                   <View style={styles.radioButtonView}>
                      <Text>Nam</Text>
-                     <RadioButton.IOS value={0} />
+                     <RadioButton value={true} />
                   </View>
                   <View style={styles.radioButtonView}>
                      <Text>Nữ</Text>
-                     <RadioButton.IOS value={1} />
+                     <RadioButton value={false} />
                   </View>
                </RadioButton.Group>
                <Text style={{ fontWeight: '600', marginTop: 16 }}>Ngày sinh</Text>
@@ -63,7 +76,7 @@ export const RegisterScreen = ({ navigation }) => {
                   iconColor="#fff"
                   icon="arrow-right"
                   disabled={name.length < 2 || name.length > 40}
-                  onPress={() => navigation.navigate('PhoneNumber', { name, gender: value, dob: date }, {})}
+                  onPress={handleNext}
                />
             </View>
          </TouchableWithoutFeedback>

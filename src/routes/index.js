@@ -1,16 +1,18 @@
+import { PORT, SERVER_HOST } from '@env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import Toast from 'react-native-toast-message';
+import { toastConfig } from '../utils/toastConfig';
 import AppStack from './AppStack';
 import AuthStack from './AuthStack';
-import { SERVER_HOST, PORT } from '@env';
 
 const Stack = createNativeStackNavigator();
 
-const Router = () => {
+const Router = (props) => {
    const [userID, setUserID] = useState(1);
    useEffect(() => {
       checkLogin();
@@ -36,6 +38,7 @@ const Router = () => {
                <Stack.Screen name="AuthStack" component={AuthStack} options={{ headerShown: false }} />
             </Stack.Navigator>
          </NavigationContainer>
+         <Toast config={toastConfig} />
       </SafeAreaProvider>
    );
 };

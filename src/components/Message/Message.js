@@ -1,7 +1,7 @@
 import React from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
-import styles from './styles';
 import { formatTime } from '../../utils/func';
+import styles from './styles';
 
 /**
  * Message component. This component is used to render a message.
@@ -17,7 +17,6 @@ import { formatTime } from '../../utils/func';
  */
 export const Message = ({ data, index, localUserID }) => {
    const { dateTimeSend, message } = data;
-   // console.log(data);
    const id = data.sender;
 
    const avatar = 'https://picsum.photos/200';

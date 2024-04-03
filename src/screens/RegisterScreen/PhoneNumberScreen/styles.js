@@ -21,6 +21,10 @@ const styles = StyleSheet.create({
       borderBottomWidth: 1,
       borderBottomColor: '#ccc',
    },
+   phoneContainer: {
+      width: '95%',
+      alignSelf: 'center',
+   },
    btnNext: {
       position: 'absolute',
       bottom: 20,

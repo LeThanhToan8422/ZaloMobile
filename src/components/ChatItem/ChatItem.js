@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Image, Pressable, Text, View } from 'react-native';
-import styles from './styles';
 import { formatTime } from '../../utils/func';
+import styles from './styles';
 
 /**
  * Represents a chat item component.

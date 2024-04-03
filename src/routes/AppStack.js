@@ -4,8 +4,8 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React from 'react';
 import HeaderApp from '../components/HeaderApp';
 import ChatScreen from '../screens/ChatScreen';
-import AppTabs from './AppTabs';
 import SettingScreen from '../screens/SettingScreen';
+import AppTabs from './AppTabs';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();

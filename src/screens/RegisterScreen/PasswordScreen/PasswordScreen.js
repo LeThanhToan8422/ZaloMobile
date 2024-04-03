@@ -1,8 +1,11 @@
-import { View, Text } from 'react-native';
-import React, { useState } from 'react';
-import { Button, TextInput } from 'react-native-paper';
+import { PORT, SERVER_HOST } from '@env';
 import axios from 'axios';
-import { SERVER_HOST, PORT } from '@env';
+import React, { useState } from 'react';
+import { Keyboard, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, View } from 'react-native';
+import reactNativeBcrypt from 'react-native-bcrypt';
+import { Button, TextInput } from 'react-native-paper';
+import Toast from 'react-native-toast-message';
+import { checkPassword } from '../../../utils/func';
 import { storeData } from '../../../utils/storage';
 
 export const PasswordScreen = ({ navigation, route }) => {
@@ -13,73 +16,80 @@ export const PasswordScreen = ({ navigation, route }) => {
    const { name, gender, dob, phone } = route.params;
 
    const handleRegister = async () => {
-      if (password.length < 8) {
-         alert('Mật khẩu phải có ít nhất 8 ký tự');
-         return false;
-      }
-      if (password !== rePassword) {
-         alert('Mật khẩu không trùng khớp');
-         return false;
-      }
-      console.log({
-         name,
-         gender,
-         dob,
-      });
-      let dataUsers = await axios.post(`${SERVER_HOST}:${PORT}/users`, {
-         name,
-         gender,
-         dob,
-      });
-      console.log(dataUsers.data);
-      if (dataUsers.data) {
-         let dataAccount = await axios.post(`${SERVER_HOST}:${PORT}/accounts`, {
+      if (!checkPassword(password, rePassword)) return;
+      const salt = reactNativeBcrypt.genSaltSync(10);
+      const hashPass = reactNativeBcrypt.hashSync(password, salt);
+      try {
+         const dataUsers = await axios.post(`${SERVER_HOST}:${PORT}/users`, {
+            name,
+            gender,
+            dob,
             phone,
-            password,
-            user: dataUsers.data.id,
          });
-         if (dataAccount.data) {
-            storeData({ phone, password, id: dataAccount.data.id });
-            navigation.navigate('AppStack');
+         if (dataUsers.data) {
+            const dataAccount = await axios.post(`${SERVER_HOST}:${PORT}/accounts`, {
+               phone,
+               password: hashPass,
+               user: dataUsers.data.id,
+            });
+            if (dataAccount.data) {
+               storeData({ phone, password: hashPass, id: dataUsers.data.id });
+               navigation.navigate('AppStack');
+            }
          }
+      } catch (error) {
+         console.error(error);
+         Toast.show({
+            type: 'error',
+            text1: 'Đã có lỗi xảy ra, vui lòng thử lại',
+            position: 'bottom',
+         });
       }
    };
 
    return (
-      <View>
-         <TextInput
-            label="Mật khẩu"
-            secureTextEntry={securePass}
-            value={password}
-            onChangeText={(pass) => setPassword(pass)}
-            right={
-               <TextInput.Icon
-                  icon={securePass ? 'eye-off' : 'eye'}
-                  onPress={() => {
-                     setSecurePass(!securePass);
-                     return false;
-                  }}
+      <KeyboardAvoidingView
+         enabled
+         {...(Platform.OS === 'ios' && { behavior: 'padding', keyboardVerticalOffset: 60 })}
+         style={{ flexGrow: 1 }}
+      >
+         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <View>
+               <TextInput
+                  label="Mật khẩu"
+                  secureTextEntry={securePass}
+                  value={password}
+                  onChangeText={(pass) => setPassword(pass)}
+                  right={
+                     <TextInput.Icon
+                        icon={securePass ? 'eye-off' : 'eye'}
+                        onPress={() => {
+                           setSecurePass(!securePass);
+                           return false;
+                        }}
+                     />
+                  }
                />
-            }
-         />
-         <TextInput
-            label="Nhập lại mật khẩu"
-            secureTextEntry={secureRePass}
-            value={rePassword}
-            onChangeText={(rePass) => setRePassword(rePass)}
-            right={
-               <TextInput.Icon
-                  icon={secureRePass ? 'eye-off' : 'eye'}
-                  onPress={() => {
-                     setSecureRePass(!secureRePass);
-                     return false;
-                  }}
+               <TextInput
+                  label="Nhập lại mật khẩu"
+                  secureTextEntry={secureRePass}
+                  value={rePassword}
+                  onChangeText={(rePass) => setRePassword(rePass)}
+                  right={
+                     <TextInput.Icon
+                        icon={secureRePass ? 'eye-off' : 'eye'}
+                        onPress={() => {
+                           setSecureRePass(!secureRePass);
+                           return false;
+                        }}
+                     />
+                  }
                />
-            }
-         />
-         <Button style={{ marginTop: 16 }} mode="contained" onPress={handleRegister}>
-            Tiếp tục
-         </Button>
-      </View>
+               <Button style={{ marginTop: 16 }} mode="contained" onPress={handleRegister}>
+                  Tiếp tục
+               </Button>
+            </View>
+         </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
    );
 };

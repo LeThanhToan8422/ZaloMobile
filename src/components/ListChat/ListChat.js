@@ -1,8 +1,6 @@
-import { View, Text } from 'react-native';
-import React, { useEffect, useState } from 'react';
-import { FlatList } from 'react-native';
+import React from 'react';
+import { FlatList, View } from 'react-native';
 import ChatItem from '../ChatItem';
-import axios from 'axios';
 
 /**
  * Represents a component that displays a list of chats.

@@ -1,11 +1,11 @@
-import { View, Text, SectionList, Pressable } from 'react-native';
-import React, { useEffect, useState } from 'react';
-import styles from './styles';
-import { ContactItem } from '../../../components/ContactItem/ContactItem';
+import { PORT, SERVER_HOST } from '@env';
 import axios from 'axios';
-import { SERVER_HOST, PORT } from '@env';
-import { getUserID } from '../../../utils/storage';
+import React, { useEffect, useState } from 'react';
+import { SectionList, Text, View } from 'react-native';
+import { ContactItem } from '../../../components/ContactItem/ContactItem';
 import PressableItem from '../../../components/PressableItem';
+import { getUserID } from '../../../utils/storage';
+import styles from './styles';
 
 export const FriendTab = ({ navigation }) => {
    const [contacts, setContacts] = useState([]);

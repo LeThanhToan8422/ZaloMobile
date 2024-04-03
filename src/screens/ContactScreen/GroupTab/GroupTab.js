@@ -1,12 +1,12 @@
+import { PORT, SERVER_HOST } from '@env';
 import { AntDesign } from '@expo/vector-icons';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
 import { Button } from 'react-native-paper';
 import ListChat from '../../../components/ListChat';
-import styles from './styles';
-import { SERVER_HOST, PORT } from '@env';
 import { getUserID } from '../../../utils/storage';
+import styles from './styles';
 
 export const GroupTab = ({ navigation }) => {
    const [data, setData] = useState([]);

@@ -1,11 +1,11 @@
-import { View, Text, Image } from 'react-native';
-import React, { useEffect, useState } from 'react';
-import styles from './styles';
-import PressableItem from '../../components/PressableItem';
-import { IconButton } from 'react-native-paper';
+import { PORT, SERVER_HOST } from '@env';
 import axios from 'axios';
-import { SERVER_HOST, PORT } from '@env';
+import React, { useEffect, useState } from 'react';
+import { Image, View } from 'react-native';
+import { IconButton } from 'react-native-paper';
+import PressableItem from '../../components/PressableItem';
 import { getUserID } from '../../utils/storage';
+import styles from './styles';
 
 export const PersonalScreen = ({ navigation }) => {
    const [profile, setProfile] = useState({});
@@ -15,7 +15,7 @@ export const PersonalScreen = ({ navigation }) => {
             getProfile(id);
          })
          .catch((err) => {
-            console.log(err);
+            console.error(err);
          });
    }, []);
 

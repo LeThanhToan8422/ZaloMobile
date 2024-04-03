@@ -1,12 +1,14 @@
-import { View, Text } from 'react-native';
+import { PORT, SERVER_HOST } from '@env';
+import axios from 'axios';
 import React, { useState } from 'react';
-import styles from './styles';
+import { Text, View } from 'react-native';
+import reactNativeBcrypt from 'react-native-bcrypt';
 import { Button, TextInput } from 'react-native-paper';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Toast from 'react-native-toast-message';
 import OpenURLText from '../../components/OpenURLText';
 import { storeData } from '../../utils/storage';
-import axios from 'axios';
-import { SERVER_HOST, PORT } from '@env';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import styles from './styles';
 
 export const LoginScreen = ({ navigation }) => {
    const [phone, setPhone] = useState('');
@@ -16,13 +18,17 @@ export const LoginScreen = ({ navigation }) => {
 
    const handleLogin = async () => {
       try {
-         const params = { phone, password };
-         let res = await axios.post(`${SERVER_HOST}:${PORT}/login`, params);
-         if (res.data) {
-            storeData({ phone, password, id: res.data.id });
+         // if (!checkPassword(password)) return;
+         let res = await axios.get(`${SERVER_HOST}:${PORT}/accounts/phone/${phone}`);
+         if (reactNativeBcrypt.compareSync(password, res.data.password)) {
+            storeData({ phone, password: res.data.password, id: res.data.user });
             navigation.navigate('AppStack');
          } else {
-            alert('Vui lòng kiểm tra lại thông tin đăng nhập!');
+            Toast.show({
+               type: 'error',
+               text1: 'Sai số điện thoại hoặc mật khẩu',
+               position: 'bottom',
+            });
          }
       } catch (e) {
          console.error(e);
