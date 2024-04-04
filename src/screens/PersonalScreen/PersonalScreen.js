@@ -33,6 +33,7 @@ export const PersonalScreen = ({ navigation }) => {
       <View>
          <PressableItem
             navigation={navigation}
+            navParams={{ screen: 'ProfileScreen' }}
             icon={() => <Image style={styles.imageAvt} source={{ uri: profile.image }} />}
             title={profile.name}
             subtitle="Xem trang cá nhân"

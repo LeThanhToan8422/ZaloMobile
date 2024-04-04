@@ -2,11 +2,12 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useHeaderHeight } from '@react-navigation/elements';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React from 'react';
+import { View } from 'react-native';
 import HeaderApp from '../components/HeaderApp';
 import { ChangePassScreen } from '../screens/ChangePassScreen/ChangePassScreen';
 import ChatScreen from '../screens/ChatScreen';
+import { ProfileScreen } from '../screens/ProfileScreen/ProfileScreen';
 import AppTabs from './AppTabs';
-import { View } from 'react-native';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -37,6 +38,23 @@ const AppStack = ({ navigation }) => {
             component={ChangePassScreen}
             options={{
                title: 'Đổi mật khẩu',
+               headerBackground: () => (
+                  <View
+                     style={{
+                        backgroundColor: '#4A8CFE',
+                        flex: 1,
+                        borderBottomWidth: 1,
+                        borderBottomColor: '#ddd',
+                     }}
+                  />
+               ),
+               headerTintColor: '#fff',
+            }}
+         />
+         <Stack.Screen
+            name="ProfileScreen"
+            component={ProfileScreen}
+            options={{
                headerBackground: () => (
                   <View
                      style={{
