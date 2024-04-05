@@ -1921,6 +1921,13 @@
   resolved "https://registry.npmjs.org/@react-native-community/clipboard/-/clipboard-1.5.1.tgz"
   integrity sha512-AHAmrkLEH5UtPaDiRqoULERHh3oNv7Dgs0bTC0hO5Z2GdNokAMPT5w8ci8aMcRemcwbtdHjxChgtjbeA38GBdA==
 
+"@react-native-community/datetimepicker@7.2.0":
+  version "7.2.0"
+  resolved "https://registry.yarnpkg.com/@react-native-community/datetimepicker/-/datetimepicker-7.2.0.tgz#db8c03dbf49bf3c24b06b617a8467d8b05511f62"
+  integrity sha512-dO1sQy83M/EvnHE2egto05iwXZX7EYn5f/VDMp6afZFRFXRiRo7CzB3VFg4B55gJRJMNBv06NYMLPM3SlpnEGQ==
+  dependencies:
+    invariant "^2.2.4"
+
 "@react-native-firebase/app@^19.1.1":
   version "19.1.2"
   resolved "https://registry.npmjs.org/@react-native-firebase/app/-/app-19.1.2.tgz"
@@ -4284,6 +4291,18 @@ expo-font@~11.4.0:
   dependencies:
     fontfaceobserver "^2.1.0"
 
+expo-image-loader@~4.3.0:
+  version "4.3.0"
+  resolved "https://registry.yarnpkg.com/expo-image-loader/-/expo-image-loader-4.3.0.tgz#d897b4d4f1838faa8291c36f00b99c2b36a6ac5c"
+  integrity sha512-2kqJIO+oYM8J3GbvTUHLqTSpt1dLpOn/X0eB4U4RTuzz/faj8l/TyQELsMBLlGAkweNUuG9LqznbaBz+WuSFEw==
+
+expo-image-picker@~14.3.2:
+  version "14.3.2"
+  resolved "https://registry.yarnpkg.com/expo-image-picker/-/expo-image-picker-14.3.2.tgz#5ae2f36fe518a10c8fe82e5ff2ee735c14817cfc"
+  integrity sha512-xr/YeQMIYheXecWP033F2SPwpBlBR5xVCx7YSfSCTH8Y9pw7Z886agqKGbS9QBVGlzJ5qecJktZ6ASSzeslDVg==
+  dependencies:
+    expo-image-loader "~4.3.0"
+
 expo-json-utils@~0.7.0:
   version "0.7.1"
   resolved "https://registry.npmjs.org/expo-json-utils/-/expo-json-utils-0.7.1.tgz"
@@ -5392,6 +5411,11 @@ is-wsl@^2.0.0, is-wsl@^2.1.1, is-wsl@^2.2.0:
   integrity sha512-fKzAra0rGJUUBwGBgNkHZuToZcn+TtXHpeCgmkMJMMYx1sQDYaCSyjJBSCa2nH1DGm7s3n1oBnohoVTBaN7Lww==
   dependencies:
     is-docker "^2.0.0"
+
+isaac@^0.0.5:
+  version "0.0.5"
+  resolved "https://registry.yarnpkg.com/isaac/-/isaac-0.0.5.tgz#a4f292229a8bdf6e33900a3eb8b4201a57ff2d89"
+  integrity sha512-KVtdbh4E0xebBIyGjVdEUyBAJ6QmfD5Q2jZXalthodNc5DeHg6ByvoymLSAAWPpZ6MjrcyZLuw8+u5dj1LbBLg==
 
 isarray@~1.0.0:
   version "1.0.0"

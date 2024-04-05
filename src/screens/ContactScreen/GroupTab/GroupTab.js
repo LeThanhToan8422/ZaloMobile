@@ -18,7 +18,7 @@ export const GroupTab = ({ navigation }) => {
 
    // Func Call API to get data
    const getApiChatsByUserId = async (userID) => {
-      const res = await axios.get(`${SERVER_HOST}:${PORT}/user/get-chats-by-id/${userID}`);
+      const res = await axios.get(`${SERVER_HOST}:${PORT}/users/friends/${userID}`);
       setData(res.data);
    };
    return (
@@ -34,7 +34,7 @@ export const GroupTab = ({ navigation }) => {
             Create New Group
          </Button>
 
-         <ListChat style={{ height: '100%', backgroundColor: '#fff' }} chats={data} navigation={navigation} />
+         {/* <ListChat style={{ height: '100%', backgroundColor: '#fff' }} chats={data} navigation={navigation} /> */}
       </View>
    );
 };

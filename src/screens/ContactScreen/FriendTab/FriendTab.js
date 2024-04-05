@@ -16,11 +16,10 @@ export const FriendTab = ({ navigation }) => {
    }, []);
 
    const getContacts = async (userID) => {
-      const res = await axios.get(`${SERVER_HOST}:${PORT}/relationship/get-friends-of-${userID}/`);
+      const res = await axios.get(`${SERVER_HOST}:${PORT}/users/friends/${userID}`);
       const transformedData = res.data.reduce((acc, obj) => {
          const title = obj.name.charAt(0).toUpperCase();
          const existingTitle = acc.find((item) => item.title === title);
-         obj.image = 'https://picsum.photos/200';
          if (existingTitle) existingTitle.data.push(obj);
          else acc.push({ title, data: [obj] });
          return acc;

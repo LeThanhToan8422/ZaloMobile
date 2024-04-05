@@ -19,9 +19,8 @@ import styles from './styles';
  * @returns {JSX.Element} The rendered chat item component.
  */
 export const ChatItem = ({ navigation, data }) => {
-   const { name, member, message, dateTimeSend } = data;
+   const { name, member, message, image, dateTimeSend } = data;
    const [numberMessageUnread, setNumberMessageUnread] = useState(data.numberMessageUnread || 0);
-   const image = 'https://picsum.photos/200';
    return (
       <Pressable style={styles.container} onPress={() => navigation.push('ChatScreen', data)}>
          <Image source={{ uri: image }} style={styles.image} />

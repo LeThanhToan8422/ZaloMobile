@@ -24,8 +24,7 @@ export const VerifyPhoneScreen = ({ navigation, route }) => {
 
    useEffect(() => {
       const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
-      // signInWithPhoneNumber(phone);
-      signInWithPhoneNumber('+44 7444 555666');
+      signInWithPhoneNumber(phone);
       return subscriber; // unsubscribe on unmount
    }, []);
 

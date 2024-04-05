@@ -1,5 +1,6 @@
-import React from 'react';
-import { Image, Text, TouchableOpacity, View } from 'react-native';
+import React, { useState } from 'react';
+import { Image, Pressable, Text, View } from 'react-native';
+import { Modal, PaperProvider, Portal } from 'react-native-paper';
 import { formatTime } from '../../utils/func';
 import styles from './styles';
 
@@ -15,13 +16,13 @@ import styles from './styles';
  * @param {number} props.index - The index of the message.
  * @returns {JSX.Element} The rendered Message component.
  */
-export const Message = ({ data, index, localUserID }) => {
-   const { dateTimeSend, message } = data;
+export const Message = ({ data, index, localUserID, handleModal }) => {
+   const { message, dateTimeSend, image } = data;
    const id = data.sender;
+   const urlRegex = /^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/;
 
-   const avatar = 'https://picsum.photos/200';
    return (
-      <TouchableOpacity>
+      <Pressable onLongPress={() => handleModal(data)}>
          <View
             style={[
                styles.container,
@@ -29,12 +30,17 @@ export const Message = ({ data, index, localUserID }) => {
                index === 0 ? { marginBottom: 20 } : {},
             ]}
          >
-            {id !== localUserID ? <Image source={{ uri: avatar }} style={styles.avatar} /> : null}
-            <View style={[styles.messageContainer, id === localUserID ? { backgroundColor: '#CFF0FF' } : {}]}>
-               <Text style={styles.content}>{message}</Text>
-               <Text style={styles.time}>{formatTime(dateTimeSend)}</Text>
-            </View>
+            {id !== localUserID ? <Image source={{ uri: image }} style={styles.avatar} /> : null}
+
+            {urlRegex.test(message) ? (
+               <Image source={{ uri: message }} style={{ width: 200, height: 300, objectFit: 'cover' }} />
+            ) : (
+               <View style={[styles.messageContainer, id === localUserID ? { backgroundColor: '#CFF0FF' } : {}]}>
+                  <Text style={styles.content}>{message}</Text>
+                  <Text style={styles.time}>{dateTimeSend ? formatTime(dateTimeSend) : formatTime(new Date())}</Text>
+               </View>
+            )}
          </View>
-      </TouchableOpacity>
+      </Pressable>
    );
 };
