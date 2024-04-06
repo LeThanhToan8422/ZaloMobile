@@ -1,12 +1,11 @@
 import { PORT, SERVER_HOST } from '@env';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { Image, Pressable, View, Text } from 'react-native';
-import { Button, Icon, IconButton } from 'react-native-paper';
+import { Image, ScrollView } from 'react-native';
+import { Button, IconButton } from 'react-native-paper';
 import PressableItem from '../../components/PressableItem';
 import { getUserID } from '../../utils/storage';
 import styles from './styles';
-import { CommonActions } from '@react-navigation/native';
 
 export const PersonalScreen = ({ navigation }) => {
    const [profile, setProfile] = useState({});
@@ -30,7 +29,7 @@ export const PersonalScreen = ({ navigation }) => {
    };
 
    return (
-      <View>
+      <ScrollView>
          <PressableItem
             navigation={navigation}
             navParams={{ screen: 'ProfileScreen' }}
@@ -76,6 +75,6 @@ export const PersonalScreen = ({ navigation }) => {
          >
             Đăng xuất
          </Button>
-      </View>
+      </ScrollView>
    );
 };

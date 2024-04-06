@@ -1,7 +1,10 @@
-import React from 'react';
-import { Image, Text, TouchableOpacity, View } from 'react-native';
+import { PORT, SERVER_HOST } from '@env';
+import axios from 'axios';
+import React, { useEffect, useState } from 'react';
+import { Image, Pressable, Text, View } from 'react-native';
 import { formatTime } from '../../utils/func';
 import styles from './styles';
+import { getUserID } from '../../utils/storage';
 
 /**
  * Message component. This component is used to render a message.
@@ -15,13 +18,31 @@ import styles from './styles';
  * @param {number} props.index - The index of the message.
  * @returns {JSX.Element} The rendered Message component.
  */
-export const Message = ({ data, index, localUserID }) => {
-   const { dateTimeSend, message } = data;
+export const Message = ({ data, index, localUserID, handleModal }) => {
+   const { message, dateTimeSend } = data;
    const id = data.sender;
+   const friendId = data.receiver;
+   const [avtFriend, setAvtFriend] = useState(null);
+   // const id = data.sender;
+   const urlRegex = /^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/;
 
-   const avatar = 'https://picsum.photos/200';
+   useEffect(() => {
+      getUserID().then((localUserId) => {
+         localUserID === friendId && getAvatarFriend(id);
+      });
+   }, []);
+
+   const getAvatarFriend = async (id) => {
+      try {
+         const response = await axios.get(`${SERVER_HOST}:${PORT}/users/${id}`);
+         setAvtFriend(response.data.image);
+      } catch (error) {
+         console.error(error);
+      }
+   };
+
    return (
-      <TouchableOpacity>
+      <Pressable onLongPress={() => handleModal(data)}>
          <View
             style={[
                styles.container,
@@ -29,12 +50,17 @@ export const Message = ({ data, index, localUserID }) => {
                index === 0 ? { marginBottom: 20 } : {},
             ]}
          >
-            {id !== localUserID ? <Image source={{ uri: avatar }} style={styles.avatar} /> : null}
-            <View style={[styles.messageContainer, id === localUserID ? { backgroundColor: '#CFF0FF' } : {}]}>
-               <Text style={styles.content}>{message}</Text>
-               <Text style={styles.time}>{formatTime(dateTimeSend)}</Text>
-            </View>
+            {id !== localUserID ? <Image source={{ uri: avtFriend }} style={styles.avatar} /> : null}
+
+            {urlRegex.test(message) ? (
+               <Image source={{ uri: message }} style={styles.imageMessage} />
+            ) : (
+               <View style={[styles.messageContainer, id === localUserID ? { backgroundColor: '#CFF0FF' } : {}]}>
+                  <Text style={styles.content}>{message}</Text>
+                  <Text style={styles.time}>{dateTimeSend ? formatTime(dateTimeSend) : formatTime(new Date())}</Text>
+               </View>
+            )}
          </View>
-      </TouchableOpacity>
+      </Pressable>
    );
 };

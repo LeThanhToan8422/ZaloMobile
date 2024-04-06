@@ -5,27 +5,23 @@ import * as ImagePicker from 'expo-image-picker';
 import React, { useEffect, useState } from 'react';
 import { ImageBackground, Pressable, Text, View } from 'react-native';
 import { Avatar, Button, Icon, IconButton, RadioButton, TextInput } from 'react-native-paper';
+import Toast from 'react-native-toast-message';
 import { getUserID } from '../../utils/storage';
 import styles from './styles';
+import dayjs from 'dayjs';
 
 export const ProfileScreen = () => {
    const [name, setName] = useState('');
    const [image, setImage] = useState(null);
    const [profile, setProfile] = useState({});
-   const [show, setShow] = useState(false);
+   const [dob, setDob] = useState(null);
 
    const onChange = (event, selectedDate) => {
-      const currentDate = selectedDate;
-      setShow(false);
-      setDob(currentDate);
+      setDob(selectedDate);
+      setProfile({ ...profile, dob: selectedDate });
    };
 
-   const showMode = (currentMode) => {
-      setShow(true);
-      setMode(currentMode);
-   };
-
-   const pickImage = async () => {
+   const pickImage = async (type) => {
       // No permissions request is necessary for launching the image library
       let result = await ImagePicker.launchImageLibraryAsync({
          mediaTypes: ImagePicker.MediaTypeOptions.All,
@@ -34,10 +30,32 @@ export const ProfileScreen = () => {
          quality: 1,
       });
 
-      console.log(result);
+      // console.log(result);
 
       if (!result.canceled) {
-         setImage(result.assets[0].uri);
+         let localUri = result.assets[0].uri;
+         let filename = localUri.split('/').pop();
+         let match = /\.(\w+)$/.exec(filename);
+         let typeImage = match ? `image/${match[1]}` : `image`;
+
+         let data = new FormData();
+         data.append('photo', {
+            uri: localUri,
+            name: filename,
+            type: typeImage,
+         });
+
+         try {
+            if (type === 'avatar') {
+               const response = await axios.put(`${SERVER_HOST}:${PORT}/users/avatar`, data);
+               setProfile({ ...profile, image: response.data });
+               setProfile({ ...profile, image: result.assets[0].uri });
+            } else {
+               setProfile({ ...profile, background: result.assets[0].uri });
+            }
+         } catch (error) {
+            console.error(error);
+         }
       }
    };
 
@@ -56,6 +74,28 @@ export const ProfileScreen = () => {
          const response = await axios.get(`${SERVER_HOST}:${PORT}/users/${userID}`);
          setProfile(response.data);
          setName(response.data.name);
+         setDob(new Date(response.data.dob));
+      } catch (error) {
+         console.error(error);
+      }
+   };
+
+   const handleUpdateProfile = async () => {
+      try {
+         const response = await axios.put(`${SERVER_HOST}:${PORT}/users`, {
+            id: profile.id,
+            name,
+            gender: profile.gender ? 1 : 0,
+            dob: dayjs(dob).format('YYYY-MM-DD'),
+         });
+         if (response.data) {
+            Toast.show({
+               type: 'success',
+               text1: 'Cập nhật thông tin cá nhân thành công',
+               position: 'bottom',
+            });
+            setProfile({ ...profile, name });
+         }
       } catch (error) {
          console.error(error);
       }
@@ -63,8 +103,8 @@ export const ProfileScreen = () => {
 
    return (
       <View style={styles.container}>
-         <Pressable onPress={pickImage}>
-            <ImageBackground source={{ uri: profile.background }} style={styles.background}>
+         <Pressable onPress={() => pickImage('background')}>
+            <ImageBackground source={{ uri: profile?.background }} style={styles.background}>
                <IconButton
                   mode="contained-tonal"
                   icon={'dots-horizontal'}
@@ -73,8 +113,8 @@ export const ProfileScreen = () => {
             </ImageBackground>
          </Pressable>
          <View style={styles.avatarContainer}>
-            <Pressable onPress={pickImage}>
-               <Avatar.Image size={150} source={{ uri: profile.image }} />
+            <Pressable onPress={() => pickImage('avatar')}>
+               <Avatar.Image size={150} source={{ uri: profile?.image }} />
             </Pressable>
             <Text style={{ fontSize: 25, fontWeight: '700' }}>{profile.name}</Text>
          </View>
@@ -93,17 +133,14 @@ export const ProfileScreen = () => {
          </View>
          <View style={styles.inputContainer}>
             <Text style={styles.labelInput}>Ngày sinh:</Text>
-            <Button
-               mode="text"
-               style={styles.dobStyle}
-               labelStyle={{ fontSize: 16, color: '#000' }}
-               onPress={() => showMode('date')}
-            >
-               {new Date(profile.dob).toLocaleDateString()}
-            </Button>
-            {show && (
-               <DateTimePicker testID="dateTimePicker" value={new Date(profile.dob)} mode="date" onChange={onChange} />
-            )}
+            {
+               <DateTimePicker
+                  testID="dateTimePicker"
+                  value={new Date(profile.dob || null)}
+                  mode="date"
+                  onChange={onChange}
+               />
+            }
          </View>
          <View style={styles.inputContainer}>
             <Text style={styles.labelInput}>Giới tính:</Text>
@@ -120,7 +157,7 @@ export const ProfileScreen = () => {
             mode="contained"
             style={styles.btnEdit}
             labelStyle={{ fontSize: 16, color: '#000' }}
-            onPress={() => {}}
+            onPress={handleUpdateProfile}
          >
             Chỉnh sửa
          </Button>
