@@ -1,4 +1,5 @@
-import { StyleSheet } from 'react-native';
+import { Dimensions, StyleSheet } from 'react-native';
+const win = Dimensions.get('window');
 
 const styles = StyleSheet.create({
    container: {
@@ -35,6 +36,12 @@ const styles = StyleSheet.create({
       paddingVertical: 10,
       borderColor: '#c8c8c8',
       backgroundColor: '#fff',
+   },
+   imageMessage: {
+      width: win.width * 0.7,
+      height: win.height * 0.3,
+      objectFit: 'fill',
+      borderRadius: 10,
    },
 });
 

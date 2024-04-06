@@ -4,6 +4,7 @@ import * as ImagePicker from 'expo-image-picker';
 import React, { useEffect, useState } from 'react';
 import {
    FlatList,
+   Image,
    Keyboard,
    KeyboardAvoidingView,
    Platform,
@@ -26,6 +27,7 @@ import styles from './styles';
  * @returns {JSX.Element} The rendered ChatScreen component.
  */
 export const ChatScreen = ({ route }) => {
+   const urlRegex = /^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/;
    const [userID, setUserID] = useState(1);
    const friendID = route.params.id;
    const [messages, setMessages] = useState([]);
@@ -34,7 +36,9 @@ export const ChatScreen = ({ route }) => {
    const [image, setImage] = useState(null);
    const [visible, setVisible] = useState(false);
    const [modalData, setModalData] = useState(null);
+
    const hideModal = () => setVisible(false);
+
    const showModal = (item) => {
       setModalData(item);
       setVisible(true);
@@ -66,10 +70,27 @@ export const ChatScreen = ({ route }) => {
          quality: 1,
       });
 
-      console.log(result);
+      let localUri = result.assets[0].uri;
+      let filename = localUri.split('/').pop();
+      let match = /\.(\w+)$/.exec(filename);
+      let typeImage = match ? `image/${match[1]}` : `image`;
+      const buffer = await axios.get(localUri, { responseType: 'arraybuffer' }).then((res) => res.data);
+      const data = {
+         originalname: filename,
+         encoding: '7bit',
+         mimetype: typeImage,
+         buffer: buffer,
+         size: result.assets[0].fileSize,
+      };
 
       if (!result.canceled) {
-         setImage(result.assets[0].uri);
+         socket.emit('Client-Chat-Room', {
+            chatRoom: userID < friendID ? `${userID}${friendID}` : `${friendID}${userID}`,
+            file: data,
+            dateTimeSend: new Date(),
+            sender: userID,
+            receiver: friendID,
+         });
       }
    };
 
@@ -100,7 +121,11 @@ export const ChatScreen = ({ route }) => {
                <PaperProvider>
                   <Portal>
                      <Modal visible={visible} onDismiss={hideModal} contentContainerStyle={styles.modalContainer}>
-                        <Text style={styles.messageContainer}>{modalData?.message}</Text>
+                        {urlRegex.test(modalData?.message) ? (
+                           <Image source={{ uri: modalData?.message }} style={styles.imageMessage} />
+                        ) : (
+                           <Text style={styles.messageContainer}>{modalData?.message}</Text>
+                        )}
                         <View style={styles.modalActionContainer}>
                            <Button
                               icon={() => <Icon source="delete" size={24} iconColor="#333" />}
@@ -109,13 +134,15 @@ export const ChatScreen = ({ route }) => {
                            >
                               Xóa
                            </Button>
-                           <Button
-                              icon={() => <Icon source="backup-restore" size={24} iconColor="#333" />}
-                              contentStyle={{ flexDirection: 'row-reverse' }}
-                              onPress={() => {}}
-                           >
-                              Thu hồi
-                           </Button>
+                           {userID === modalData?.sender && (
+                              <Button
+                                 icon={() => <Icon source="backup-restore" size={24} iconColor="#333" />}
+                                 contentStyle={{ flexDirection: 'row-reverse' }}
+                                 onPress={() => {}}
+                              >
+                                 Thu hồi
+                              </Button>
+                           )}
                         </View>
                      </Modal>
                   </Portal>

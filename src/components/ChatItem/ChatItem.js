@@ -19,6 +19,7 @@ import styles from './styles';
  * @returns {JSX.Element} The rendered chat item component.
  */
 export const ChatItem = ({ navigation, data }) => {
+   const urlRegex = /^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/;
    const { name, member, message, image, dateTimeSend } = data;
    const [numberMessageUnread, setNumberMessageUnread] = useState(data.numberMessageUnread || 0);
    return (
@@ -28,7 +29,7 @@ export const ChatItem = ({ navigation, data }) => {
             <View style={{ flex: 1, marginLeft: 10, rowGap: 4 }}>
                <Text style={styles.name}>{name}</Text>
                <Text ellipsizeMode="tail" numberOfLines={1} style={styles.message}>
-                  {message}
+                  {urlRegex.test(message) ? '[Hình ảnh]' : message}
                </Text>
             </View>
             <View style={{ alignItems: 'center', rowGap: 4 }}>

@@ -1,4 +1,5 @@
-import { StyleSheet } from 'react-native';
+import { Dimensions, StyleSheet } from 'react-native';
+const win = Dimensions.get('window');
 
 const styles = StyleSheet.create({
    container: {
@@ -22,6 +23,13 @@ const styles = StyleSheet.create({
       marginRight: 10,
    },
    content: {},
+   imageMessage: {
+      width: win.width * 0.7,
+      height: win.height * 0.3,
+      objectFit: 'fill',
+      borderRadius: 10,
+      marginVertical: 2,
+   },
    time: {
       fontSize: 12,
       color: '#888',

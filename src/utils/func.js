@@ -1,7 +1,11 @@
 import Toast from 'react-native-toast-message';
 
 const formatTime = (time) => {
-   return time.split('T')[1].split(':', 2).join(':');
+   try {
+      return time.split('T')[1].split(':', 2).join(':');
+   } catch (error) {
+      return time.toString().split(' ')[4].split(':', 2).join(':');
+   }
 };
 
 const checkPassword = (password, rePassword) => {
