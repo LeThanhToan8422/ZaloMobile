@@ -1,4 +1,4 @@
-import { PORT, SERVER_HOST } from '@env';
+import { SERVER_HOST } from '@env';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { SectionList, Text, View } from 'react-native';
@@ -16,7 +16,7 @@ export const FriendTab = ({ navigation }) => {
    }, []);
 
    const getContacts = async (userID) => {
-      const res = await axios.get(`${SERVER_HOST}:${PORT}/users/friends/${userID}`);
+      const res = await axios.get(`${SERVER_HOST}/users/friends/${userID}`);
       const transformedData = res.data.reduce((acc, obj) => {
          const title = obj.name.charAt(0).toUpperCase();
          const existingTitle = acc.find((item) => item.title === title);

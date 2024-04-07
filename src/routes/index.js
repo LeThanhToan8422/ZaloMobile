@@ -1,4 +1,4 @@
-import { PORT, SERVER_HOST } from '@env';
+import { SERVER_HOST } from '@env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -23,7 +23,7 @@ const Router = (props) => {
          const jsonValue = await AsyncStorage.getItem('@user');
          const params = jsonValue != null ? JSON.parse(jsonValue) : null;
          if (!params) return setUserID(null);
-         let res = await axios.post(`${SERVER_HOST}:${PORT}/login`, params);
+         let res = await axios.post(`${SERVER_HOST}/login`, params);
          setUserID(res.data ? res.data.id : null);
       } catch (e) {
          setUserID(null);

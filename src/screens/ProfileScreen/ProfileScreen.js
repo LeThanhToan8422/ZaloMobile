@@ -1,4 +1,4 @@
-import { PORT, SERVER_HOST } from '@env';
+import { SERVER_HOST } from '@env';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import axios from 'axios';
 import dayjs from 'dayjs';
@@ -14,7 +14,7 @@ import {
    TouchableWithoutFeedback,
    View,
 } from 'react-native';
-import { Avatar, Button, Icon, IconButton, RadioButton, TextInput } from 'react-native-paper';
+import { Avatar, Button, Icon, RadioButton, TextInput } from 'react-native-paper';
 import Toast from 'react-native-toast-message';
 import { socket } from '../../utils/socket';
 import { getUserID } from '../../utils/storage';
@@ -100,7 +100,7 @@ export const ProfileScreen = () => {
 
    const getProfile = async (userID) => {
       try {
-         const response = await axios.get(`${SERVER_HOST}:${PORT}/users/${userID}`);
+         const response = await axios.get(`${SERVER_HOST}/users/${userID}`);
          setProfile(response.data);
          setName(response.data.name);
          setDob(new Date(response.data.dob));
@@ -113,7 +113,7 @@ export const ProfileScreen = () => {
 
    const handleUpdateProfile = async () => {
       try {
-         const response = await axios.put(`${SERVER_HOST}:${PORT}/users`, {
+         const response = await axios.put(`${SERVER_HOST}/users`, {
             id: profile.id,
             name,
             gender: profile.gender ? 1 : 0,

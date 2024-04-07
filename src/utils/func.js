@@ -4,7 +4,7 @@ const formatTime = (time) => {
    try {
       return time.split('T')[1].split(':', 2).join(':');
    } catch (error) {
-      return time.toString().split(' ')[4].split(':', 2).join(':');
+      return time.toString().split(' ')[1].split(':', 2).join(':');
    }
 };
 

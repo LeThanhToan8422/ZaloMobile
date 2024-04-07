@@ -1,4 +1,4 @@
-import { PORT, SERVER_HOST } from '@env';
+import { SERVER_HOST } from '@env';
 import axios from 'axios';
 import React, { useState } from 'react';
 import { Keyboard, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, View } from 'react-native';
@@ -20,14 +20,14 @@ export const PasswordScreen = ({ navigation, route }) => {
       const salt = reactNativeBcrypt.genSaltSync(10);
       const hashPass = reactNativeBcrypt.hashSync(password, salt);
       try {
-         const dataUsers = await axios.post(`${SERVER_HOST}:${PORT}/users`, {
+         const dataUsers = await axios.post(`${SERVER_HOST}/users`, {
             name,
             gender,
             dob,
             phone,
          });
          if (dataUsers.data) {
-            const dataAccount = await axios.post(`${SERVER_HOST}:${PORT}/accounts`, {
+            const dataAccount = await axios.post(`${SERVER_HOST}/accounts`, {
                phone,
                password: hashPass,
                user: dataUsers.data.id,
