@@ -4,7 +4,16 @@ import axios from 'axios';
 import dayjs from 'dayjs';
 import * as ImagePicker from 'expo-image-picker';
 import React, { useEffect, useState } from 'react';
-import { ImageBackground, Pressable, Text, View } from 'react-native';
+import {
+   ImageBackground,
+   Keyboard,
+   KeyboardAvoidingView,
+   Platform,
+   Pressable,
+   Text,
+   TouchableWithoutFeedback,
+   View,
+} from 'react-native';
 import { Avatar, Button, Icon, IconButton, RadioButton, TextInput } from 'react-native-paper';
 import Toast from 'react-native-toast-message';
 import { socket } from '../../utils/socket';
@@ -124,59 +133,67 @@ export const ProfileScreen = () => {
    };
 
    return (
-      <View style={styles.container}>
-         <Pressable onPress={() => pickImage('background')}>
-            <ImageBackground source={{ uri: background }} style={styles.background}></ImageBackground>
-         </Pressable>
-         <View style={styles.avatarContainer}>
-            <Pressable onPress={() => pickImage('avatar')}>
-               <Avatar.Image size={150} source={{ uri: avatar }} />
-            </Pressable>
-            <Text style={{ fontSize: 25, fontWeight: '700' }}>{profile.name}</Text>
-         </View>
-         <Text style={{ fontSize: 20, fontWeight: '500', marginTop: 30, marginLeft: 10, marginBottom: 10 }}>
-            Thông tin cá nhân
-         </Text>
-         <View style={styles.inputContainer}>
-            <Text style={styles.labelInput}>Họ tên:</Text>
-            <TextInput
-               style={styles.input}
-               placeholder="Nhập họ tên"
-               value={name}
-               onChangeText={(text) => setName(text)}
-               onBlur={() => setProfile({ ...profile, name })}
-            />
-         </View>
-         <View style={styles.inputContainer}>
-            <Text style={styles.labelInput}>Ngày sinh:</Text>
-            {
-               <DateTimePicker
-                  testID="dateTimePicker"
-                  value={new Date(profile.dob || null)}
-                  mode="date"
-                  onChange={onChange}
-               />
-            }
-         </View>
-         <View style={styles.inputContainer}>
-            <Text style={styles.labelInput}>Giới tính:</Text>
-            <RadioButton.Group
-               onValueChange={(value) => setProfile({ ...profile, gender: value })}
-               value={profile.gender ? true : false}
-            >
-               <RadioButton.Item label="Nam" value={true} />
-               <RadioButton.Item label="Nữ" value={false} />
-            </RadioButton.Group>
-         </View>
-         <Button
-            icon={() => <Icon source={'account-edit-outline'} size={22} />}
-            mode="contained"
-            style={styles.btnEdit}
-            labelStyle={{ fontSize: 16, color: '#000' }}
-            onPress={handleUpdateProfile}
-         >
-            Chỉnh sửa
-         </Button>
-      </View>
+      <KeyboardAvoidingView
+         enabled
+         {...(Platform.OS === 'ios' && { behavior: 'padding', keyboardVerticalOffset: 60 })}
+         style={{ flexGrow: 1 }}
+      >
+         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <View style={styles.container}>
+               <Pressable onPress={() => pickImage('background')}>
+                  <ImageBackground source={{ uri: background }} style={styles.background}></ImageBackground>
+               </Pressable>
+               <View style={styles.avatarContainer}>
+                  <Pressable onPress={() => pickImage('avatar')}>
+                     <Avatar.Image size={150} source={{ uri: avatar }} />
+                  </Pressable>
+                  <Text style={{ fontSize: 25, fontWeight: '700' }}>{profile.name}</Text>
+               </View>
+               <Text style={{ fontSize: 20, fontWeight: '500', marginTop: 30, marginLeft: 10, marginBottom: 10 }}>
+                  Thông tin cá nhân
+               </Text>
+               <View style={styles.inputContainer}>
+                  <Text style={styles.labelInput}>Họ tên:</Text>
+                  <TextInput
+                     style={styles.input}
+                     placeholder="Nhập họ tên"
+                     value={name}
+                     onChangeText={(text) => setName(text)}
+                     onBlur={() => setProfile({ ...profile, name })}
+                  />
+               </View>
+               <View style={styles.inputContainer}>
+                  <Text style={styles.labelInput}>Ngày sinh:</Text>
+                  {
+                     <DateTimePicker
+                        testID="dateTimePicker"
+                        value={new Date(profile.dob || null)}
+                        mode="date"
+                        onChange={onChange}
+                     />
+                  }
+               </View>
+               <View style={styles.inputContainer}>
+                  <Text style={styles.labelInput}>Giới tính:</Text>
+                  <RadioButton.Group
+                     onValueChange={(value) => setProfile({ ...profile, gender: value })}
+                     value={profile.gender ? true : false}
+                  >
+                     <RadioButton.Item label="Nam" value={true} />
+                     <RadioButton.Item label="Nữ" value={false} />
+                  </RadioButton.Group>
+               </View>
+               <Button
+                  icon={() => <Icon source={'account-edit-outline'} size={22} />}
+                  mode="contained"
+                  style={styles.btnEdit}
+                  labelStyle={{ fontSize: 16, color: '#000' }}
+                  onPress={handleUpdateProfile}
+               >
+                  Chỉnh sửa
+               </Button>
+            </View>
+         </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
    );
 };

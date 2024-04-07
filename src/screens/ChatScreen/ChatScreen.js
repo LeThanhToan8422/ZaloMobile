@@ -19,6 +19,7 @@ import Message from '../../components/Message';
 import { socket } from '../../utils/socket';
 import { getUserID } from '../../utils/storage';
 import styles from './styles';
+import { hide } from 'expo-splash-screen';
 
 /**
  * ChatScreen component. This component is used to render the chat screen.
@@ -59,7 +60,12 @@ export const ChatScreen = ({ route }) => {
 
       socket.on(`Server-Chat-Room-${idRoom}`, onChatEvents);
       socket.on(`Server-Status-Chat-${idRoom}`, (res) => {
-         console.log(res);
+         console.log(res.data);
+         const dateTimeSend = res.data.dateTimeSend;
+         setMessages((prev) => {
+            return prev.filter((prev) => prev.dateTimeSend !== dateTimeSend);
+         });
+         hideModal();
       });
       return () => {
          socket.off(`Server-Chat-Room-${idRoom}`, onChatEvents);
@@ -113,7 +119,6 @@ export const ChatScreen = ({ route }) => {
          chatRoom: userId > friendID ? `${friendID}${userId}` : `${userId}${friendID}`,
          objectId: friendID,
       });
-      // setIsRerenderStatusChat(!isRerenderStatusChat);
    };
 
    const sendMessage = () => {
@@ -191,9 +196,9 @@ export const ChatScreen = ({ route }) => {
                   />
                   {!message ? (
                      <>
-                        <IconButton icon="dots-horizontal" size={32} iconColor="#333" />
+                        <IconButton icon="file" size={32} iconColor="#333" />
                         <IconButton icon="microphone-outline" size={32} iconColor="#333" />
-                        <IconButton icon="file-image" size={32} iconColor="#333" onPress={pickImage} />
+                        <IconButton icon="image" size={32} iconColor="#333" onPress={pickImage} />
                      </>
                   ) : (
                      <IconButton icon="send-circle" size={32} iconColor="#4D9DF7" onPress={sendMessage} />
