@@ -23,13 +23,15 @@ export const Message = ({ data, index, localUserID, handleModal, onPress }) => {
    const { message, dateTimeSend } = data;
    const id = data.sender;
    const friendId = data.receiver;
-   const [avtFriend, setAvtFriend] = useState(null);
+   const [avtFriend, setAvtFriend] = useState(
+      'https://s3-dynamodb-cloudfront-20040331.s3.ap-southeast-1.amazonaws.com/toan.jfif'
+   );
    // const id = data.sender;
    const urlRegex = /^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/;
-   // console.log(message);
+
    useEffect(() => {
       getUserID().then((localUserId) => {
-         localUserID === friendId && getAvatarFriend(id);
+         localUserID !== id && getAvatarFriend(friendId);
       });
    }, []);
 
@@ -54,7 +56,10 @@ export const Message = ({ data, index, localUserID, handleModal, onPress }) => {
             {id !== localUserID ? <Image source={{ uri: avtFriend }} style={styles.avatar} /> : null}
             {urlRegex.test(message) ? (
                message.split('.').pop() === 'jpg' ? (
-                  <Image source={{ uri: message }} style={styles.imageMessage} />
+                  <View>
+                     <Image source={{ uri: message }} style={styles.imageMessage} />
+                     <Text style={styles.time}>{dateTimeSend && formatTime(dateTimeSend)}</Text>
+                  </View>
                ) : (
                   <View
                      style={[
@@ -70,12 +75,13 @@ export const Message = ({ data, index, localUserID, handleModal, onPress }) => {
                         <FileIcon extension={message.split('.').pop()} {...defaultStyles[message.split('.').pop()]} />
                      </View>
                      <Text>{message.split('--').slice(1)}</Text>
+                     <Text style={styles.time}>{dateTimeSend && formatTime(dateTimeSend)}</Text>
                   </View>
                )
             ) : (
                <View style={[styles.messageContainer, id === localUserID ? { backgroundColor: '#CFF0FF' } : {}]}>
                   <Text style={styles.content}>{message}</Text>
-                  <Text style={styles.time}>{dateTimeSend ? formatTime(dateTimeSend) : formatTime(new Date())}</Text>
+                  <Text style={styles.time}>{dateTimeSend && formatTime(dateTimeSend)}</Text>
                </View>
             )}
          </View>

@@ -15,6 +15,15 @@ export const FriendTab = ({ navigation }) => {
       });
    }, []);
 
+   useEffect(() => {
+      const unsubscribe = navigation.addListener('focus', () => {
+         getUserID().then((userID) => {
+            getContacts(userID);
+         });
+      });
+      return unsubscribe;
+   }, [navigation]);
+
    const getContacts = async (userID) => {
       const res = await axios.get(`${SERVER_HOST}/users/friends/${userID}`);
       const transformedData = res.data.reduce((acc, obj) => {

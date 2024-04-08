@@ -14,14 +14,17 @@ import {
    TouchableWithoutFeedback,
    View,
 } from 'react-native';
+import { FileIcon, defaultStyles } from 'react-native-file-icon';
+import FileViewer from 'react-native-file-viewer';
+import RNFS from 'react-native-fs';
+import ImageView from 'react-native-image-viewing';
 import { Button, Icon, IconButton, Modal, PaperProvider, Portal } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Message from '../../components/Message';
 import { socket } from '../../utils/socket';
 import { getUserID } from '../../utils/storage';
 import styles from './styles';
-import { FileIcon, defaultStyles } from 'react-native-file-icon';
-import ImageView from 'react-native-image-viewing';
+import dayjs from 'dayjs';
 
 /**
  * ChatScreen component. This component is used to render the chat screen.
@@ -64,6 +67,7 @@ export const ChatScreen = ({ route }) => {
 
       socket.on(`Server-Chat-Room-${idRoom}`, onChatEvents);
       socket.on(`Server-Status-Chat-${idRoom}`, (res) => {
+         console.log(res.data.id);
          setMessages((prev) => prev.filter((prev) => prev.id !== res.data.id));
          hideModal();
       });
@@ -115,9 +119,21 @@ export const ChatScreen = ({ route }) => {
       socket.emit('Client-Chat-Room', {
          chatRoom: userID < friendID ? `${userID}${friendID}` : `${friendID}${userID}`,
          file: data,
+         dateTimeSend: dayjs().format('YYYY-MM-DD HH:mm:ss'),
          sender: userID,
          receiver: friendID,
       });
+   };
+
+   const sendMessage = () => {
+      socket.emit('Client-Chat-Room', {
+         chatRoom: userID < friendID ? `${userID}${friendID}` : `${friendID}${userID}`,
+         message: message.trim(),
+         dateTimeSend: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+         sender: userID,
+         receiver: friendID,
+      });
+      setMessage('');
    };
 
    const handleClickStatusChat = (status, userId, chat) => {
@@ -130,15 +146,33 @@ export const ChatScreen = ({ route }) => {
       });
    };
 
-   const sendMessage = () => {
-      socket.emit('Client-Chat-Room', {
-         chatRoom: userID < friendID ? `${userID}${friendID}` : `${friendID}${userID}`,
-         message: message.trim(),
-         dateTimeSend: new Date(),
-         sender: userID,
-         receiver: friendID,
-      });
-      setMessage('');
+   const hanlePressMessage = async (item) => {
+      if (urlRegex.test(item.message)) {
+         if (item.message.split('.').pop() === ('jpg' || 'png')) {
+            setImagesView([{ uri: item.message }]);
+            setIsVisibleImage(true);
+         } else {
+            function getUrlExtension(url) {
+               return url.split(/[#?]/)[0].split('.').pop().trim();
+            }
+
+            const extension = getUrlExtension(item.message);
+            const localFile = `${RNFS.DocumentDirectoryPath}/${item.message.split('--').slice(1)}.${extension}`;
+
+            const options = {
+               fromUrl: item.message,
+               toFile: localFile,
+            };
+            RNFS.downloadFile(options)
+               .promise.then(() => FileViewer.open(localFile))
+               .then(() => {
+                  // success
+               })
+               .catch((error) => {
+                  // error
+               });
+         }
+      }
    };
 
    const getMessagesOfChat = async (userID, friendID) => {
@@ -213,11 +247,7 @@ export const ChatScreen = ({ route }) => {
                            index={index}
                            localUserID={userID}
                            handleModal={showModal}
-                           onPress={() => {
-                              console.log('Press image');
-                              setImagesView([{ uri: item.message }]);
-                              setIsVisibleImage(true);
-                           }}
+                           onPress={() => hanlePressMessage(item)}
                         />
                      )}
                      keyExtractor={(_, index) => index.toString()}
