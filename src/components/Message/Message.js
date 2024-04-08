@@ -1,10 +1,11 @@
-import { PORT, SERVER_HOST } from '@env';
+import { SERVER_HOST } from '@env';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { Image, Pressable, Text, View } from 'react-native';
 import { formatTime } from '../../utils/func';
-import styles from './styles';
 import { getUserID } from '../../utils/storage';
+import styles from './styles';
+import { FileIcon, defaultStyles } from 'react-native-file-icon';
 
 /**
  * Message component. This component is used to render a message.
@@ -18,23 +19,25 @@ import { getUserID } from '../../utils/storage';
  * @param {number} props.index - The index of the message.
  * @returns {JSX.Element} The rendered Message component.
  */
-export const Message = ({ data, index, localUserID, handleModal }) => {
+export const Message = ({ data, index, localUserID, handleModal, onPress }) => {
    const { message, dateTimeSend } = data;
    const id = data.sender;
    const friendId = data.receiver;
-   const [avtFriend, setAvtFriend] = useState(null);
+   const [avtFriend, setAvtFriend] = useState(
+      'https://s3-dynamodb-cloudfront-20040331.s3.ap-southeast-1.amazonaws.com/toan.jfif'
+   );
    // const id = data.sender;
    const urlRegex = /^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/;
 
    useEffect(() => {
       getUserID().then((localUserId) => {
-         localUserID === friendId && getAvatarFriend(id);
+         localUserID !== id && getAvatarFriend(friendId);
       });
    }, []);
 
    const getAvatarFriend = async (id) => {
       try {
-         const response = await axios.get(`${SERVER_HOST}:${PORT}/users/${id}`);
+         const response = await axios.get(`${SERVER_HOST}/users/${id}`);
          setAvtFriend(response.data.image);
       } catch (error) {
          console.error(error);
@@ -42,7 +45,7 @@ export const Message = ({ data, index, localUserID, handleModal }) => {
    };
 
    return (
-      <Pressable onLongPress={() => handleModal(data)}>
+      <Pressable onPress={onPress} onLongPress={() => handleModal(data)}>
          <View
             style={[
                styles.container,
@@ -51,13 +54,34 @@ export const Message = ({ data, index, localUserID, handleModal }) => {
             ]}
          >
             {id !== localUserID ? <Image source={{ uri: avtFriend }} style={styles.avatar} /> : null}
-
             {urlRegex.test(message) ? (
-               <Image source={{ uri: message }} style={styles.imageMessage} />
+               message.split('.').pop() === 'jpg' ? (
+                  <View>
+                     <Image source={{ uri: message }} style={styles.imageMessage} />
+                     <Text style={styles.time}>{dateTimeSend && formatTime(dateTimeSend)}</Text>
+                  </View>
+               ) : (
+                  <View
+                     style={[
+                        styles.messageContainer,
+                        {
+                           width: 150,
+                           height: 200,
+                           justifyContent: 'space-around',
+                        },
+                     ]}
+                  >
+                     <View style={{ width: 100, height: 120 }}>
+                        <FileIcon extension={message.split('.').pop()} {...defaultStyles[message.split('.').pop()]} />
+                     </View>
+                     <Text>{message.split('--').slice(1)}</Text>
+                     <Text style={styles.time}>{dateTimeSend && formatTime(dateTimeSend)}</Text>
+                  </View>
+               )
             ) : (
                <View style={[styles.messageContainer, id === localUserID ? { backgroundColor: '#CFF0FF' } : {}]}>
                   <Text style={styles.content}>{message}</Text>
-                  <Text style={styles.time}>{dateTimeSend ? formatTime(dateTimeSend) : formatTime(new Date())}</Text>
+                  <Text style={styles.time}>{dateTimeSend && formatTime(dateTimeSend)}</Text>
                </View>
             )}
          </View>

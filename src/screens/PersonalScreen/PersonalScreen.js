@@ -9,6 +9,7 @@ import styles from './styles';
 
 export const PersonalScreen = ({ navigation }) => {
    const [profile, setProfile] = useState({});
+
    useEffect(() => {
       getUserID()
          .then((id) => {
@@ -21,7 +22,7 @@ export const PersonalScreen = ({ navigation }) => {
 
    const getProfile = async (userID) => {
       try {
-         const response = await axios.get(`${SERVER_HOST}:${PORT}/users/${userID}`);
+         const response = await axios.get(`${SERVER_HOST}/users/${userID}`);
          setProfile(response.data);
       } catch (error) {
          console.error(error);

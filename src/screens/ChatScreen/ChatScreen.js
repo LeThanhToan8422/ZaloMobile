@@ -1,5 +1,6 @@
-import { PORT, SERVER_HOST } from '@env';
+import { SERVER_HOST } from '@env';
 import axios from 'axios';
+import * as DocumentPicker from 'expo-document-picker';
 import * as ImagePicker from 'expo-image-picker';
 import React, { useEffect, useState } from 'react';
 import {
@@ -13,13 +14,17 @@ import {
    TouchableWithoutFeedback,
    View,
 } from 'react-native';
+import { FileIcon, defaultStyles } from 'react-native-file-icon';
+import FileViewer from 'react-native-file-viewer';
+import RNFS from 'react-native-fs';
+import ImageView from 'react-native-image-viewing';
 import { Button, Icon, IconButton, Modal, PaperProvider, Portal } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Message from '../../components/Message';
 import { socket } from '../../utils/socket';
 import { getUserID } from '../../utils/storage';
 import styles from './styles';
-import { hide } from 'expo-splash-screen';
+import dayjs from 'dayjs';
 
 /**
  * ChatScreen component. This component is used to render the chat screen.
@@ -37,6 +42,8 @@ export const ChatScreen = ({ route }) => {
    const [image, setImage] = useState(null);
    const [visible, setVisible] = useState(false);
    const [modalData, setModalData] = useState(null);
+   const [imagesView, setImagesView] = useState([]);
+   const [visibleImage, setIsVisibleImage] = useState(false);
 
    const hideModal = () => setVisible(false);
 
@@ -60,11 +67,8 @@ export const ChatScreen = ({ route }) => {
 
       socket.on(`Server-Chat-Room-${idRoom}`, onChatEvents);
       socket.on(`Server-Status-Chat-${idRoom}`, (res) => {
-         console.log(res.data);
-         const dateTimeSend = res.data.dateTimeSend;
-         setMessages((prev) => {
-            return prev.filter((prev) => prev.dateTimeSend !== dateTimeSend);
-         });
+         console.log(res.data.id);
+         setMessages((prev) => prev.filter((prev) => prev.id !== res.data.id));
          hideModal();
       });
       return () => {
@@ -83,32 +87,53 @@ export const ChatScreen = ({ route }) => {
       });
 
       if (!result.canceled) {
-         result.assets.forEach((image) => handleSendImage(image));
+         result.assets.forEach((image) => handleSendFile(image));
       }
    };
 
-   const handleSendImage = async (image) => {
-      let localUri = image.uri;
-      let filename = localUri.split('/').pop();
-      let match = /\.(\w+)$/.exec(filename);
-      let typeImage = match ? `image/${match[1]}` : `image`;
+   const pickFile = async () => {
+      let result = await DocumentPicker.getDocumentAsync({
+         type: '*/*',
+         multiple: true,
+      });
+
+      if (!result.canceled) {
+         result.assets.forEach((file) => handleSendFile(file));
+      }
+   };
+
+   const handleSendFile = async (file) => {
+      let localUri = file.uri;
+      let filename = file.fileName || file.name;
+      let type = file.type ? `${file.type}/${localUri.split('.').pop()}` : file.mimeType;
       const buffer = await axios.get(localUri, { responseType: 'arraybuffer' }).then((res) => res.data);
 
       const data = {
          originalname: filename,
          encoding: '7bit',
-         mimetype: typeImage,
+         mimetype: type,
          buffer: buffer,
-         size: image.fileSize,
+         size: file.fileSize,
       };
 
       socket.emit('Client-Chat-Room', {
          chatRoom: userID < friendID ? `${userID}${friendID}` : `${friendID}${userID}`,
          file: data,
-         dateTimeSend: new Date(),
+         dateTimeSend: dayjs().format('YYYY-MM-DD HH:mm:ss'),
          sender: userID,
          receiver: friendID,
       });
+   };
+
+   const sendMessage = () => {
+      socket.emit('Client-Chat-Room', {
+         chatRoom: userID < friendID ? `${userID}${friendID}` : `${friendID}${userID}`,
+         message: message.trim(),
+         dateTimeSend: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+         sender: userID,
+         receiver: friendID,
+      });
+      setMessage('');
    };
 
    const handleClickStatusChat = (status, userId, chat) => {
@@ -121,19 +146,37 @@ export const ChatScreen = ({ route }) => {
       });
    };
 
-   const sendMessage = () => {
-      socket.emit('Client-Chat-Room', {
-         chatRoom: userID < friendID ? `${userID}${friendID}` : `${friendID}${userID}`,
-         message: message.trim(),
-         dateTimeSend: new Date(),
-         sender: userID,
-         receiver: friendID,
-      });
-      setMessage('');
+   const hanlePressMessage = async (item) => {
+      if (urlRegex.test(item.message)) {
+         if (item.message.split('.').pop() === ('jpg' || 'png')) {
+            setImagesView([{ uri: item.message }]);
+            setIsVisibleImage(true);
+         } else {
+            function getUrlExtension(url) {
+               return url.split(/[#?]/)[0].split('.').pop().trim();
+            }
+
+            const extension = getUrlExtension(item.message);
+            const localFile = `${RNFS.DocumentDirectoryPath}/${item.message.split('--').slice(1)}.${extension}`;
+
+            const options = {
+               fromUrl: item.message,
+               toFile: localFile,
+            };
+            RNFS.downloadFile(options)
+               .promise.then(() => FileViewer.open(localFile))
+               .then(() => {
+                  // success
+               })
+               .catch((error) => {
+                  // error
+               });
+         }
+      }
    };
 
    const getMessagesOfChat = async (userID, friendID) => {
-      let datas = await axios.get(`${SERVER_HOST}:${PORT}/chats/content-chats-between-users/${userID}-and-${friendID}`);
+      let datas = await axios.get(`${SERVER_HOST}/chats/content-chats-between-users/${userID}-and-${friendID}`);
       setMessages(datas.data.sort((a, b) => new Date(b.dateTimeSend) - new Date(a.dateTimeSend)));
    };
 
@@ -149,7 +192,28 @@ export const ChatScreen = ({ route }) => {
                   <Portal>
                      <Modal visible={visible} onDismiss={hideModal} contentContainerStyle={styles.modalContainer}>
                         {urlRegex.test(modalData?.message) ? (
-                           <Image source={{ uri: modalData?.message }} style={styles.imageMessage} />
+                           modalData?.message.split('.').pop() === ('jpg' || 'png') ? (
+                              <Image source={{ uri: modalData?.message }} style={styles.imageMessage} />
+                           ) : (
+                              <View
+                                 style={[
+                                    styles.messageContainer,
+                                    {
+                                       width: 150,
+                                       height: 200,
+                                       justifyContent: 'space-around',
+                                    },
+                                 ]}
+                              >
+                                 <View style={{ width: 100, height: 120 }}>
+                                    <FileIcon
+                                       extension={modalData?.message.split('.').pop()}
+                                       {...defaultStyles[modalData?.message.split('.').pop()]}
+                                    />
+                                 </View>
+                                 <Text>{modalData?.message.split('--').slice(1)}</Text>
+                              </View>
+                           )
                         ) : (
                            <Text style={styles.messageContainer}>{modalData?.message}</Text>
                         )}
@@ -178,7 +242,13 @@ export const ChatScreen = ({ route }) => {
                      data={messages}
                      style={{ flexGrow: 1, backgroundColor: '#E2E8F1' }}
                      renderItem={({ item, index }) => (
-                        <Message data={item} index={index} localUserID={userID} handleModal={showModal} />
+                        <Message
+                           data={item}
+                           index={index}
+                           localUserID={userID}
+                           handleModal={showModal}
+                           onPress={() => hanlePressMessage(item)}
+                        />
                      )}
                      keyExtractor={(_, index) => index.toString()}
                   />
@@ -196,7 +266,7 @@ export const ChatScreen = ({ route }) => {
                   />
                   {!message ? (
                      <>
-                        <IconButton icon="file" size={32} iconColor="#333" />
+                        <IconButton icon="file" size={32} iconColor="#333" onPress={pickFile} />
                         <IconButton icon="microphone-outline" size={32} iconColor="#333" />
                         <IconButton icon="image" size={32} iconColor="#333" onPress={pickImage} />
                      </>
@@ -204,6 +274,12 @@ export const ChatScreen = ({ route }) => {
                      <IconButton icon="send-circle" size={32} iconColor="#4D9DF7" onPress={sendMessage} />
                   )}
                </View>
+               <ImageView
+                  images={imagesView}
+                  imageIndex={0}
+                  visible={visibleImage}
+                  onRequestClose={() => setIsVisibleImage(false)}
+               />
             </View>
          </TouchableWithoutFeedback>
       </KeyboardAvoidingView>

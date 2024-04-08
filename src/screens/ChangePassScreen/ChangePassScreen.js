@@ -1,4 +1,4 @@
-import { PORT, SERVER_HOST } from '@env';
+import { SERVER_HOST } from '@env';
 import axios from 'axios';
 import React, { useState } from 'react';
 import { Keyboard, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, View } from 'react-native';
@@ -20,11 +20,11 @@ export const ChangePassScreen = ({ navigation, route }) => {
 
    const handleChangePass = async () => {
       try {
-         const dataUsers = await axios.get(`${SERVER_HOST}:${PORT}/accounts/phone/${phone}`);
+         const dataUsers = await axios.get(`${SERVER_HOST}/accounts/phone/${phone}`);
          if (reactNativeBcrypt.compareSync(oldPass, dataUsers.data.password)) {
             if (!checkPassword(password, rePassword)) return;
             const hashPass = reactNativeBcrypt.hashSync(password, salt);
-            const dataAccount = await axios.put(`${SERVER_HOST}:${PORT}/accounts`, {
+            const dataAccount = await axios.put(`${SERVER_HOST}/accounts`, {
                phone,
                password: hashPass,
                id: dataUsers.data.id,

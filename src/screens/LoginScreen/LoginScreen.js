@@ -19,7 +19,7 @@ export const LoginScreen = ({ navigation }) => {
    const handleLogin = async () => {
       try {
          // if (!checkPassword(password)) return;
-         let res = await axios.get(`${SERVER_HOST}:${PORT}/accounts/phone/${phone}`);
+         let res = await axios.get(`${SERVER_HOST}/accounts/phone/${phone}`);
          if (reactNativeBcrypt.compareSync(password, res.data.password)) {
             storeData({ phone, password: res.data.password, id: res.data.user });
             navigation.navigate('AppStack');

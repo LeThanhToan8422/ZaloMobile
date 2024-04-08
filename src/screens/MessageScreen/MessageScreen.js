@@ -13,13 +13,23 @@ export const MessageScreen = ({ navigation }) => {
       });
    }, []);
 
+   useEffect(() => {
+      const unsubscribe = navigation.addListener('focus', () => {
+         getUserID().then((userID) => {
+            getApiChatsByUserId(userID);
+         });
+      });
+
+      return unsubscribe;
+   }, [navigation]);
+
    /**
     * Calls the API to get chat data by user ID.
     * @param {number} userID - The user ID.
     * @returns {Promise<void>} A Promise that resolves when the API call is complete.
     */
    const getApiChatsByUserId = async (userID) => {
-      const res = await axios.get(`${SERVER_HOST}:${PORT}/users/get-chats-by-id/${userID}`);
+      const res = await axios.get(`${SERVER_HOST}/users/get-chats-by-id/${userID}`);
       setData(res.data);
    };
 

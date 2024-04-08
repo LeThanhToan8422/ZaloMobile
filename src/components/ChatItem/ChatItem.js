@@ -29,7 +29,11 @@ export const ChatItem = ({ navigation, data }) => {
             <View style={{ flex: 1, marginLeft: 10, rowGap: 4 }}>
                <Text style={styles.name}>{name}</Text>
                <Text ellipsizeMode="tail" numberOfLines={1} style={styles.message}>
-                  {urlRegex.test(message) ? '[Hình ảnh]' : message}
+                  {urlRegex.test(message)
+                     ? message.split('.').pop() === ('jpg' || 'png')
+                        ? '[Hình ảnh]'
+                        : '[Tập tin]'
+                     : message}
                </Text>
             </View>
             <View style={{ alignItems: 'center', rowGap: 4 }}>

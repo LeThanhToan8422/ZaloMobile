@@ -1,4 +1,4 @@
-import { PORT, SERVER_HOST } from '@env';
+import { SERVER_HOST } from '@env';
 import axios from 'axios';
 import React, { useRef, useState } from 'react';
 import { Keyboard, KeyboardAvoidingView, Platform, Text, TouchableWithoutFeedback, View } from 'react-native';
@@ -22,7 +22,7 @@ export const PhoneNumberScreen = ({ navigation, route }, props) => {
          Toast.show({ type: 'error', text1: 'Số điện thoại không hợp lệ', position: 'bottom' });
          return;
       }
-      const checkPhone = await axios.get(`${SERVER_HOST}:${PORT}/accounts/phone/${phone}`);
+      const checkPhone = await axios.get(`${SERVER_HOST}/accounts/phone/${phone}`);
       if (checkPhone.data) {
          Toast.show({ type: 'error', text1: 'Số điện thoại đã tồn tại', position: 'bottom' });
          return;

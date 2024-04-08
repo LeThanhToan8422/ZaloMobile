@@ -18,7 +18,7 @@ export const GroupTab = ({ navigation }) => {
 
    // Func Call API to get data
    const getApiChatsByUserId = async (userID) => {
-      const res = await axios.get(`${SERVER_HOST}:${PORT}/users/friends/${userID}`);
+      const res = await axios.get(`${SERVER_HOST}/users/friends/${userID}`);
       setData(res.data);
    };
    return (
