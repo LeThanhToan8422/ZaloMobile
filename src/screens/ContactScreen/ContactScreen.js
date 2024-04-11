@@ -1,9 +1,11 @@
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React from 'react';
 import Friend from './FriendTab';
 import Group from './GroupTab';
 
 const Tab = createMaterialTopTabNavigator();
+const Stack = createNativeStackNavigator();
 
 export const ContactScreen = () => {
    return (

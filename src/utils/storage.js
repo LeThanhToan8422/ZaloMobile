@@ -27,4 +27,13 @@ const storeData = async (value) => {
    }
 };
 
-export { getUserID, storeData };
+const getData = async () => {
+   try {
+      const jsonValue = await AsyncStorage.getItem('@user');
+      return jsonValue != null ? JSON.parse(jsonValue) : null;
+   } catch (e) {
+      // error reading value
+   }
+};
+
+export { getUserID, getData, storeData };

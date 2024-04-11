@@ -1,7 +1,7 @@
 import { SERVER_HOST } from '@env';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { SectionList, Text, View } from 'react-native';
+import { Pressable, SectionList, Text, View } from 'react-native';
 import { ContactItem } from '../../../components/ContactItem/ContactItem';
 import PressableItem from '../../../components/PressableItem';
 import { getUserID } from '../../../utils/storage';
@@ -39,6 +39,8 @@ export const FriendTab = ({ navigation }) => {
    return (
       <View style={styles.container}>
          <PressableItem
+            navParams={{ screen: 'FriendRequest' }}
+            navigation={navigation}
             title="Lời mời kết bạn"
             icon="account-multiple-outline"
             iconStyle={{ size: 28 }}

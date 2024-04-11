@@ -1,8 +1,9 @@
 import { AntDesign, Entypo, Feather, Ionicons } from '@expo/vector-icons';
-import React from 'react';
+import React, { useState } from 'react';
 import { Platform, Text, TextInput, View } from 'react-native';
 import { Appbar } from 'react-native-paper';
 import styles from './styles';
+import { IconButton } from 'react-native-paper';
 
 /**
  * Represents the header component of the app.
@@ -13,6 +14,7 @@ import styles from './styles';
  */
 export const HeaderApp = ({ navigation, props, type, title, member }) => {
    Platform.OS === 'ios' ? (height = 44) : (height = 56);
+   const [search, setSearch] = useState('0981209501');
    return (
       <Appbar.Header {...props} mode="small" style={{ height: height, backgroundColor: '#4D9DF7' }}>
          {type === 'chat' ? (
@@ -70,8 +72,19 @@ export const HeaderApp = ({ navigation, props, type, title, member }) => {
                <Appbar.Content
                   title={
                      <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft: 12 }}>
-                        <Ionicons name="ios-search-outline" size={22} color="white" />
-                        <TextInput style={[styles.searchInput]} placeholder="Tìm kiếm" placeholderTextColor="#fff" />
+                        <IconButton
+                           icon={() => <Ionicons name="ios-search-outline" size={22} color="white" />}
+                           onPress={() => search.trim() && navigation.navigate('SearchScreen', { search: search })}
+                        />
+                        <TextInput
+                           style={[styles.searchInput]}
+                           placeholder="Tìm kiếm"
+                           placeholderTextColor="#fff"
+                           color="#fff"
+                           fontSize={18}
+                           value={search}
+                           onChangeText={(text) => setSearch(text)}
+                        />
                      </View>
                   }
                   onPress={() => {}}

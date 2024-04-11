@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { Image, ScrollView } from 'react-native';
 import { Button, IconButton } from 'react-native-paper';
 import PressableItem from '../../components/PressableItem';
-import { getUserID } from '../../utils/storage';
+import { getUserID, storeData } from '../../utils/storage';
 import styles from './styles';
 
 export const PersonalScreen = ({ navigation }) => {
