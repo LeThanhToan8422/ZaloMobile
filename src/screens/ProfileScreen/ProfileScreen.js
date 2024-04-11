@@ -1,5 +1,5 @@
 import { SERVER_HOST } from '@env';
-import DateTimePicker from '@react-native-community/datetimepicker';
+import DateTimePicker, { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import axios from 'axios';
 import dayjs from 'dayjs';
 import * as ImagePicker from 'expo-image-picker';
@@ -19,17 +19,29 @@ import Toast from 'react-native-toast-message';
 import { socket } from '../../utils/socket';
 import { getUserID } from '../../utils/storage';
 import styles from './styles';
+import { IconButton, Menu, Divider, PaperProvider } from 'react-native-paper';
 
-export const ProfileScreen = () => {
+export const ProfileScreen = ({ navigation, route }) => {
    const [profile, setProfile] = useState({});
    const [name, setName] = useState('');
    const [dob, setDob] = useState(null);
    const [avatar, setAvatar] = useState(null);
    const [background, setBackground] = useState(null);
+   const [friendID, setFriendID] = useState(route.params?.friend);
+   const [statusFriend, setStatusFriend] = useState(false);
+   const [visible, setVisible] = React.useState(false);
 
    const onChange = (event, selectedDate) => {
       setDob(selectedDate);
       setProfile({ ...profile, dob: selectedDate });
+   };
+
+   const showMode = () => {
+      DateTimePickerAndroid.open({
+         value: new Date(profile.dob) || new Date(),
+         onChange,
+         mode: 'date',
+      });
    };
 
    const pickImage = async (type) => {
@@ -78,7 +90,9 @@ export const ProfileScreen = () => {
    useEffect(() => {
       getUserID()
          .then((id) => {
-            getProfile(id);
+            if (id === friendID) setFriendID(null);
+            friendID ? getProfile(friendID) : getProfile(id);
+            friendID && checkIsFriend(id, friendID);
          })
          .catch((err) => {
             console.error(err);
@@ -132,68 +146,167 @@ export const ProfileScreen = () => {
       }
    };
 
+   const handleAddFriend = async () => {
+      getUserID().then((id) => {
+         const params = {
+            content: 'Mình kết bạn với nhau nhé!!!',
+            giver: id, // id user của mình
+            recipient: friendID, // id của user muốn kết bạn
+         };
+         const dataAddFriend = axios.post(`${SERVER_HOST}/make-friends`, params);
+         if (dataAddFriend.data) {
+            // setSendMakeFriend(true);
+            // setRerender(pre => !pre)
+            Toast.show({
+               type: 'success',
+               text1: 'Đã gửi lời mời kết bạn',
+               position: 'bottom',
+            });
+         }
+      });
+   };
+
+   const checkIsFriend = async (id, friendID) => {
+      try {
+         const response = await axios.get(`${SERVER_HOST}/users/check-is-friend/${id}/${friendID}`);
+         if (response.data) {
+            setStatusFriend(response.data.isFriends);
+         }
+      } catch (error) {
+         console.error(error);
+      }
+   };
+
+   const openMenu = () => setVisible(true);
+
+   const closeMenu = () => setVisible(false);
+
    return (
-      <KeyboardAvoidingView
-         enabled
-         {...(Platform.OS === 'ios' && { behavior: 'padding', keyboardVerticalOffset: 60 })}
-         style={{ flexGrow: 1 }}
-      >
-         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-            <View style={styles.container}>
-               <Pressable onPress={() => pickImage('background')}>
-                  <ImageBackground source={{ uri: background }} style={styles.background}></ImageBackground>
-               </Pressable>
-               <View style={styles.avatarContainer}>
-                  <Pressable onPress={() => pickImage('avatar')}>
-                     <Avatar.Image size={150} source={{ uri: avatar }} />
+      <PaperProvider>
+         <KeyboardAvoidingView
+            enabled
+            {...(Platform.OS === 'ios' && { behavior: 'padding', keyboardVerticalOffset: 60 })}
+            style={{ flexGrow: 1 }}
+         >
+            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+               <View style={styles.container}>
+                  <Pressable onPress={() => pickImage('background')}>
+                     <ImageBackground source={{ uri: background }} style={styles.background}></ImageBackground>
                   </Pressable>
-                  <Text style={{ fontSize: 25, fontWeight: '700' }}>{profile.name}</Text>
-               </View>
-               <Text style={{ fontSize: 20, fontWeight: '500', marginTop: 30, marginLeft: 10, marginBottom: 10 }}>
-                  Thông tin cá nhân
-               </Text>
-               <View style={styles.inputContainer}>
-                  <Text style={styles.labelInput}>Họ tên:</Text>
-                  <TextInput
-                     style={styles.input}
-                     placeholder="Nhập họ tên"
-                     value={name}
-                     onChangeText={(text) => setName(text)}
-                     onBlur={() => setProfile({ ...profile, name })}
-                  />
-               </View>
-               <View style={styles.inputContainer}>
-                  <Text style={styles.labelInput}>Ngày sinh:</Text>
-                  {
-                     <DateTimePicker
-                        testID="dateTimePicker"
-                        value={new Date(profile.dob || null)}
-                        mode="date"
-                        onChange={onChange}
+                  <View style={styles.avatarContainer}>
+                     <Pressable onPress={() => pickImage('avatar')}>
+                        <Avatar.Image size={150} source={{ uri: avatar && avatar }} />
+                     </Pressable>
+                     <Text style={{ fontSize: 25, fontWeight: '700' }}>{profile.name}</Text>
+                  </View>
+                  {friendID && (
+                     <View
+                        style={{
+                           flexDirection: 'row',
+                           justifyContent: 'center',
+                           alignItems: 'center',
+                           marginHorizontal: 12,
+                        }}
+                     >
+                        <Button
+                           icon={() => <Icon source={'chat-plus-outline'} size={22} />}
+                           mode="contained"
+                           style={[styles.btnEdit, { marginRight: 10, flex: 1, backgroundColor: '#A5C4F2' }]}
+                           labelStyle={{ fontSize: 16, color: '#000' }}
+                           onPress={() => navigation.navigate('ChatScreen', { id: friendID })}
+                        >
+                           Nhắn tin
+                        </Button>
+                        <Button
+                           icon={() => <Icon source={'account-plus-outline'} size={22} />}
+                           mode="contained"
+                           style={[styles.btnEdit]}
+                           labelStyle={{ fontSize: 16, color: '#000' }}
+                           onPress={handleAddFriend}
+                        >
+                           {statusFriend === '1' ? 'Bạn bè' : statusFriend ? 'Đã gửi lời mời' : 'Kết bạn'}
+                        </Button>
+                        <Menu
+                           visible={visible}
+                           onDismiss={closeMenu}
+                           anchor={
+                              <IconButton
+                                 style={{ marginBottom: -5 }}
+                                 mode="contained-tonal"
+                                 icon="dots-vertical"
+                                 color="#000"
+                                 size={24}
+                                 onPress={openMenu}
+                              />
+                           }
+                        >
+                           <Menu.Item
+                              leadingIcon={() => <Icon source={'account-cancel-outline'} size={22} />}
+                              title={'Chặn'}
+                              onPress={() => {}}
+                           />
+                        </Menu>
+                     </View>
+                  )}
+                  <Text style={{ fontSize: 20, fontWeight: '500', marginTop: 30, marginLeft: 10, marginBottom: 10 }}>
+                     Thông tin cá nhân
+                  </Text>
+                  <View style={styles.inputContainer}>
+                     <Text style={styles.labelInput}>Họ tên:</Text>
+                     <TextInput
+                        style={styles.input}
+                        contentStyle={{ color: '#000' }}
+                        placeholder="Nhập họ tên"
+                        value={name}
+                        editable={friendID ? false : true}
+                        onChangeText={(text) => setName(text)}
+                        onBlur={() => setProfile({ ...profile, name })}
                      />
-                  }
+                  </View>
+                  <View style={styles.inputContainer}>
+                     <Text style={styles.labelInput}>Ngày sinh:</Text>
+                     {Platform.OS === 'android' ? (
+                        <Button mode="text" onPress={showMode} labelStyle={{ color: '#000', fontSize: 16 }}>
+                           {dayjs(profile.dob).format('DD/MM/YYYY') || null}
+                        </Button>
+                     ) : (
+                        <DateTimePicker
+                           visible={false}
+                           testID="dateTimePicker"
+                           value={new Date(profile.dob || null)}
+                           mode="date"
+                           onChange={onChange}
+                        />
+                     )}
+                  </View>
+                  <View style={styles.inputContainer}>
+                     <Text style={styles.labelInput}>Giới tính:</Text>
+                     {friendID ? (
+                        <RadioButton.Item label={profile.gender ? 'Nam' : 'Nữ'} />
+                     ) : (
+                        <RadioButton.Group
+                           onValueChange={(value) => setProfile({ ...profile, gender: value })}
+                           value={profile.gender ? true : false}
+                        >
+                           <RadioButton.Item label="Nam" value={true} />
+                           <RadioButton.Item label="Nữ" value={false} />
+                        </RadioButton.Group>
+                     )}
+                  </View>
+                  {!friendID && (
+                     <Button
+                        icon={() => <Icon source={'account-edit-outline'} size={22} />}
+                        mode="contained"
+                        style={styles.btnEdit}
+                        labelStyle={{ fontSize: 16, color: '#000' }}
+                        onPress={handleUpdateProfile}
+                     >
+                        Chỉnh sửa
+                     </Button>
+                  )}
                </View>
-               <View style={styles.inputContainer}>
-                  <Text style={styles.labelInput}>Giới tính:</Text>
-                  <RadioButton.Group
-                     onValueChange={(value) => setProfile({ ...profile, gender: value })}
-                     value={profile.gender ? true : false}
-                  >
-                     <RadioButton.Item label="Nam" value={true} />
-                     <RadioButton.Item label="Nữ" value={false} />
-                  </RadioButton.Group>
-               </View>
-               <Button
-                  icon={() => <Icon source={'account-edit-outline'} size={22} />}
-                  mode="contained"
-                  style={styles.btnEdit}
-                  labelStyle={{ fontSize: 16, color: '#000' }}
-                  onPress={handleUpdateProfile}
-               >
-                  Chỉnh sửa
-               </Button>
-            </View>
-         </TouchableWithoutFeedback>
-      </KeyboardAvoidingView>
+            </TouchableWithoutFeedback>
+         </KeyboardAvoidingView>
+      </PaperProvider>
    );
 };

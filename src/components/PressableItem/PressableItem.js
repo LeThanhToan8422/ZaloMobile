@@ -8,7 +8,9 @@ import styles from './styles';
  *
  * @param {object} props - The component props.
  * @param {object} props.navigation - The navigation object.
- * @param {string} props.navParams - The params to pass to the next screen. Include the screen name and the params.
+ * @param {object} props.navParams - The params to pass to the next screen. Include the screen name and the params.
+ * @param {object} props.navParams.screen - The name of the screen to navigate to.
+ * @param {object} props.navParams.params - The params to pass to the next screen.
  * @param {string} props.icon - The source of the icon.
  * @param {string} props.title - The title of the item.
  * @param {string} props.subtitle - The subtitle of the item.

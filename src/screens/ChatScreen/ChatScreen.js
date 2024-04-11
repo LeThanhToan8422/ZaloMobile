@@ -4,6 +4,7 @@ import * as DocumentPicker from 'expo-document-picker';
 import * as ImagePicker from 'expo-image-picker';
 import React, { useEffect, useState } from 'react';
 import {
+   ActivityIndicator,
    FlatList,
    Image,
    Keyboard,
@@ -44,6 +45,8 @@ export const ChatScreen = ({ route }) => {
    const [modalData, setModalData] = useState(null);
    const [imagesView, setImagesView] = useState([]);
    const [visibleImage, setIsVisibleImage] = useState(false);
+   const [loading, setLoading] = useState(false);
+   const [page, setPage] = useState(1); // Keep track of the current page
 
    const hideModal = () => setVisible(false);
 
@@ -176,8 +179,10 @@ export const ChatScreen = ({ route }) => {
    };
 
    const getMessagesOfChat = async (userID, friendID) => {
-      let datas = await axios.get(`${SERVER_HOST}/chats/content-chats-between-users/${userID}-and-${friendID}`);
+      setLoading(true);
+      let datas = await axios.get(`${SERVER_HOST}/chats/content-chats-between-users/${userID}-and-${friendID}/${page}`);
       setMessages(datas.data.sort((a, b) => new Date(b.dateTimeSend) - new Date(a.dateTimeSend)));
+      setLoading(false);
    };
 
    return (
@@ -241,6 +246,15 @@ export const ChatScreen = ({ route }) => {
                      inverted
                      data={messages}
                      style={{ flexGrow: 1, backgroundColor: '#E2E8F1' }}
+                     onEndReached={() => {
+                        // Load more data when reaching the end of the list
+                        if (!loading) {
+                           setPage((prevPage) => prevPage + 1);
+                           getMessagesOfChat(userID, friendID);
+                        }
+                     }}
+                     onEndReachedThreshold={0.1} // Adjust this value as needed
+                     keyExtractor={(_, index) => index.toString()}
                      renderItem={({ item, index }) => (
                         <Message
                            data={item}
@@ -250,7 +264,10 @@ export const ChatScreen = ({ route }) => {
                            onPress={() => hanlePressMessage(item)}
                         />
                      )}
-                     keyExtractor={(_, index) => index.toString()}
+                     ListFooterComponent={() =>
+                        // Render a loading indicator at the bottom of the list
+                        loading && <ActivityIndicator size="large" color="#ccc" />
+                     }
                   />
                </PaperProvider>
                <View style={[styles.chatContainer, { paddingBottom: insets.bottom }]}>

@@ -32,6 +32,7 @@ const styles = StyleSheet.create({
       flex: 1,
       margin: 5,
       backgroundColor: '#fff',
+      fontSize: 18,
    },
    btnEdit: {
       marginTop: 10,

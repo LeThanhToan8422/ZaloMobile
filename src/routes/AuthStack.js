@@ -8,6 +8,7 @@ import RegisterScreen from '../screens/RegisterScreen';
 import PasswordScreen from '../screens/RegisterScreen/PasswordScreen';
 import PhoneNumberScreen from '../screens/RegisterScreen/PhoneNumberScreen';
 import { VerifyPhoneScreen } from '../screens/VerifyPhoneScreen';
+import FriendRequestScreen from '../screens/FriendRequestScreen';
 const Stack = createNativeStackNavigator();
 
 const AuthStack = () => {
