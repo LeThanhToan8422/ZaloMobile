@@ -20,7 +20,8 @@ import { FileIcon, defaultStyles } from 'react-native-file-icon';
  * @returns {JSX.Element} The rendered Message component.
  */
 export const Message = ({ data, index, localUserID, handleModal, onPress }) => {
-   const { message, dateTimeSend } = data;
+   const [message, setMessage] = useState(data.message);
+   const { dateTimeSend, isRecalls } = data;
    const id = data.sender;
    const friendId = data.receiver;
    const [avtFriend, setAvtFriend] = useState(
@@ -33,6 +34,7 @@ export const Message = ({ data, index, localUserID, handleModal, onPress }) => {
       getUserID().then((localUserId) => {
          localUserID !== id && getAvatarFriend(friendId);
       });
+      isRecalls && setMessage('Tin nhắn đã được thu hồi');
    }, []);
 
    const getAvatarFriend = async (id) => {
@@ -45,7 +47,7 @@ export const Message = ({ data, index, localUserID, handleModal, onPress }) => {
    };
 
    return (
-      <Pressable onPress={onPress} onLongPress={() => handleModal(data)}>
+      <Pressable onPress={onPress} onLongPress={() => handleModal(data)} disabled={isRecalls ? true : false}>
          <View
             style={[
                styles.container,
@@ -80,7 +82,7 @@ export const Message = ({ data, index, localUserID, handleModal, onPress }) => {
                )
             ) : (
                <View style={[styles.messageContainer, id === localUserID ? { backgroundColor: '#CFF0FF' } : {}]}>
-                  <Text style={styles.content}>{message}</Text>
+                  <Text style={[styles.content, isRecalls && { color: '#333' }]}>{message}</Text>
                   <Text style={styles.time}>{dateTimeSend && formatTime(dateTimeSend)}</Text>
                </View>
             )}

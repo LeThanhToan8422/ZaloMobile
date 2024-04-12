@@ -18,7 +18,7 @@ export const AuthenticationScreen = ({ navigation }) => {
          ]}
       >
          <View>
-            <Image style={styles.logo} source={require('../../assets/images/zalo.png')} />
+            <Image style={styles.logo} source={require('../../../assets/images/zalo.png')} />
          </View>
          <IntroSlider />
          <View style={{ rowGap: 8 }}>
