@@ -17,7 +17,7 @@ import {
 } from 'react-native';
 import { FileIcon, defaultStyles } from 'react-native-file-icon';
 import FileViewer from 'react-native-file-viewer';
-import RNFS from 'react-native-fs';
+import RNFS, { stat } from 'react-native-fs';
 import ImageView from 'react-native-image-viewing';
 import { Button, Icon, IconButton, Modal, PaperProvider, Portal } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -53,13 +53,6 @@ export const ChatScreen = ({ route }) => {
    const [recording, setRecording] = useState();
    const [permissionResponse, requestPermission] = Audio.usePermissions();
 
-   const hideModal = () => setVisible(false);
-
-   const showModal = (item) => {
-      setModalData(item);
-      setVisible(true);
-   };
-
    useEffect(() => {
       getUserID().then((id) => {
          getMessagesOfChat(userID, friendID);
@@ -71,19 +64,17 @@ export const ChatScreen = ({ route }) => {
       const onChatEvents = (res) => {
          setMessages((prev) => [res.data, ...prev]);
       };
-      const idRoom = userID < friendID ? `${userID}${friendID}` : `${friendID}${userID}`;
-
-      socket.on(`Server-Chat-Room-${groupChat.members ? groupChat.id : idRoom}`, onChatEvents);
-      socket.on(`Server-Status-Chat-${groupChat.members ? groupChat.id : idRoom}`, (res) => {
-         console.log(res.data);
+      const onStatusChatEvents = (res) => {
          const index = messages.findIndex((message) => message.id === res.data.id);
-         messages[index].isRecalls = 1;
+         if (index !== -1) messages[index].isRecalls = 1;
          setMessages([...messages]);
-         hideModal();
-      });
+      };
+      const idRoom = userID < friendID ? `${userID}${friendID}` : `${friendID}${userID}`;
+      socket.on(`Server-Chat-Room-${groupChat.members ? groupChat.id : idRoom}`, onChatEvents);
+      socket.on(`Server-Status-Chat-${groupChat.members ? groupChat.id : idRoom}`, onStatusChatEvents);
       return () => {
          socket.off(`Server-Chat-Room-${groupChat.members ? groupChat.id : idRoom}`, onChatEvents);
-         socket.off(`Server-Status-Chat-${groupChat.members ? groupChat.id : idRoom}`);
+         socket.off(`Server-Status-Chat-${groupChat.members ? groupChat.id : idRoom}`, onStatusChatEvents);
       };
    }, [socket, messages]);
 
@@ -150,11 +141,14 @@ export const ChatScreen = ({ route }) => {
          message: message, // thông tin message
          dateTimeSend: dayjs().format('YYYY-MM-DD HH:mm:ss'),
          sender: userID, // id người gửi
-         chatRoom: groupChat.id, // phòng chat lấy id của group chat
+         chatRoom: groupChat.members
+            ? groupChat.id
+            : userID > friendID
+            ? `${friendID}${userID}`
+            : `${userID}${friendID}`,
       };
       groupChat.members ? (params.groupChat = groupChat.id) : (params.receiver = friendID);
       socket.emit('Client-Chat-Room', params);
-
       setMessage('');
    };
 
@@ -171,6 +165,10 @@ export const ChatScreen = ({ route }) => {
       };
       !groupChat.members && (params.objectId = friendID);
       socket.emit(`Client-Status-Chat`, params);
+      hideModal();
+      if (status === 'delete') {
+         setMessages(messages.filter((message) => message.id !== chat));
+      }
    };
 
    const handlePressMessage = async (item) => {
@@ -202,6 +200,13 @@ export const ChatScreen = ({ route }) => {
       }
    };
 
+   const hideModal = () => setVisible(false);
+
+   const showModal = (item) => {
+      setModalData(item);
+      setVisible(true);
+   };
+
    const playSound = async () => {
       console.log('Loading Sound');
       const { sound } = await Audio.Sound.createAsync();
@@ -213,7 +218,6 @@ export const ChatScreen = ({ route }) => {
    const startRecording = async () => {
       try {
          if (permissionResponse.status !== 'granted') {
-            console.log('Requesting permission..');
             await requestPermission();
          }
          await Audio.setAudioModeAsync({
@@ -234,17 +238,26 @@ export const ChatScreen = ({ route }) => {
          allowsRecordingIOS: false,
       });
       const uri = recording.getURI();
-      console.log(recording);
+      const filename = uri.split('/').pop();
+      const mimeType = recording._options.web.mimeType;
+      const fileSize = (await stat(uri)).size;
+      const file = {
+         uri: uri,
+         name: filename,
+         mimeType: mimeType,
+         fileSize: fileSize,
+      };
+      handleSendFile(file);
    };
 
    const getMessagesOfChat = async (userID, friendID) => {
       setLoading(true);
-      const datas = !groupChat.members
+      const res = !groupChat.members
          ? await axios.get(`${SERVER_HOST}/chats/content-chats-between-users/${userID}-and-${friendID}/${page}`)
          : await axios.get(
               `${SERVER_HOST}/group-chats/content-chats-between-group/${route.params.id}/${userID}/${page}`
            );
-      setMessages(datas.data.sort((a, b) => new Date(b.dateTimeSend) - new Date(a.dateTimeSend)));
+      setMessages(res.data.sort((a, b) => new Date(b.dateTimeSend) - new Date(a.dateTimeSend)));
       setLoading(false);
    };
 

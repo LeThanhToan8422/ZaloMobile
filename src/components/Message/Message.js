@@ -20,21 +20,18 @@ import { FileIcon, defaultStyles } from 'react-native-file-icon';
  * @returns {JSX.Element} The rendered Message component.
  */
 export const Message = ({ data, index, localUserID, handleModal, onPress }) => {
-   const [message, setMessage] = useState(data.message);
-   const { dateTimeSend, isRecalls } = data;
+   const { message, dateTimeSend, isRecalls } = data;
    const id = data.sender;
    const friendId = data.receiver;
    const [avtFriend, setAvtFriend] = useState(
       'https://s3-dynamodb-cloudfront-20040331.s3.ap-southeast-1.amazonaws.com/toan.jfif'
    );
-   // const id = data.sender;
    const urlRegex = /^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/;
 
    useEffect(() => {
       getUserID().then((localUserId) => {
          localUserID !== id && getAvatarFriend(friendId);
       });
-      isRecalls && setMessage('Tin nhắn đã được thu hồi');
    }, []);
 
    const getAvatarFriend = async (id) => {
@@ -47,7 +44,7 @@ export const Message = ({ data, index, localUserID, handleModal, onPress }) => {
    };
 
    return (
-      <Pressable onPress={onPress} onLongPress={() => handleModal(data)} disabled={isRecalls ? true : false}>
+      <Pressable onPress={isRecalls ? null : onPress} onLongPress={isRecalls ? null : () => handleModal(data)}>
          <View
             style={[
                styles.container,
@@ -55,36 +52,48 @@ export const Message = ({ data, index, localUserID, handleModal, onPress }) => {
                index === 0 ? { marginBottom: 20 } : {},
             ]}
          >
-            {id !== localUserID ? <Image source={{ uri: avtFriend }} style={styles.avatar} /> : null}
-            {urlRegex.test(message) ? (
-               message.split('.').pop() === 'jpg' ? (
-                  <View>
-                     <Image source={{ uri: message }} style={styles.imageMessage} />
-                     <Text style={styles.time}>{dateTimeSend && formatTime(dateTimeSend)}</Text>
-                  </View>
-               ) : (
-                  <View
-                     style={[
-                        styles.messageContainer,
-                        {
-                           width: 150,
-                           height: 200,
-                           justifyContent: 'space-around',
-                        },
-                     ]}
-                  >
-                     <View style={{ width: 100, height: 120 }}>
-                        <FileIcon extension={message.split('.').pop()} {...defaultStyles[message.split('.').pop()]} />
-                     </View>
-                     <Text>{message.split('--').slice(1)}</Text>
-                     <Text style={styles.time}>{dateTimeSend && formatTime(dateTimeSend)}</Text>
-                  </View>
-               )
-            ) : (
+            {isRecalls ? (
                <View style={[styles.messageContainer, id === localUserID ? { backgroundColor: '#CFF0FF' } : {}]}>
-                  <Text style={[styles.content, isRecalls && { color: '#333' }]}>{message}</Text>
+                  <Text style={[styles.content, { color: '#333' }]}>Tin nhắn đã được thu hồi</Text>
                   <Text style={styles.time}>{dateTimeSend && formatTime(dateTimeSend)}</Text>
                </View>
+            ) : (
+               <>
+                  {id !== localUserID ? <Image source={{ uri: avtFriend }} style={styles.avatar} /> : null}
+                  {urlRegex.test(message) ? (
+                     message.split('.').pop() === 'jpg' ? (
+                        <View>
+                           <Image source={{ uri: message }} style={styles.imageMessage} />
+                           <Text style={styles.time}>{dateTimeSend && formatTime(dateTimeSend)}</Text>
+                        </View>
+                     ) : (
+                        <View
+                           style={[
+                              styles.messageContainer,
+                              {
+                                 width: 150,
+                                 height: 200,
+                                 justifyContent: 'space-around',
+                              },
+                           ]}
+                        >
+                           <View style={{ width: 100, height: 120 }}>
+                              <FileIcon
+                                 extension={message.split('.').pop()}
+                                 {...defaultStyles[message.split('.').pop()]}
+                              />
+                           </View>
+                           <Text>{message.split('--').slice(1)}</Text>
+                           <Text style={styles.time}>{dateTimeSend && formatTime(dateTimeSend)}</Text>
+                        </View>
+                     )
+                  ) : (
+                     <View style={[styles.messageContainer, id === localUserID ? { backgroundColor: '#CFF0FF' } : {}]}>
+                        <Text style={styles.content}>{message}</Text>
+                        <Text style={styles.time}>{dateTimeSend && formatTime(dateTimeSend)}</Text>
+                     </View>
+                  )}
+               </>
             )}
          </View>
       </Pressable>
