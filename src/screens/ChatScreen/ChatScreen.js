@@ -180,10 +180,8 @@ export const ChatScreen = ({ route }) => {
             function getUrlExtension(url) {
                return url.split(/[#?]/)[0].split('.').pop().trim();
             }
-
             const extension = getUrlExtension(item.message);
             const localFile = `${RNFS.DocumentDirectoryPath}/${item.message.split('--').slice(1)}.${extension}`;
-
             const options = {
                fromUrl: item.message,
                toFile: localFile,

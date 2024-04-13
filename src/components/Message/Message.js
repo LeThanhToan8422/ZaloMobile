@@ -6,6 +6,7 @@ import { formatTime } from '../../utils/func';
 import { getUserID } from '../../utils/storage';
 import styles from './styles';
 import { FileIcon, defaultStyles } from 'react-native-file-icon';
+import { ResizeMode, Video } from 'expo-av';
 
 /**
  * Message component. This component is used to render a message.
@@ -61,9 +62,20 @@ export const Message = ({ data, index, localUserID, handleModal, onPress }) => {
                <>
                   {id !== localUserID ? <Image source={{ uri: avtFriend }} style={styles.avatar} /> : null}
                   {urlRegex.test(message) ? (
-                     message.split('.').pop() === 'jpg' ? (
+                     /(jpg|png|bmp|bmp)$/i.test(message.split('.').pop()) ? (
                         <View>
                            <Image source={{ uri: message }} style={styles.imageMessage} />
+                           <Text style={styles.time}>{dateTimeSend && formatTime(dateTimeSend)}</Text>
+                        </View>
+                     ) : /(mp4|avi|mkv|mov|wmv|flv|webm)$/i.test(message.split('.').pop()) ? (
+                        <View>
+                           <View style={{ backgroundColor: '#000', borderRadius: 10 }}>
+                              <Video
+                                 source={{ uri: message }}
+                                 style={styles.imageMessage}
+                                 resizeMode={ResizeMode.CONTAIN}
+                              />
+                           </View>
                            <Text style={styles.time}>{dateTimeSend && formatTime(dateTimeSend)}</Text>
                         </View>
                      ) : (
@@ -83,7 +95,9 @@ export const Message = ({ data, index, localUserID, handleModal, onPress }) => {
                                  {...defaultStyles[message.split('.').pop()]}
                               />
                            </View>
-                           <Text>{message.split('--').slice(1)}</Text>
+                           {!/(m4a|wav|aac|flac|ogg)$/i.test(message.split('.').pop()) && (
+                              <Text>{message.split('--').slice(1)}</Text>
+                           )}
                            <Text style={styles.time}>{dateTimeSend && formatTime(dateTimeSend)}</Text>
                         </View>
                      )
