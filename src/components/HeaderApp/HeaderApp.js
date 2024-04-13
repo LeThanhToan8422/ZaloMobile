@@ -4,6 +4,7 @@ import { Platform, Text, TextInput, View } from 'react-native';
 import { Appbar } from 'react-native-paper';
 import styles from './styles';
 import { IconButton } from 'react-native-paper';
+import { MaterialIcons } from '@expo/vector-icons';
 
 /**
  * Represents the header component of the app.
@@ -30,7 +31,9 @@ export const HeaderApp = ({ navigation, props, type, title, member }) => {
                   title={
                      <>
                         <Text style={{ color: '#fff', fontWeight: 500, fontSize: 20 }}>{title}</Text>
-                        {member ? <Text style={{ color: '#BBE5FE', fontWeight: '300' }}>{member} members</Text> : null}
+                        {member ? (
+                           <Text style={{ color: '#BBE5FE', fontWeight: '300' }}>{member.length} members</Text>
+                        ) : null}
                      </>
                   }
                />
@@ -101,7 +104,7 @@ export const HeaderApp = ({ navigation, props, type, title, member }) => {
                      <Appbar.Action
                         color="#fff"
                         size={32}
-                        icon={(props) => <Ionicons {...props} name="ios-add-outline" />}
+                        icon={(props) => <MaterialIcons {...props} name="group-add" />}
                         animated={false}
                         onPress={() => {}}
                      />

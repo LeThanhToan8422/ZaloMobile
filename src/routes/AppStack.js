@@ -29,7 +29,7 @@ const AppStack = ({ navigation }) => {
                      navigation={navigation}
                      type="chat"
                      title={route.params.name}
-                     member={route.params.member}
+                     member={route.params.members}
                      headerHeight={headerHeight}
                   />
                ),

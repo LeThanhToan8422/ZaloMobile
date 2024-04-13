@@ -14,22 +14,90 @@ import {
    TouchableWithoutFeedback,
    View,
 } from 'react-native';
-import { Avatar, Button, Icon, RadioButton, TextInput } from 'react-native-paper';
+import { Avatar, Button, Icon, IconButton, Menu, PaperProvider, RadioButton, TextInput } from 'react-native-paper';
 import Toast from 'react-native-toast-message';
 import { socket } from '../../utils/socket';
 import { getUserID } from '../../utils/storage';
 import styles from './styles';
-import { IconButton, Menu, Divider, PaperProvider } from 'react-native-paper';
 
 export const ProfileScreen = ({ navigation, route }) => {
+   const [userID, setUserID] = useState(null);
    const [profile, setProfile] = useState({});
    const [name, setName] = useState('');
    const [dob, setDob] = useState(null);
    const [avatar, setAvatar] = useState(null);
    const [background, setBackground] = useState(null);
    const [friendID, setFriendID] = useState(route.params?.friend);
-   const [statusFriend, setStatusFriend] = useState(false);
+   const [statusFriend, setStatusFriend] = useState();
    const [visible, setVisible] = React.useState(false);
+
+   useEffect(() => {
+      getUserID()
+         .then((id) => {
+            setUserID(id);
+            if (id === friendID) setFriendID(null);
+            friendID ? getProfile(friendID) : getProfile(id);
+            friendID && checkIsFriend(id, friendID);
+         })
+         .catch((err) => {
+            console.error(err);
+         });
+   }, []);
+
+   useEffect(() => {
+      socket.on(`Server-update-avatar-${profile.id}`, (data) => {
+         setAvatar(data.data.image);
+      });
+      socket.on(`Server-update-background-${profile.id}`, (data) => {
+         setBackground(data.data.background);
+      });
+      return () => {
+         socket.off('Server-update-avatar');
+         socket.off('Server-update-background');
+      };
+   }, [socket, avatar, background]);
+
+   useEffect(() => {
+      socket?.on(
+         `Server-Make-Friends-${userID > friendID ? `${friendID}${userID}` : `${userID}${userID}`}`,
+         (dataGot) => {
+            if (dataGot.data) {
+               setSendMakeFriend(true);
+               // setIsFriend({
+               //    id: dataGot.data.id,
+               //    isFriends: 'Đã gửi lời mời kết bạn',
+               // });
+            }
+         }
+      );
+      return () => {
+         socket?.disconnect();
+      };
+   }, [userID, friendID]);
+
+   const getProfile = async (userID) => {
+      try {
+         const response = await axios.get(`${SERVER_HOST}/users/${userID}`);
+         setProfile(response.data);
+         setName(response.data.name);
+         setDob(new Date(response.data.dob));
+         setAvatar(response.data.image);
+         setBackground(response.data.background);
+      } catch (error) {
+         console.error(error);
+      }
+   };
+
+   const checkIsFriend = async (id, friendID) => {
+      try {
+         const response = await axios.get(`${SERVER_HOST}/users/check-is-friend/${id}/${friendID}`);
+         if (response.data) {
+            setStatusFriend(response.data);
+         }
+      } catch (error) {
+         console.error(error);
+      }
+   };
 
    const onChange = (event, selectedDate) => {
       setDob(selectedDate);
@@ -87,44 +155,6 @@ export const ProfileScreen = ({ navigation, route }) => {
       }
    };
 
-   useEffect(() => {
-      getUserID()
-         .then((id) => {
-            if (id === friendID) setFriendID(null);
-            friendID ? getProfile(friendID) : getProfile(id);
-            friendID && checkIsFriend(id, friendID);
-         })
-         .catch((err) => {
-            console.error(err);
-         });
-   }, []);
-
-   useEffect(() => {
-      socket.on(`Server-update-avatar-${profile.id}`, (data) => {
-         setAvatar(data.data.image);
-      });
-      socket.on(`Server-update-background-${profile.id}`, (data) => {
-         setBackground(data.data.background);
-      });
-      return () => {
-         socket.off('Server-update-avatar');
-         socket.off('Server-update-background');
-      };
-   }, [socket, avatar, background]);
-
-   const getProfile = async (userID) => {
-      try {
-         const response = await axios.get(`${SERVER_HOST}/users/${userID}`);
-         setProfile(response.data);
-         setName(response.data.name);
-         setDob(new Date(response.data.dob));
-         setAvatar(response.data.image);
-         setBackground(response.data.background);
-      } catch (error) {
-         console.error(error);
-      }
-   };
-
    const handleUpdateProfile = async () => {
       try {
          const response = await axios.put(`${SERVER_HOST}/users`, {
@@ -147,39 +177,35 @@ export const ProfileScreen = ({ navigation, route }) => {
    };
 
    const handleAddFriend = async () => {
-      getUserID().then((id) => {
-         const params = {
-            content: 'Mình kết bạn với nhau nhé!!!',
-            giver: id, // id user của mình
-            recipient: friendID, // id của user muốn kết bạn
-         };
-         const dataAddFriend = axios.post(`${SERVER_HOST}/make-friends`, params);
-         if (dataAddFriend.data) {
-            // setSendMakeFriend(true);
-            // setRerender(pre => !pre)
-            Toast.show({
-               type: 'success',
-               text1: 'Đã gửi lời mời kết bạn',
-               position: 'bottom',
-            });
-         }
+      socket.emit(`Client-Make-Friends`, {
+         content: 'Mình kết bạn với nhau nhé!!!',
+         giver: userID, // id user của mình
+         recipient: friendID, // id của user muốn kết bạn hoặc block
+         chatRoom: userID > friendID ? `${friendID}${userID}` : `${userID}${friendID}`,
       });
    };
 
-   const checkIsFriend = async (id, friendID) => {
-      try {
-         const response = await axios.get(`${SERVER_HOST}/users/check-is-friend/${id}/${friendID}`);
-         if (response.data) {
-            setStatusFriend(response.data.isFriends);
+   const handleAgreeMakeFriend = async (friendRequest) => {
+      const dataDelete = await axios.delete(`${SERVER_HOST}/make-friends/${friendRequest.makeFriendId}`);
+      if (dataDelete.data) {
+         const params = {
+            relationship: 'friends',
+            id: userID, // id user của mình
+            objectId: friendRequest.id, // id của user muốn kết bạn
+         };
+         let dataAddFriend = await axios.post(`${SERVER_HOST}/users/relationships`, params);
+         if (dataAddFriend.data) {
+            socket.emit(`Client-Chat-Room`, {
+               message: `Bạn và ${friendRequest.name} đã trở thành bạn`,
+               dateTimeSend: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+               sender: userID,
+               receiver: friendRequest.id,
+               chatRoom: userID > friendRequest.id ? `${friendRequest.id}${userID}` : `${userID}${friendRequest.id}`,
+            });
+            setContentChat(`Bạn và ${friendRequest.name} đã trở thành bạn`);
          }
-      } catch (error) {
-         console.error(error);
       }
    };
-
-   const openMenu = () => setVisible(true);
-
-   const closeMenu = () => setVisible(false);
 
    return (
       <PaperProvider>
@@ -190,11 +216,11 @@ export const ProfileScreen = ({ navigation, route }) => {
          >
             <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                <View style={styles.container}>
-                  <Pressable onPress={() => pickImage('background')}>
+                  <Pressable onPress={() => !friendID && pickImage('background')}>
                      <ImageBackground source={{ uri: background }} style={styles.background}></ImageBackground>
                   </Pressable>
                   <View style={styles.avatarContainer}>
-                     <Pressable onPress={() => pickImage('avatar')}>
+                     <Pressable onPress={() => !friendID && pickImage('avatar')}>
                         <Avatar.Image size={150} source={{ uri: avatar && avatar }} />
                      </Pressable>
                      <Text style={{ fontSize: 25, fontWeight: '700' }}>{profile.name}</Text>
@@ -222,13 +248,13 @@ export const ProfileScreen = ({ navigation, route }) => {
                            mode="contained"
                            style={[styles.btnEdit]}
                            labelStyle={{ fontSize: 16, color: '#000' }}
-                           onPress={handleAddFriend}
+                           onPress={statusFriend ? handleAgreeMakeFriend : handleAddFriend}
                         >
-                           {statusFriend === '1' ? 'Bạn bè' : statusFriend ? 'Đã gửi lời mời' : 'Kết bạn'}
+                           {statusFriend ? statusFriend.isFriends : 'Kết bạn'}
                         </Button>
                         <Menu
                            visible={visible}
-                           onDismiss={closeMenu}
+                           onDismiss={() => setVisible(false)}
                            anchor={
                               <IconButton
                                  style={{ marginBottom: -5 }}
@@ -236,7 +262,7 @@ export const ProfileScreen = ({ navigation, route }) => {
                                  icon="dots-vertical"
                                  color="#000"
                                  size={24}
-                                 onPress={openMenu}
+                                 onPress={() => setVisible(true)}
                               />
                            }
                         >
@@ -271,6 +297,7 @@ export const ProfileScreen = ({ navigation, route }) => {
                         </Button>
                      ) : (
                         <DateTimePicker
+                           disabled={friendID ? true : false}
                            visible={false}
                            testID="dateTimePicker"
                            value={new Date(profile.dob || null)}
@@ -282,7 +309,7 @@ export const ProfileScreen = ({ navigation, route }) => {
                   <View style={styles.inputContainer}>
                      <Text style={styles.labelInput}>Giới tính:</Text>
                      {friendID ? (
-                        <RadioButton.Item label={profile.gender ? 'Nam' : 'Nữ'} />
+                        <Text style={{ fontSize: 18, marginLeft: 16 }}>{profile.gender ? 'Nam' : 'Nữ'}</Text>
                      ) : (
                         <RadioButton.Group
                            onValueChange={(value) => setProfile({ ...profile, gender: value })}

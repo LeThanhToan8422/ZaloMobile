@@ -17,7 +17,7 @@ import {
 } from 'react-native';
 import { FileIcon, defaultStyles } from 'react-native-file-icon';
 import FileViewer from 'react-native-file-viewer';
-import RNFS from 'react-native-fs';
+import RNFS, { stat } from 'react-native-fs';
 import ImageView from 'react-native-image-viewing';
 import { Button, Icon, IconButton, Modal, PaperProvider, Portal } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -26,6 +26,7 @@ import { socket } from '../../utils/socket';
 import { getUserID } from '../../utils/storage';
 import styles from './styles';
 import dayjs from 'dayjs';
+import { Audio } from 'expo-av';
 
 /**
  * ChatScreen component. This component is used to render the chat screen.
@@ -35,7 +36,8 @@ import dayjs from 'dayjs';
  */
 export const ChatScreen = ({ route }) => {
    const urlRegex = /^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/;
-   const [userID, setUserID] = useState(1);
+   const [userID, setUserID] = useState();
+   const [groupChat, setGroupChat] = useState(route.params);
    const friendID = route.params.id;
    const [messages, setMessages] = useState([]);
    const insets = useSafeAreaInsets();
@@ -46,14 +48,10 @@ export const ChatScreen = ({ route }) => {
    const [imagesView, setImagesView] = useState([]);
    const [visibleImage, setIsVisibleImage] = useState(false);
    const [loading, setLoading] = useState(false);
-   const [page, setPage] = useState(1); // Keep track of the current page
-
-   const hideModal = () => setVisible(false);
-
-   const showModal = (item) => {
-      setModalData(item);
-      setVisible(true);
-   };
+   const [page, setPage] = useState(10); // Keep track of the current page
+   const [sound, setSound] = useState();
+   const [recording, setRecording] = useState();
+   const [permissionResponse, requestPermission] = Audio.usePermissions();
 
    useEffect(() => {
       getUserID().then((id) => {
@@ -66,19 +64,28 @@ export const ChatScreen = ({ route }) => {
       const onChatEvents = (res) => {
          setMessages((prev) => [res.data, ...prev]);
       };
+      const onStatusChatEvents = (res) => {
+         const index = messages.findIndex((message) => message.id === res.data.id);
+         if (index !== -1) messages[index].isRecalls = 1;
+         setMessages([...messages]);
+      };
       const idRoom = userID < friendID ? `${userID}${friendID}` : `${friendID}${userID}`;
-
-      socket.on(`Server-Chat-Room-${idRoom}`, onChatEvents);
-      socket.on(`Server-Status-Chat-${idRoom}`, (res) => {
-         console.log(res.data.id);
-         setMessages((prev) => prev.filter((prev) => prev.id !== res.data.id));
-         hideModal();
-      });
+      socket.on(`Server-Chat-Room-${groupChat.members ? groupChat.id : idRoom}`, onChatEvents);
+      socket.on(`Server-Status-Chat-${groupChat.members ? groupChat.id : idRoom}`, onStatusChatEvents);
       return () => {
-         socket.off(`Server-Chat-Room-${idRoom}`, onChatEvents);
-         socket.off(`Server-Status-Chat-${idRoom}`);
+         socket.off(`Server-Chat-Room-${groupChat.members ? groupChat.id : idRoom}`, onChatEvents);
+         socket.off(`Server-Status-Chat-${groupChat.members ? groupChat.id : idRoom}`, onStatusChatEvents);
       };
    }, [socket, messages]);
+
+   useEffect(() => {
+      return sound
+         ? () => {
+              console.log('Unloading Sound');
+              sound.unloadAsync();
+           }
+         : undefined;
+   }, [sound]);
 
    const pickImage = async () => {
       // No permissions request is necessary for launching the image library
@@ -119,37 +126,52 @@ export const ChatScreen = ({ route }) => {
          size: file.fileSize,
       };
 
-      socket.emit('Client-Chat-Room', {
-         chatRoom: userID < friendID ? `${userID}${friendID}` : `${friendID}${userID}`,
+      const params = {
          file: data,
          dateTimeSend: dayjs().format('YYYY-MM-DD HH:mm:ss'),
          sender: userID,
-         receiver: friendID,
-      });
+         chatRoom: groupChat.id,
+      };
+      groupChat.members ? (params.groupChat = groupChat.id) : (params.receiver = friendID);
+      socket.emit('Client-Chat-Room', params);
    };
 
    const sendMessage = () => {
-      socket.emit('Client-Chat-Room', {
-         chatRoom: userID < friendID ? `${userID}${friendID}` : `${friendID}${userID}`,
-         message: message.trim(),
+      const params = {
+         message: message, // thông tin message
          dateTimeSend: dayjs().format('YYYY-MM-DD HH:mm:ss'),
-         sender: userID,
-         receiver: friendID,
-      });
+         sender: userID, // id người gửi
+         chatRoom: groupChat.members
+            ? groupChat.id
+            : userID > friendID
+            ? `${friendID}${userID}`
+            : `${userID}${friendID}`,
+      };
+      groupChat.members ? (params.groupChat = groupChat.id) : (params.receiver = friendID);
+      socket.emit('Client-Chat-Room', params);
       setMessage('');
    };
 
    const handleClickStatusChat = (status, userId, chat) => {
-      socket.emit(`Client-Status-Chat`, {
+      const params = {
          status: status,
          implementer: userId,
          chat: chat,
-         chatRoom: userId > friendID ? `${friendID}${userId}` : `${userId}${friendID}`,
-         objectId: friendID,
-      });
+         chatRoom: groupChat.members
+            ? groupChat.id
+            : userId > friendID
+            ? `${friendID}${userId}`
+            : `${userId}${friendID}`,
+      };
+      !groupChat.members && (params.objectId = friendID);
+      socket.emit(`Client-Status-Chat`, params);
+      hideModal();
+      if (status === 'delete') {
+         setMessages(messages.filter((message) => message.id !== chat));
+      }
    };
 
-   const hanlePressMessage = async (item) => {
+   const handlePressMessage = async (item) => {
       if (urlRegex.test(item.message)) {
          if (item.message.split('.').pop() === ('jpg' || 'png')) {
             setImagesView([{ uri: item.message }]);
@@ -158,10 +180,8 @@ export const ChatScreen = ({ route }) => {
             function getUrlExtension(url) {
                return url.split(/[#?]/)[0].split('.').pop().trim();
             }
-
             const extension = getUrlExtension(item.message);
             const localFile = `${RNFS.DocumentDirectoryPath}/${item.message.split('--').slice(1)}.${extension}`;
-
             const options = {
                fromUrl: item.message,
                toFile: localFile,
@@ -178,10 +198,64 @@ export const ChatScreen = ({ route }) => {
       }
    };
 
+   const hideModal = () => setVisible(false);
+
+   const showModal = (item) => {
+      setModalData(item);
+      setVisible(true);
+   };
+
+   const playSound = async () => {
+      console.log('Loading Sound');
+      const { sound } = await Audio.Sound.createAsync();
+      setSound(sound);
+      console.log('Playing Sound');
+      await sound.playAsync();
+   };
+
+   const startRecording = async () => {
+      try {
+         if (permissionResponse.status !== 'granted') {
+            await requestPermission();
+         }
+         await Audio.setAudioModeAsync({
+            allowsRecordingIOS: true,
+            playsInSilentModeIOS: true,
+         });
+         const { recording } = await Audio.Recording.createAsync(Audio.RecordingOptionsPresets.HIGH_QUALITY);
+         setRecording(recording);
+      } catch (err) {
+         console.error('Failed to start recording', err);
+      }
+   };
+
+   const stopRecording = async () => {
+      setRecording(undefined);
+      await recording.stopAndUnloadAsync();
+      await Audio.setAudioModeAsync({
+         allowsRecordingIOS: false,
+      });
+      const uri = recording.getURI();
+      const filename = uri.split('/').pop();
+      const mimeType = recording._options.web.mimeType;
+      const fileSize = (await stat(uri)).size;
+      const file = {
+         uri: uri,
+         name: filename,
+         mimeType: mimeType,
+         fileSize: fileSize,
+      };
+      handleSendFile(file);
+   };
+
    const getMessagesOfChat = async (userID, friendID) => {
       setLoading(true);
-      let datas = await axios.get(`${SERVER_HOST}/chats/content-chats-between-users/${userID}-and-${friendID}/${page}`);
-      setMessages(datas.data.sort((a, b) => new Date(b.dateTimeSend) - new Date(a.dateTimeSend)));
+      const res = !groupChat.members
+         ? await axios.get(`${SERVER_HOST}/chats/content-chats-between-users/${userID}-and-${friendID}/${page}`)
+         : await axios.get(
+              `${SERVER_HOST}/group-chats/content-chats-between-group/${route.params.id}/${userID}/${page}`
+           );
+      setMessages(res.data.sort((a, b) => new Date(b.dateTimeSend) - new Date(a.dateTimeSend)));
       setLoading(false);
    };
 
@@ -223,22 +297,33 @@ export const ChatScreen = ({ route }) => {
                            <Text style={styles.messageContainer}>{modalData?.message}</Text>
                         )}
                         <View style={styles.modalActionContainer}>
-                           <Button
-                              icon={() => <Icon source="delete" size={24} iconColor="#333" />}
-                              contentStyle={{ flexDirection: 'row-reverse' }}
-                              onPress={() => handleClickStatusChat('delete', userID, modalData?.id)}
-                           >
-                              Xóa
-                           </Button>
-                           {userID === modalData?.sender && (
+                           <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
                               <Button
-                                 icon={() => <Icon source="backup-restore" size={24} iconColor="#333" />}
+                                 icon={() => <Icon source="delete" size={24} iconColor="#333" />}
                                  contentStyle={{ flexDirection: 'row-reverse' }}
-                                 onPress={() => handleClickStatusChat('recalls', userID, modalData?.id)}
+                                 onPress={() => handleClickStatusChat('delete', userID, modalData?.id)}
                               >
-                                 Thu hồi
+                                 Xóa
                               </Button>
-                           )}
+                              {userID === modalData?.sender && (
+                                 <Button
+                                    icon={() => <Icon source="backup-restore" size={24} iconColor="#333" />}
+                                    contentStyle={{ flexDirection: 'row-reverse' }}
+                                    onPress={() => handleClickStatusChat('recalls', userID, modalData?.id)}
+                                 >
+                                    Thu hồi
+                                 </Button>
+                              )}
+                           </View>
+                           <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
+                              <Button
+                                 icon={() => <Icon source="delete" size={24} iconColor="#333" />}
+                                 contentStyle={{ flexDirection: 'row-reverse' }}
+                                 onPress={() => handleClickStatusChat('delete', userID, modalData?.id)}
+                              >
+                                 Chuyển tiếp
+                              </Button>
+                           </View>
                         </View>
                      </Modal>
                   </Portal>
@@ -247,13 +332,12 @@ export const ChatScreen = ({ route }) => {
                      data={messages}
                      style={{ flexGrow: 1, backgroundColor: '#E2E8F1' }}
                      onEndReached={() => {
-                        // Load more data when reaching the end of the list
                         if (!loading) {
-                           setPage((prevPage) => prevPage + 1);
+                           setPage((prevPage) => prevPage + 10);
                            getMessagesOfChat(userID, friendID);
                         }
                      }}
-                     onEndReachedThreshold={0.1} // Adjust this value as needed
+                     onEndReachedThreshold={0.05} // Adjust this value as needed
                      keyExtractor={(_, index) => index.toString()}
                      renderItem={({ item, index }) => (
                         <Message
@@ -261,7 +345,7 @@ export const ChatScreen = ({ route }) => {
                            index={index}
                            localUserID={userID}
                            handleModal={showModal}
-                           onPress={() => hanlePressMessage(item)}
+                           onPress={() => handlePressMessage(item)}
                         />
                      )}
                      ListFooterComponent={() =>
@@ -284,7 +368,12 @@ export const ChatScreen = ({ route }) => {
                   {!message ? (
                      <>
                         <IconButton icon="file" size={32} iconColor="#333" onPress={pickFile} />
-                        <IconButton icon="microphone-outline" size={32} iconColor="#333" />
+                        <IconButton
+                           icon={recording ? 'microphone-off' : 'microphone-outline'}
+                           size={32}
+                           iconColor="#333"
+                           onPress={recording ? stopRecording : startRecording}
+                        />
                         <IconButton icon="image" size={32} iconColor="#333" onPress={pickImage} />
                      </>
                   ) : (

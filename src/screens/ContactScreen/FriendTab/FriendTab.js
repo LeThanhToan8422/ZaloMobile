@@ -55,8 +55,8 @@ export const FriendTab = ({ navigation }) => {
          />
          <SectionList
             sections={contacts}
-            renderItem={({ item }) => <ContactItem navigation={navigation} data={item} />}
             renderSectionHeader={({ section }) => <Text style={styles.title}>{section.title}</Text>}
+            renderItem={({ item }) => <ContactItem navigation={navigation} data={item} />}
             keyExtractor={(item, index) => item + index}
             ItemSeparatorComponent={() => <View style={{ height: 20 }} />}
             SectionSeparatorComponent={() => <View style={{ height: 10 }} />}

@@ -4,12 +4,12 @@
       "slug": "Zalo",
       "version": "1.0.0",
       "orientation": "portrait",
-      "icon": "src/assets/images/zalo_arc.png",
+      "icon": "./assets/images/zalo_arc.png",
       "userInterfaceStyle": "light",
       "splash": {
-         "image": "src/assets/images/splash_image.png",
+         "image": "./assets/splash.jpeg",
          "resizeMode": "contain",
-         "backgroundColor": "#ffffff"
+         "backgroundColor": "#447DF4"
       },
       "assetBundlePatterns": ["**/*"],
       "ios": {
@@ -21,12 +21,12 @@
          "googleServicesFile": "./google-services.json",
          "package": "fit.se.zalomobile",
          "adaptiveIcon": {
-            "foregroundImage": "src/assets/images/zalo_arc.png",
+            "foregroundImage": "./assets/images/zalo_arc.png",
             "backgroundColor": "#ffffff"
          }
       },
       "web": {
-         "favicon": "src/assets/images/zalo_arc.png"
+         "favicon": "./assets/images/zalo_arc.png"
       },
       "plugins": [
          "@react-native-firebase/app",

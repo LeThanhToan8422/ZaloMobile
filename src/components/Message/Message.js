@@ -6,6 +6,7 @@ import { formatTime } from '../../utils/func';
 import { getUserID } from '../../utils/storage';
 import styles from './styles';
 import { FileIcon, defaultStyles } from 'react-native-file-icon';
+import { ResizeMode, Video } from 'expo-av';
 
 /**
  * Message component. This component is used to render a message.
@@ -20,13 +21,12 @@ import { FileIcon, defaultStyles } from 'react-native-file-icon';
  * @returns {JSX.Element} The rendered Message component.
  */
 export const Message = ({ data, index, localUserID, handleModal, onPress }) => {
-   const { message, dateTimeSend } = data;
+   const { message, dateTimeSend, isRecalls } = data;
    const id = data.sender;
    const friendId = data.receiver;
    const [avtFriend, setAvtFriend] = useState(
       'https://s3-dynamodb-cloudfront-20040331.s3.ap-southeast-1.amazonaws.com/toan.jfif'
    );
-   // const id = data.sender;
    const urlRegex = /^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/;
 
    useEffect(() => {
@@ -45,7 +45,7 @@ export const Message = ({ data, index, localUserID, handleModal, onPress }) => {
    };
 
    return (
-      <Pressable onPress={onPress} onLongPress={() => handleModal(data)}>
+      <Pressable onPress={isRecalls ? null : onPress} onLongPress={isRecalls ? null : () => handleModal(data)}>
          <View
             style={[
                styles.container,
@@ -53,36 +53,61 @@ export const Message = ({ data, index, localUserID, handleModal, onPress }) => {
                index === 0 ? { marginBottom: 20 } : {},
             ]}
          >
-            {id !== localUserID ? <Image source={{ uri: avtFriend }} style={styles.avatar} /> : null}
-            {urlRegex.test(message) ? (
-               message.split('.').pop() === 'jpg' ? (
-                  <View>
-                     <Image source={{ uri: message }} style={styles.imageMessage} />
-                     <Text style={styles.time}>{dateTimeSend && formatTime(dateTimeSend)}</Text>
-                  </View>
-               ) : (
-                  <View
-                     style={[
-                        styles.messageContainer,
-                        {
-                           width: 150,
-                           height: 200,
-                           justifyContent: 'space-around',
-                        },
-                     ]}
-                  >
-                     <View style={{ width: 100, height: 120 }}>
-                        <FileIcon extension={message.split('.').pop()} {...defaultStyles[message.split('.').pop()]} />
-                     </View>
-                     <Text>{message.split('--').slice(1)}</Text>
-                     <Text style={styles.time}>{dateTimeSend && formatTime(dateTimeSend)}</Text>
-                  </View>
-               )
-            ) : (
+            {isRecalls ? (
                <View style={[styles.messageContainer, id === localUserID ? { backgroundColor: '#CFF0FF' } : {}]}>
-                  <Text style={styles.content}>{message}</Text>
+                  <Text style={[styles.content, { color: '#333' }]}>Tin nhắn đã được thu hồi</Text>
                   <Text style={styles.time}>{dateTimeSend && formatTime(dateTimeSend)}</Text>
                </View>
+            ) : (
+               <>
+                  {id !== localUserID ? <Image source={{ uri: avtFriend }} style={styles.avatar} /> : null}
+                  {urlRegex.test(message) ? (
+                     /(jpg|png|bmp|bmp)$/i.test(message.split('.').pop()) ? (
+                        <View>
+                           <Image source={{ uri: message }} style={styles.imageMessage} />
+                           <Text style={styles.time}>{dateTimeSend && formatTime(dateTimeSend)}</Text>
+                        </View>
+                     ) : /(mp4|avi|mkv|mov|wmv|flv|webm)$/i.test(message.split('.').pop()) ? (
+                        <View>
+                           <View style={{ backgroundColor: '#000', borderRadius: 10 }}>
+                              <Video
+                                 source={{ uri: message }}
+                                 style={styles.imageMessage}
+                                 resizeMode={ResizeMode.CONTAIN}
+                              />
+                           </View>
+                           <Text style={styles.time}>{dateTimeSend && formatTime(dateTimeSend)}</Text>
+                        </View>
+                     ) : (
+                        <View
+                           style={[
+                              styles.messageContainer,
+                              {
+                                 width: 150,
+                                 height: 200,
+                                 justifyContent: 'space-around',
+                              },
+                           ]}
+                        >
+                           <View style={{ width: 100, height: 120 }}>
+                              <FileIcon
+                                 extension={message.split('.').pop()}
+                                 {...defaultStyles[message.split('.').pop()]}
+                              />
+                           </View>
+                           {!/(m4a|wav|aac|flac|ogg)$/i.test(message.split('.').pop()) && (
+                              <Text>{message.split('--').slice(1)}</Text>
+                           )}
+                           <Text style={styles.time}>{dateTimeSend && formatTime(dateTimeSend)}</Text>
+                        </View>
+                     )
+                  ) : (
+                     <View style={[styles.messageContainer, id === localUserID ? { backgroundColor: '#CFF0FF' } : {}]}>
+                        <Text style={styles.content}>{message}</Text>
+                        <Text style={styles.time}>{dateTimeSend && formatTime(dateTimeSend)}</Text>
+                     </View>
+                  )}
+               </>
             )}
          </View>
       </Pressable>

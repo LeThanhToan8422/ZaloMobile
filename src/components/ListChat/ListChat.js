@@ -17,7 +17,7 @@ export const ListChat = ({ chats, navigation, ...props }) => {
       <View {...props}>
          <FlatList
             data={chats}
-            keyExtractor={(item) => item.id}
+            keyExtractor={(_, index) => index.toString()}
             renderItem={({ item }) => <ChatItem navigation={navigation} data={item} />}
          />
       </View>
