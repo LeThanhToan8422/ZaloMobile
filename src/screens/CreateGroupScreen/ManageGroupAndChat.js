@@ -99,15 +99,17 @@ export const ManageGroupAndChat = ({ navigation, route }) => {
       return true;
    };
 
-   const sendMessage = (friendID) => {
+   const sendMessage = async (friendID) => {
+      const res = await axios.get(`${SERVER_HOST}/group-chats/${friendID}`);
       const params = {
          message: data.message.trim(), // thông tin message
          dateTimeSend: dayjs().format('YYYY-MM-DD HH:mm:ss'),
          sender: userID, // id người gửi
-         chatRoom: data.members ? data.id : userID > friendID ? `${friendID}${userID}` : `${userID}${friendID}`,
+         chatRoom: res.data ? res.data.id : userID > friendID ? `${friendID}${userID}` : `${userID}${friendID}`,
       };
-      data.members ? (params.groupChat = data.id) : (params.receiver = friendID);
-      socket.emit('Client-Chat-Room', params);
+      res.data ? (params.groupChat = res.data.id) : (params.receiver = friendID);
+      console.log(params);
+      // socket.emit('Client-Chat-Room', params);
    };
 
    const pickImage = async () => {

@@ -25,7 +25,7 @@ export const MessageScreen = ({ navigation }) => {
 
    useEffect(() => {
       !userID ? getUserID().then((id) => getApiChatsByUserId(id)) : getApiChatsByUserId(userID);
-   }, [socket, data]);
+   }, [socket]);
 
    /**
     * Calls the API to get chat data by user ID.

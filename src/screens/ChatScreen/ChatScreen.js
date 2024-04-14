@@ -158,7 +158,6 @@ export const ChatScreen = ({ navigation, route }) => {
             : `${userID}${friendID}`,
       };
       groupChat.members ? (params.groupChat = groupChat.id) : (params.receiver = friendID);
-      console.log(params);
       socket.emit('Client-Chat-Room', params);
       setMessage('');
    };
