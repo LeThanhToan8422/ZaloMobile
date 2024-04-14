@@ -39,6 +39,8 @@
       "react-file-icon": "^1.4.0",
       "react-native": "0.72.10",
       "react-native-bcrypt": "^2.4.0",
+      "react-native-bouncy-checkbox": "^4.0.0",
+      "react-native-dialog": "^9.3.0",
       "react-native-dotenv": "^3.4.11",
       "react-native-file-icon": "^0.2.1",
       "react-native-file-viewer": "^2.1.5",

@@ -12,26 +12,44 @@ import styles from './styles';
  * @param {object} props.navParams.screen - The name of the screen to navigate to.
  * @param {object} props.navParams.params - The params to pass to the next screen.
  * @param {string} props.icon - The source of the icon.
+ * @param {object} props.iconStyle - The custom style for the icon.
  * @param {string} props.title - The title of the item.
+ * @param {object} props.titleStyle - The custom style for the title.
  * @param {string} props.subtitle - The subtitle of the item.
  * @param {ReactNode} props.action - The action component to render.
+ * @param {ReactNode} props.actionRight - The action component to render on the right side.
  * @param {object} props.style - The custom style for the component.
  * @returns {ReactNode} The rendered pressable item component.
  */
 
-export const PressableItem = ({ navigation, navParams, icon, iconStyle, title, subtitle, action, ...props }) => {
+export const PressableItem = ({
+   navigation,
+   navParams,
+   icon,
+   iconStyle,
+   title,
+   titleStyle,
+   subtitle,
+   action,
+   actionRight,
+   ...props
+}) => {
    return (
       <Pressable
          style={[props.style, styles.container]}
-         onPress={() => (navParams ? navigation.navigate(navParams.screen, navParams.params) : null)}
+         onPress={action ? action : () => (navParams ? navigation.navigate(navParams.screen, navParams.params) : null)}
       >
          <Icon source={icon} size={22} color="#375FD1" {...iconStyle} />
          <View style={styles.textContainer}>
-            <Text style={styles.title}>{title}</Text>
+            <Text style={[styles.title, { ...titleStyle }]}>{title}</Text>
             {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
          </View>
          <View style={{ marginLeft: 'auto' }}>
-            {action === null ? null : action ? action : <Icon source="chevron-right" size={22} color="#999" />}
+            {actionRight === null ? null : actionRight ? (
+               actionRight
+            ) : (
+               <Icon source="chevron-right" size={22} color="#999" />
+            )}
          </View>
       </Pressable>
    );

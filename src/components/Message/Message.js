@@ -21,7 +21,7 @@ import { ResizeMode, Video } from 'expo-av';
  * @returns {JSX.Element} The rendered Message component.
  */
 export const Message = ({ data, index, localUserID, handleModal, onPress }) => {
-   const { message, dateTimeSend, isRecalls } = data;
+   const { name, message, dateTimeSend, isRecalls } = data;
    const id = data.sender;
    const friendId = data.receiver;
    const [avtFriend, setAvtFriend] = useState(
@@ -53,22 +53,25 @@ export const Message = ({ data, index, localUserID, handleModal, onPress }) => {
                index === 0 ? { marginBottom: 20 } : {},
             ]}
          >
+            {id !== localUserID ? <Image source={{ uri: avtFriend }} style={styles.avatar} /> : null}
             {isRecalls ? (
                <View style={[styles.messageContainer, id === localUserID ? { backgroundColor: '#CFF0FF' } : {}]}>
+                  {name && id !== localUserID && <Text style={styles.name}>{name}</Text>}
                   <Text style={[styles.content, { color: '#333' }]}>Tin nhắn đã được thu hồi</Text>
                   <Text style={styles.time}>{dateTimeSend && formatTime(dateTimeSend)}</Text>
                </View>
             ) : (
                <>
-                  {id !== localUserID ? <Image source={{ uri: avtFriend }} style={styles.avatar} /> : null}
                   {urlRegex.test(message) ? (
-                     /(jpg|png|bmp|bmp)$/i.test(message.split('.').pop()) ? (
+                     /(jpg|jpeg|png|bmp|bmp)$/i.test(message.split('.').pop()) ? (
                         <View>
+                           {name && id !== localUserID && <Text style={styles.name}>{name}</Text>}
                            <Image source={{ uri: message }} style={styles.imageMessage} />
                            <Text style={styles.time}>{dateTimeSend && formatTime(dateTimeSend)}</Text>
                         </View>
                      ) : /(mp4|avi|mkv|mov|wmv|flv|webm)$/i.test(message.split('.').pop()) ? (
                         <View>
+                           {name && id !== localUserID && <Text style={styles.name}>{name}</Text>}
                            <View style={{ backgroundColor: '#000', borderRadius: 10 }}>
                               <Video
                                  source={{ uri: message }}
@@ -89,6 +92,7 @@ export const Message = ({ data, index, localUserID, handleModal, onPress }) => {
                               },
                            ]}
                         >
+                           {name && id !== localUserID && <Text style={styles.name}>{name}</Text>}
                            <View style={{ width: 100, height: 120 }}>
                               <FileIcon
                                  extension={message.split('.').pop()}
@@ -96,13 +100,16 @@ export const Message = ({ data, index, localUserID, handleModal, onPress }) => {
                               />
                            </View>
                            {!/(m4a|wav|aac|flac|ogg)$/i.test(message.split('.').pop()) && (
-                              <Text>{message.split('--').slice(1)}</Text>
+                              <View>
+                                 <Text>{message.split('--').slice(1)}</Text>
+                              </View>
                            )}
                            <Text style={styles.time}>{dateTimeSend && formatTime(dateTimeSend)}</Text>
                         </View>
                      )
                   ) : (
                      <View style={[styles.messageContainer, id === localUserID ? { backgroundColor: '#CFF0FF' } : {}]}>
+                        {name && id !== localUserID && <Text style={styles.name}>{name}</Text>}
                         <Text style={styles.content}>{message}</Text>
                         <Text style={styles.time}>{dateTimeSend && formatTime(dateTimeSend)}</Text>
                      </View>

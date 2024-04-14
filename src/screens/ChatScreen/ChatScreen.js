@@ -34,7 +34,7 @@ import { Audio } from 'expo-av';
  * @param {Object} route - The route object containing navigation parameters.
  * @returns {JSX.Element} The rendered ChatScreen component.
  */
-export const ChatScreen = ({ route }) => {
+export const ChatScreen = ({ navigation, route }) => {
    const urlRegex = /^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/;
    const [userID, setUserID] = useState();
    const [groupChat, setGroupChat] = useState(route.params);
@@ -64,17 +64,22 @@ export const ChatScreen = ({ route }) => {
       const onChatEvents = (res) => {
          setMessages((prev) => [res.data, ...prev]);
       };
+
       const onStatusChatEvents = (res) => {
          const index = messages.findIndex((message) => message.id === res.data.id);
          if (index !== -1) messages[index].isRecalls = 1;
          setMessages([...messages]);
       };
+
       const idRoom = userID < friendID ? `${userID}${friendID}` : `${friendID}${userID}`;
       socket.on(`Server-Chat-Room-${groupChat.members ? groupChat.id : idRoom}`, onChatEvents);
       socket.on(`Server-Status-Chat-${groupChat.members ? groupChat.id : idRoom}`, onStatusChatEvents);
+      // socket.on(`Server-Group-Chats-${userID}`);
+
       return () => {
          socket.off(`Server-Chat-Room-${groupChat.members ? groupChat.id : idRoom}`, onChatEvents);
          socket.off(`Server-Status-Chat-${groupChat.members ? groupChat.id : idRoom}`, onStatusChatEvents);
+         // socket.off(`Server-Group-Chats-${userID}`);
       };
    }, [socket, messages]);
 
@@ -130,15 +135,20 @@ export const ChatScreen = ({ route }) => {
          file: data,
          dateTimeSend: dayjs().format('YYYY-MM-DD HH:mm:ss'),
          sender: userID,
-         chatRoom: groupChat.id,
+         chatRoom: groupChat.members
+            ? groupChat.id
+            : userID > friendID
+            ? `${friendID}${userID}`
+            : `${userID}${friendID}`,
       };
+      console.log(data);
       groupChat.members ? (params.groupChat = groupChat.id) : (params.receiver = friendID);
       socket.emit('Client-Chat-Room', params);
    };
 
    const sendMessage = () => {
       const params = {
-         message: message, // thông tin message
+         message: message.trim(), // thông tin message
          dateTimeSend: dayjs().format('YYYY-MM-DD HH:mm:ss'),
          sender: userID, // id người gửi
          chatRoom: groupChat.members
@@ -148,6 +158,7 @@ export const ChatScreen = ({ route }) => {
             : `${userID}${friendID}`,
       };
       groupChat.members ? (params.groupChat = groupChat.id) : (params.receiver = friendID);
+      console.log(params);
       socket.emit('Client-Chat-Room', params);
       setMessage('');
    };
@@ -297,33 +308,34 @@ export const ChatScreen = ({ route }) => {
                            <Text style={styles.messageContainer}>{modalData?.message}</Text>
                         )}
                         <View style={styles.modalActionContainer}>
-                           <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
+                           <Button
+                              icon={() => <Icon source="delete" size={24} iconColor="#333" />}
+                              contentStyle={{ flexDirection: 'row-reverse' }}
+                              onPress={() => handleClickStatusChat('delete', userID, modalData?.id)}
+                           >
+                              Xóa
+                           </Button>
+                           {userID === modalData?.sender && (
                               <Button
-                                 icon={() => <Icon source="delete" size={24} iconColor="#333" />}
+                                 icon={() => <Icon source="backup-restore" size={24} iconColor="#333" />}
                                  contentStyle={{ flexDirection: 'row-reverse' }}
-                                 onPress={() => handleClickStatusChat('delete', userID, modalData?.id)}
+                                 onPress={() => handleClickStatusChat('recalls', userID, modalData?.id)}
                               >
-                                 Xóa
+                                 Thu hồi
                               </Button>
-                              {userID === modalData?.sender && (
-                                 <Button
-                                    icon={() => <Icon source="backup-restore" size={24} iconColor="#333" />}
-                                    contentStyle={{ flexDirection: 'row-reverse' }}
-                                    onPress={() => handleClickStatusChat('recalls', userID, modalData?.id)}
-                                 >
-                                    Thu hồi
-                                 </Button>
-                              )}
-                           </View>
-                           <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
-                              <Button
-                                 icon={() => <Icon source="delete" size={24} iconColor="#333" />}
-                                 contentStyle={{ flexDirection: 'row-reverse' }}
-                                 onPress={() => handleClickStatusChat('delete', userID, modalData?.id)}
-                              >
-                                 Chuyển tiếp
-                              </Button>
-                           </View>
+                           )}
+                           <Button
+                              icon={() => <Icon source="message-arrow-right-outline" size={24} iconColor="#333" />}
+                              contentStyle={{ flexDirection: 'row-reverse' }}
+                              onPress={() => {
+                                 navigation.navigate('ManageGroupAndChatScreen', {
+                                    data: modalData,
+                                    type: 'forward',
+                                 });
+                              }}
+                           >
+                              Chuyển tiếp
+                           </Button>
                         </View>
                      </Modal>
                   </Portal>

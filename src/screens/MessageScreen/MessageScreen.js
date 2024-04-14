@@ -3,25 +3,29 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { ListChat } from '../../components/ListChat/ListChat';
 import { getUserID } from '../../utils/storage';
+import { socket } from '../../utils/socket';
 
 export const MessageScreen = ({ navigation }) => {
+   const [userID, setUserID] = useState(null);
    const [data, setData] = useState([]);
 
    useEffect(() => {
-      getUserID().then((userID) => {
-         getApiChatsByUserId(userID);
+      getUserID().then((id) => {
+         getApiChatsByUserId(id);
+         setUserID(id);
       });
    }, []);
 
    useEffect(() => {
       const unsubscribe = navigation.addListener('focus', () => {
-         getUserID().then((userID) => {
-            getApiChatsByUserId(userID);
-         });
+         !userID ? getUserID().then((id) => getApiChatsByUserId(id)) : getApiChatsByUserId(userID);
       });
-
       return unsubscribe;
    }, [navigation]);
+
+   useEffect(() => {
+      !userID ? getUserID().then((id) => getApiChatsByUserId(id)) : getApiChatsByUserId(userID);
+   }, [socket, data]);
 
    /**
     * Calls the API to get chat data by user ID.
@@ -30,7 +34,7 @@ export const MessageScreen = ({ navigation }) => {
     */
    const getApiChatsByUserId = async (userID) => {
       const res = await axios.get(`${SERVER_HOST}/users/get-chats-by-id/${userID}`);
-      setData(res.data);
+      if (res.data) setData(res.data.sort((a, b) => new Date(b.dateTimeSend) - new Date(a.dateTimeSend)));
    };
 
    return <ListChat style={{ height: '100%' }} navigation={navigation} chats={data} />;

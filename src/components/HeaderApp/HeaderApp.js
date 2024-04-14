@@ -13,7 +13,7 @@ import { MaterialIcons } from '@expo/vector-icons';
  * @param {string} type - The type of the header. Can be 'chat', 'message', 'contact' or 'personal'.
  * @returns {JSX.Element} The header component.
  */
-export const HeaderApp = ({ navigation, props, type, title, member }) => {
+export const HeaderApp = ({ navigation, props, type, id, title, member }) => {
    Platform.OS === 'ios' ? (height = 44) : (height = 56);
    const [search, setSearch] = useState('0981209501');
    return (
@@ -65,9 +65,9 @@ export const HeaderApp = ({ navigation, props, type, title, member }) => {
                <Appbar.Action
                   color="#fff"
                   size={24}
-                  icon={(props) => <AntDesign {...props} name="bars" size={24} color="#fff" />}
+                  icon={(props) => <AntDesign {...props} name="bars" />}
                   animated={false}
-                  onPress={() => {}}
+                  onPress={() => navigation.navigate('DetailChatScreen', { id, member: member })}
                />
             </>
          ) : (
@@ -106,7 +106,7 @@ export const HeaderApp = ({ navigation, props, type, title, member }) => {
                         size={32}
                         icon={(props) => <MaterialIcons {...props} name="group-add" />}
                         animated={false}
-                        onPress={() => {}}
+                        onPress={() => navigation.navigate('ManageGroupAndChatScreen', { type: 'addGroup' })}
                      />
                   </>
                ) : type === 'contact' ? (

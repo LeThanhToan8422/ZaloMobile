@@ -37,7 +37,7 @@ export const PersonalScreen = ({ navigation }) => {
             icon={() => <Image style={styles.imageAvt} source={{ uri: profile.image }} />}
             title={profile.name}
             subtitle="Xem trang cá nhân"
-            action={
+            actionRight={
                <IconButton
                   icon="account-sync-outline"
                   size={24}
