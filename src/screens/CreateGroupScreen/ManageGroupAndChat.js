@@ -53,8 +53,7 @@ export const ManageGroupAndChat = ({ navigation, route }) => {
                const dataGroup = type === 'addMember' && (await axios.get(`${SERVER_HOST}/group-chats/${data.id}`));
                if (type === 'addGroup' && !checkValidate()) return;
                type === 'addGroup'
-                  ? checkValidate() &&
-                    socket.emit(`Client-Group-Chats`, {
+                  ? socket.emit(`Client-Group-Chats`, {
                        name: groupName,
                        members: JSON.stringify([userID, ...selectMembers]),
                        leader: userID,
@@ -100,16 +99,16 @@ export const ManageGroupAndChat = ({ navigation, route }) => {
    };
 
    const sendMessage = async (friendID) => {
-      const res = await axios.get(`${SERVER_HOST}/group-chats/${friendID}`);
+      const res = await axios.get(`${SERVER_HOST}/users/get-chats-by-id/${userID}`);
+      const result = res.data.filter((item) => item.id === friendID)[0];
       const params = {
          message: data.message.trim(), // thông tin message
          dateTimeSend: dayjs().format('YYYY-MM-DD HH:mm:ss'),
          sender: userID, // id người gửi
-         chatRoom: res.data ? res.data.id : userID > friendID ? `${friendID}${userID}` : `${userID}${friendID}`,
+         chatRoom: result.leader ? result.id : userID > friendID ? `${friendID}${userID}` : `${userID}${friendID}`,
       };
-      res.data ? (params.groupChat = res.data.id) : (params.receiver = friendID);
-      console.log(params);
-      // socket.emit('Client-Chat-Room', params);
+      result.leader ? (params.groupChat = result.id) : (params.receiver = friendID);
+      socket.emit('Client-Chat-Room', params);
    };
 
    const pickImage = async () => {

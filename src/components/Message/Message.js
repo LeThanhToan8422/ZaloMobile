@@ -99,11 +99,13 @@ export const Message = ({ data, index, localUserID, handleModal, onPress }) => {
                                  {...defaultStyles[message.split('.').pop()]}
                               />
                            </View>
-                           {!/(m4a|wav|aac|flac|ogg)$/i.test(message.split('.').pop()) && (
-                              <View>
+                           <View>
+                              {/(m4a|wav|aac|flac|ogg)$/i.test(message.split('.').pop()) ? (
+                                 <Text>Tin nhắn thoại</Text>
+                              ) : (
                                  <Text>{message.split('--').slice(1)}</Text>
-                              </View>
-                           )}
+                              )}
+                           </View>
                            <Text style={styles.time}>{dateTimeSend && formatTime(dateTimeSend)}</Text>
                         </View>
                      )

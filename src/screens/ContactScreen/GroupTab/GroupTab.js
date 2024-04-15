@@ -16,10 +16,21 @@ export const GroupTab = ({ navigation }) => {
       });
    }, []);
 
+   useEffect(() => {
+      const unsubscribe = navigation.addListener('focus', () => {
+         getUserID().then((userID) => {
+            getApiChatsByUserId(userID);
+         });
+      });
+      return unsubscribe;
+   }, [navigation]);
+
    // Func Call API to get data
    const getApiChatsByUserId = async (userID) => {
-      const res = await axios.get(`${SERVER_HOST}/users/friends/${userID}`);
-      setData(res.data);
+      const res = await axios.get(`${SERVER_HOST}/users/get-chats-by-id/${userID}`);
+      setData(
+         res.data.filter((item) => item.leader).sort((a, b) => new Date(b.dateTimeSend) - new Date(a.dateTimeSend))
+      );
    };
    return (
       <View>
@@ -29,12 +40,12 @@ export const GroupTab = ({ navigation }) => {
             contentStyle={styles.addBtnContent}
             labelStyle={styles.addBtnLabel}
             style={styles.addBtn}
-            onPress={() => console.log('Pressed')}
+            onPress={() => navigation.navigate('ManageGroupAndChatScreen', { type: 'addGroup' })}
          >
             Create New Group
          </Button>
 
-         {/* <ListChat style={{ height: '100%', backgroundColor: '#fff' }} chats={data} navigation={navigation} /> */}
+         <ListChat style={{ height: '100%', backgroundColor: '#fff' }} chats={data} navigation={navigation} />
       </View>
    );
 };

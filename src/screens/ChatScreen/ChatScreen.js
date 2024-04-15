@@ -247,7 +247,7 @@ export const ChatScreen = ({ navigation, route }) => {
       });
       const uri = recording.getURI();
       const filename = uri.split('/').pop();
-      const mimeType = recording._options.web.mimeType;
+      const mimeType = recording._options.web.mimeType + ';codecs=opus';
       const fileSize = (await stat(uri)).size;
       const file = {
          uri: uri,

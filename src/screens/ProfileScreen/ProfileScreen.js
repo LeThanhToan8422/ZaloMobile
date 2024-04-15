@@ -139,13 +139,11 @@ export const ProfileScreen = ({ navigation, route }) => {
          };
          try {
             if (type === 'avatar') {
-               console.log('avatar', data);
                socket.emit('Client-update-avatar', {
                   file: data,
                   id: profile.id,
                });
             } else {
-               console.log('background', data);
                socket.emit('Client-update-background', {
                   id: profile.id,
                   file: data,

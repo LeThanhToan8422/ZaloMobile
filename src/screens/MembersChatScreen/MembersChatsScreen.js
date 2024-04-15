@@ -15,7 +15,6 @@ export const MembersChatsScreen = ({ navigation, route }) => {
    useEffect(() => {
       getUserID().then((id) => setUserID(id));
       getMembers();
-      // console.log('data', data);
    }, []);
 
    useEffect(() => {
