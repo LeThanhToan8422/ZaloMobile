@@ -30,15 +30,15 @@ export const Message = ({ data, index, localUserID, handleModal, onPress }) => {
    const urlRegex = /^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/;
 
    useEffect(() => {
-      getUserID().then((localUserId) => {
-         localUserID !== id && getAvatarFriend(friendId);
-      });
+      // getUserID().then((localUserId) => {
+      //    localUserID !== id && getAvatarFriend(friendId);
+      // });
    }, []);
 
    const getAvatarFriend = async (id) => {
       try {
          const response = await axios.get(`${SERVER_HOST}/users/${id}`);
-         setAvtFriend(response.data.image);
+         // setAvtFriend(response.data.image);
       } catch (error) {
          console.error(error);
       }

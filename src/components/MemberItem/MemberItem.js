@@ -29,7 +29,6 @@ export const MemberItem = ({ data, item, userID, onFreshMember }) => {
 
    const handleAddDeputy = () => {
       group.deputy = item.id;
-      console.log('group', group);
       socket.emit(`Client-Change-Leader-And-Deputy-Group-Chats`, {
          group,
       });
