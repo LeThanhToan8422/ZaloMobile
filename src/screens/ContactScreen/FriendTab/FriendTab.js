@@ -6,34 +6,26 @@ import { ContactItem } from '../../../components/ContactItem/ContactItem';
 import PressableItem from '../../../components/PressableItem';
 import { getUserID } from '../../../utils/storage';
 import styles from './styles';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchFriend } from '../../../features/friend/friendSlice';
 
 export const FriendTab = ({ navigation }) => {
-   const [contacts, setContacts] = useState([]);
+   const dispatch = useDispatch();
+   const user = useSelector((state) => state.user.user);
+   const contacts = useSelector((state) => state.friend.friend);
+
    useEffect(() => {
-      getUserID().then((userID) => {
-         getContacts(userID);
-      });
+      dispatch(fetchFriend(7));
    }, []);
 
-   useEffect(() => {
-      const unsubscribe = navigation.addListener('focus', () => {
-         getUserID().then((userID) => {
-            getContacts(userID);
-         });
-      });
-      return unsubscribe;
-   }, [navigation]);
-
-   const getContacts = async (userID) => {
-      const res = await axios.get(`${SERVER_HOST}/users/friends/${userID}`);
-      const transformedData = res.data.reduce((acc, obj) => {
+   const transformedData = () => {
+      return contacts.reduce((acc, obj) => {
          const title = obj.name.charAt(0).toUpperCase();
          const existingTitle = acc.find((item) => item.title === title);
          if (existingTitle) existingTitle.data.push(obj);
          else acc.push({ title, data: [obj] });
          return acc;
       }, []);
-      setContacts(transformedData);
    };
 
    return (
@@ -54,7 +46,7 @@ export const FriendTab = ({ navigation }) => {
             action={null}
          />
          <SectionList
-            sections={contacts}
+            sections={transformedData()}
             renderSectionHeader={({ section }) => <Text style={styles.title}>{section.title}</Text>}
             renderItem={({ item }) => <ContactItem navigation={navigation} data={item} />}
             keyExtractor={(item, index) => item + index}

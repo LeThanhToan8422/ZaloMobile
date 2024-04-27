@@ -10,17 +10,13 @@ import styles from './styles';
 
 export const GroupTab = ({ navigation }) => {
    const [data, setData] = useState([]);
-   useEffect(() => {
-      getUserID().then((userID) => {
-         getApiChatsByUserId(userID);
-      });
-   }, []);
+   useEffect(() => {}, []);
 
-   // Func Call API to get data
-   const getApiChatsByUserId = async (userID) => {
-      const res = await axios.get(`${SERVER_HOST}/users/friends/${userID}`);
-      setData(res.data);
-   };
+   useEffect(() => {
+      const unsubscribe = navigation.addListener('focus', () => {});
+      return unsubscribe;
+   }, [navigation]);
+
    return (
       <View>
          <Button
@@ -29,12 +25,12 @@ export const GroupTab = ({ navigation }) => {
             contentStyle={styles.addBtnContent}
             labelStyle={styles.addBtnLabel}
             style={styles.addBtn}
-            onPress={() => console.log('Pressed')}
+            onPress={() => navigation.navigate('ManageGroupAndChatScreen', { type: 'addGroup' })}
          >
             Create New Group
          </Button>
 
-         {/* <ListChat style={{ height: '100%', backgroundColor: '#fff' }} chats={data} navigation={navigation} /> */}
+         <ListChat style={{ height: '100%', backgroundColor: '#fff' }} chats={data} navigation={navigation} />
       </View>
    );
 };

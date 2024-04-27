@@ -2,22 +2,15 @@ import React, { useEffect, useState } from 'react';
 import { Image, Pressable, Text, View } from 'react-native';
 import styles from './styles';
 import { IconButton } from 'react-native-paper';
-import { getUserID } from '../../utils/storage';
 import { socket } from '../../utils/socket';
 
 export const SearchItem = ({ navigation, data }) => {
-   const [userID, setUserID] = useState(null);
    const { id, image, name } = data;
    const [localUserID, setLocalUserID] = useState(null);
    const [isFriend, setIsFriend] = useState(false);
    const [isSendRequest, setIsSendRequest] = useState(false);
 
-   useEffect(() => {
-      getUserID().then((id) => {
-         setUserID(id);
-         setLocalUserID(id);
-      });
-   });
+   useEffect(() => {});
 
    const handleAddFriend = async () => {
       socket.emit(`Client-Make-Friends`, {

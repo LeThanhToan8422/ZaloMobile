@@ -22,6 +22,9 @@ const styles = StyleSheet.create({
       borderRadius: 10,
    },
    modalActionContainer: {
+      flexDirection: 'row',
+      justifyContent: 'flex-end',
+      flexWrap: 'wrap',
       justifyContent: 'flex-end',
       backgroundColor: '#E2E8F1',
       borderRadius: 10,

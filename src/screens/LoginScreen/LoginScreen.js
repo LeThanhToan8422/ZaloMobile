@@ -9,30 +9,39 @@ import Toast from 'react-native-toast-message';
 import OpenURLText from '../../components/OpenURLText';
 import { storeData } from '../../utils/storage';
 import styles from './styles';
+import { useDispatch, useSelector } from 'react-redux';
+import { login } from '../../features/user/userSlice';
 
 export const LoginScreen = ({ navigation }) => {
    const [phone, setPhone] = useState('');
    const [password, setPassword] = useState('');
    const [secPass, setSecPass] = useState(true);
    const insets = useSafeAreaInsets();
+   const dispatch = useDispatch();
+   const { user, status, error } = useSelector((state) => state.user);
 
    const handleLogin = async () => {
-      try {
-         // if (!checkPassword(password)) return;
-         let res = await axios.get(`${SERVER_HOST}/accounts/phone/${phone}`);
-         if (reactNativeBcrypt.compareSync(password, res.data.password)) {
-            storeData({ phone, password: res.data.password, id: res.data.user });
-            navigation.navigate('AppStack');
-         } else {
+      dispatch(login({ phone, password }))
+         .unwrap()
+         .then((res) => {
+            if (res) {
+               storeData({ phone: res.phone, password: password, user: res.user });
+               navigation.navigate('AppStack');
+            } else {
+               Toast.show({
+                  type: 'error',
+                  text1: `Đăng nhập thất bại. Sai số điện thoại hoặc mật khẩu`,
+                  position: 'bottom',
+               });
+            }
+         })
+         .catch((err) => {
             Toast.show({
                type: 'error',
-               text1: 'Sai số điện thoại hoặc mật khẩu',
+               text1: `Đăng nhập thất bại. ${err.message}`,
                position: 'bottom',
             });
-         }
-      } catch (e) {
-         console.error(e);
-      }
+         });
    };
 
    return (
