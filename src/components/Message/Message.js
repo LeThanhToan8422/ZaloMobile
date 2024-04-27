@@ -3,7 +3,6 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { Image, Pressable, Text, View } from 'react-native';
 import { formatTime } from '../../utils/func';
-import { getUserID } from '../../utils/storage';
 import styles from './styles';
 import { FileIcon, defaultStyles } from 'react-native-file-icon';
 import { ResizeMode, Video } from 'expo-av';
@@ -29,11 +28,7 @@ export const Message = ({ data, index, localUserID, handleModal, onPress }) => {
    );
    const urlRegex = /^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/;
 
-   useEffect(() => {
-      // getUserID().then((localUserId) => {
-      //    localUserID !== id && getAvatarFriend(friendId);
-      // });
-   }, []);
+   useEffect(() => {}, []);
 
    const getAvatarFriend = async (id) => {
       try {

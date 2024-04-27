@@ -23,10 +23,11 @@ import { Button, Icon, IconButton, Modal, PaperProvider, Portal } from 'react-na
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Message from '../../components/Message';
 import { socket } from '../../utils/socket';
-import { getUserID } from '../../utils/storage';
 import styles from './styles';
 import dayjs from 'dayjs';
 import { Audio } from 'expo-av';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchMessages } from '../../features/chat/chatSlice';
 
 /**
  * ChatScreen component. This component is used to render the chat screen.
@@ -36,11 +37,8 @@ import { Audio } from 'expo-av';
  */
 export const ChatScreen = ({ navigation, route }) => {
    const urlRegex = /^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/;
-   const [userID, setUserID] = useState();
-   const [groupChat, setGroupChat] = useState(route.params);
-   const friendID = route.params.id;
-   const [messages, setMessages] = useState([]);
    const insets = useSafeAreaInsets();
+   const [chatInfo, setChatInfo] = useState(route.params);
    const [message, setMessage] = useState('');
    const [image, setImage] = useState(null);
    const [visible, setVisible] = useState(false);
@@ -53,43 +51,43 @@ export const ChatScreen = ({ navigation, route }) => {
    const [recording, setRecording] = useState();
    const [permissionResponse, requestPermission] = Audio.usePermissions();
 
-   useEffect(() => {
-      getUserID().then((id) => {
-         getMessagesOfChat(userID, friendID);
-         setUserID(id);
-      });
-   }, [userID, friendID]);
+   const dispatch = useDispatch();
+   const user = useSelector((state) => state.user.user);
+   const messages = useSelector((state) => state.chat.currentChat.messages);
 
    useEffect(() => {
-      const onChatEvents = (res) => {
-         setMessages((prev) => [res.data, ...prev]);
-      };
+      const params = { page: page };
+      chatInfo.leader ? (params.groupId = chatInfo.id) : (params.chatId = chatInfo.id);
+      dispatch(fetchMessages(params));
+   }, []);
 
-      const onStatusChatEvents = (res) => {
-         const index = messages.findIndex((message) => message.id === res.data.id);
-         if (index !== -1) messages[index].isRecalls = 1;
-         setMessages([...messages]);
-      };
-
-      const idRoom = userID < friendID ? `${userID}${friendID}` : `${friendID}${userID}`;
-      socket.on(`Server-Chat-Room-${groupChat.members ? groupChat.id : idRoom}`, onChatEvents);
-      socket.on(`Server-Status-Chat-${groupChat.members ? groupChat.id : idRoom}`, onStatusChatEvents);
-      // socket.on(`Server-Group-Chats-${userID}`);
-
-      return () => {
-         socket.off(`Server-Chat-Room-${groupChat.members ? groupChat.id : idRoom}`, onChatEvents);
-         socket.off(`Server-Status-Chat-${groupChat.members ? groupChat.id : idRoom}`, onStatusChatEvents);
-         // socket.off(`Server-Group-Chats-${userID}`);
-      };
+   useEffect(() => {
+      // const onChatEvents = (res) => {
+      //    setMessages((prev) => [res.data, ...prev]);
+      // };
+      // const onStatusChatEvents = (res) => {
+      //    const index = messages.findIndex((message) => message.id === res.data.id);
+      //    if (index !== -1) messages[index].isRecalls = 1;
+      //    setMessages([...messages]);
+      // };
+      // const idRoom = user.id < friendID ? `${user.id}${friendID}` : `${friendID}${user.id}`;
+      // socket.on(`Server-Chat-Room-${groupChat.members ? groupChat.id : idRoom}`, onChatEvents);
+      // socket.on(`Server-Status-Chat-${groupChat.members ? groupChat.id : idRoom}`, onStatusChatEvents);
+      // // socket.on(`Server-Group-Chats-${user.id}`);
+      // return () => {
+      //    socket.off(`Server-Chat-Room-${groupChat.members ? groupChat.id : idRoom}`, onChatEvents);
+      //    socket.off(`Server-Status-Chat-${groupChat.members ? groupChat.id : idRoom}`, onStatusChatEvents);
+      //    // socket.off(`Server-Group-Chats-${user.id}`);
+      // };
    }, [socket, messages]);
 
    useEffect(() => {
-      return sound
-         ? () => {
-              console.log('Unloading Sound');
-              sound.unloadAsync();
-           }
-         : undefined;
+      // return sound
+      //    ? () => {
+      //         console.log('Unloading Sound');
+      //         sound.unloadAsync();
+      //      }
+      //    : undefined;
    }, [sound]);
 
    const pickImage = async () => {
@@ -134,14 +132,14 @@ export const ChatScreen = ({ navigation, route }) => {
       const params = {
          file: data,
          dateTimeSend: dayjs().format('YYYY-MM-DD HH:mm:ss'),
-         sender: userID,
-         chatRoom: groupChat.members
-            ? groupChat.id
-            : userID > friendID
-            ? `${friendID}${userID}`
-            : `${userID}${friendID}`,
+         sender: user.id,
+         chatRoom: chatInfo.leader
+            ? chatInfo.id
+            : user.id > chatInfo.id
+            ? `${chatInfo.id}${user.id}`
+            : `${user.id}${chatInfo.id}`,
       };
-      groupChat.members ? (params.groupChat = groupChat.id) : (params.receiver = friendID);
+      chatInfo.leader ? (params.chatInfo = chatInfo.id) : (params.receiver = chatInfo.id);
       socket.emit('Client-Chat-Room', params);
    };
 
@@ -149,34 +147,34 @@ export const ChatScreen = ({ navigation, route }) => {
       const params = {
          message: message.trim(), // thông tin message
          dateTimeSend: dayjs().format('YYYY-MM-DD HH:mm:ss'),
-         sender: userID, // id người gửi
-         chatRoom: groupChat.members
-            ? groupChat.id
-            : userID > friendID
-            ? `${friendID}${userID}`
-            : `${userID}${friendID}`,
+         sender: user.id, // id người gửi
+         chatRoom: chatInfo.leader
+            ? chatInfo.id
+            : user.id > chatInfo.id
+            ? `${chatInfo.id}${user.id}`
+            : `${user.id}${chatInfo.id}`,
       };
-      groupChat.members ? (params.groupChat = groupChat.id) : (params.receiver = friendID);
+      chatInfo.leader ? (params.groupChat = chatInfo.id) : (params.receiver = chatInfo.id);
       socket.emit('Client-Chat-Room', params);
       setMessage('');
    };
 
-   const handleClickStatusChat = (status, userId, chat) => {
+   const handleClickStatusChat = (status, chat) => {
       const params = {
          status: status,
-         implementer: userId,
+         implementer: user.id,
          chat: chat,
-         chatRoom: groupChat.members
-            ? groupChat.id
-            : userId > friendID
-            ? `${friendID}${userId}`
-            : `${userId}${friendID}`,
+         chatRoom: chatInfo.leader
+            ? chatInfo.id
+            : user.id > chatInfo.id
+            ? `${chatInfo.id}${user.id}`
+            : `${user.id}${chatInfo.id}`,
       };
-      !groupChat.members && (params.objectId = friendID);
+      !chatInfo.leader && (params.objectId = chatInfo.id);
       socket.emit(`Client-Status-Chat`, params);
       hideModal();
       if (status === 'delete') {
-         setMessages(messages.filter((message) => message.id !== chat));
+         // setMessages(messages.filter((message) => message.id !== chat));
       }
    };
 
@@ -257,17 +255,6 @@ export const ChatScreen = ({ navigation, route }) => {
       handleSendFile(file);
    };
 
-   const getMessagesOfChat = async (userID, friendID) => {
-      setLoading(true);
-      const res = !groupChat.members
-         ? await axios.get(`${SERVER_HOST}/chats/content-chats-between-users/${userID}-and-${friendID}/${page}`)
-         : await axios.get(
-              `${SERVER_HOST}/group-chats/content-chats-between-group/${route.params.id}/${userID}/${page}`
-           );
-      setMessages(res.data.sort((a, b) => new Date(b.dateTimeSend) - new Date(a.dateTimeSend)));
-      setLoading(false);
-   };
-
    return (
       <KeyboardAvoidingView
          enabled
@@ -309,15 +296,15 @@ export const ChatScreen = ({ navigation, route }) => {
                            <Button
                               icon={() => <Icon source="delete" size={24} iconColor="#333" />}
                               contentStyle={{ flexDirection: 'row-reverse' }}
-                              onPress={() => handleClickStatusChat('delete', userID, modalData?.id)}
+                              onPress={() => handleClickStatusChat('delete', modalData?.id)}
                            >
                               Xóa
                            </Button>
-                           {userID === modalData?.sender && (
+                           {user.id === modalData?.sender && (
                               <Button
                                  icon={() => <Icon source="backup-restore" size={24} iconColor="#333" />}
                                  contentStyle={{ flexDirection: 'row-reverse' }}
-                                 onPress={() => handleClickStatusChat('recalls', userID, modalData?.id)}
+                                 onPress={() => handleClickStatusChat('recalls', modalData?.id)}
                               >
                                  Thu hồi
                               </Button>
@@ -344,7 +331,9 @@ export const ChatScreen = ({ navigation, route }) => {
                      onEndReached={() => {
                         if (!loading) {
                            setPage((prevPage) => prevPage + 10);
-                           getMessagesOfChat(userID, friendID);
+                           const params = { page: page };
+                           chatInfo.leader ? (params.groupId = chatInfo.id) : (params.chatId = chatInfo.id);
+                           dispatch(fetchMessages(params));
                         }
                      }}
                      onEndReachedThreshold={0.05} // Adjust this value as needed
@@ -353,7 +342,7 @@ export const ChatScreen = ({ navigation, route }) => {
                         <Message
                            data={item}
                            index={index}
-                           localUserID={userID}
+                           localUserID={user.id}
                            handleModal={showModal}
                            onPress={() => handlePressMessage(item)}
                         />

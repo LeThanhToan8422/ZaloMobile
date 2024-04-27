@@ -6,28 +6,22 @@ import { Button, IconButton } from 'react-native-paper';
 import PressableItem from '../../components/PressableItem';
 import { getUserID, storeData } from '../../utils/storage';
 import styles from './styles';
+import { useDispatch, useSelector } from 'react-redux';
 
 export const PersonalScreen = ({ navigation }) => {
-   const [profile, setProfile] = useState({});
+   // const [profile, setProfile] = useState({});
+   const dispatch = useDispatch();
+   const profile = useSelector((state) => state.user.user);
 
    useEffect(() => {
-      getUserID()
-         .then((id) => {
-            getProfile(id);
-         })
-         .catch((err) => {
-            console.error(err);
-         });
+      // getUserID()
+      //    .then((id) => {
+      //       getProfile(id);
+      //    })
+      //    .catch((err) => {
+      //       console.error(err);
+      //    });
    }, []);
-
-   const getProfile = async (userID) => {
-      try {
-         const response = await axios.get(`${SERVER_HOST}/users/${userID}`);
-         setProfile(response.data);
-      } catch (error) {
-         console.error(error);
-      }
-   };
 
    return (
       <ScrollView>

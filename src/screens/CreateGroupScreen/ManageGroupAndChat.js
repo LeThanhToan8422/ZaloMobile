@@ -71,12 +71,7 @@ export const ManageGroupAndChat = ({ navigation, route }) => {
       ),
    });
 
-   useEffect(() => {
-      getUserID().then((userID) => {
-         getFriends(userID);
-         setUserID(userID);
-      });
-   }, []);
+   useEffect(() => {}, []);
 
    const checkValidate = () => {
       if (!groupName) {

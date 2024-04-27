@@ -10,28 +10,13 @@ import styles from './styles';
 
 export const GroupTab = ({ navigation }) => {
    const [data, setData] = useState([]);
-   useEffect(() => {
-      getUserID().then((userID) => {
-         getApiChatsByUserId(userID);
-      });
-   }, []);
+   useEffect(() => {}, []);
 
    useEffect(() => {
-      const unsubscribe = navigation.addListener('focus', () => {
-         getUserID().then((userID) => {
-            getApiChatsByUserId(userID);
-         });
-      });
+      const unsubscribe = navigation.addListener('focus', () => {});
       return unsubscribe;
    }, [navigation]);
 
-   // Func Call API to get data
-   const getApiChatsByUserId = async (userID) => {
-      const res = await axios.get(`${SERVER_HOST}/users/get-chats-by-id/${userID}`);
-      setData(
-         res.data.filter((item) => item.leader).sort((a, b) => new Date(b.dateTimeSend) - new Date(a.dateTimeSend))
-      );
-   };
    return (
       <View>
          <Button

@@ -4,7 +4,6 @@ import React, { useEffect, useState } from 'react';
 import { FlatList, Text, View } from 'react-native';
 import { IconButton, PaperProvider } from 'react-native-paper';
 import MemberItem from '../../components/MemberItem';
-import { getUserID } from '../../utils/storage';
 
 export const MembersChatsScreen = ({ navigation, route }) => {
    const { data } = route.params;
@@ -12,10 +11,7 @@ export const MembersChatsScreen = ({ navigation, route }) => {
    const [userID, setUserID] = useState();
    const [group, setGroup] = useState(data);
 
-   useEffect(() => {
-      getUserID().then((id) => setUserID(id));
-      getMembers();
-   }, []);
+   useEffect(() => {}, []);
 
    useEffect(() => {
       const unsubscribe = navigation.addListener('focus', () => {

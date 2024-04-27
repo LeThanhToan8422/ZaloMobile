@@ -4,7 +4,6 @@ import React, { useEffect, useState } from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
 import { Icon } from 'react-native-paper';
 import { PressableItem } from '../../components/PressableItem/PressableItem';
-import { getUserID } from '../../utils/storage';
 import styles from './styles';
 import { socket } from '../../utils/socket';
 import Toast from 'react-native-toast-message';
@@ -19,12 +18,7 @@ export const DetailChatScreen = ({ navigation, route }) => {
    const [visibleLeave, setVisibleLeave] = useState(false);
    const [visibleDisband, setVisibleDisband] = useState(false);
 
-   useEffect(() => {
-      getUserID().then((id) => {
-         setUserID(id);
-         getInformationOfChat();
-      });
-   }, []);
+   useEffect(() => {}, []);
 
    useEffect(() => {
       const unsubscribe = navigation.addListener('focus', () => {

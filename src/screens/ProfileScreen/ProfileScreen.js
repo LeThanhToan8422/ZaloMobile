@@ -18,11 +18,10 @@ import {
 import { Avatar, Button, Icon, IconButton, Menu, PaperProvider, RadioButton, TextInput } from 'react-native-paper';
 import Toast from 'react-native-toast-message';
 import { socket } from '../../utils/socket';
-import { getUserID } from '../../utils/storage';
 import styles from './styles';
+import { useDispatch, useSelector } from 'react-redux';
 
 export const ProfileScreen = ({ navigation, route }) => {
-   const [userID, setUserID] = useState(null);
    const [profile, setProfile] = useState({});
    const [name, setName] = useState('');
    const [dob, setDob] = useState(null);
@@ -32,17 +31,20 @@ export const ProfileScreen = ({ navigation, route }) => {
    const [statusFriend, setStatusFriend] = useState();
    const [visible, setVisible] = React.useState(false);
 
+   const dispatch = useDispatch();
+   const { user } = useSelector((state) => state.user);
+
    useEffect(() => {
-      getUserID()
-         .then((id) => {
-            setUserID(id);
-            if (id === friendID) setFriendID(null);
-            friendID ? getProfile(friendID) : getProfile(id);
-            friendID && checkIsFriend(id, friendID);
-         })
-         .catch((err) => {
-            console.error(err);
-         });
+      // getUserID()
+      //    .then((id) => {
+      //       setUserID(id);
+      //       if (id === friendID) setFriendID(null);
+      //       friendID ? getProfile(friendID) : getProfile(id);
+      //       friendID && checkIsFriend(id, friendID);
+      //    })
+      //    .catch((err) => {
+      //       console.error(err);
+      //    });
    }, []);
 
    useEffect(() => {

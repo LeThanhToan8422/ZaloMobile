@@ -3,7 +3,8 @@ import * as encoding from 'text-encoding';
 import Router from './src/routes';
 import reactNativeBcrypt from 'react-native-bcrypt';
 import isaac from 'isaac';
-import { useEffect } from 'react';
+import store from './src/app/store';
+import { Provider } from 'react-redux';
 
 reactNativeBcrypt.setRandomFallback((len) => {
    const buf = new Uint8Array(len);
@@ -11,7 +12,11 @@ reactNativeBcrypt.setRandomFallback((len) => {
 });
 
 export default function App() {
-   return Router();
+   return (
+      <Provider store={store}>
+         <Router />
+      </Provider>
+   );
 }
 
 const styles = StyleSheet.create({
