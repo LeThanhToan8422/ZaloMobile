@@ -27,7 +27,7 @@ import styles from './styles';
 import dayjs from 'dayjs';
 import { Audio } from 'expo-av';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchMessages } from '../../features/chat/chatSlice';
+import { deleteMessage, fetchMessages } from '../../features/chat/chatSlice';
 
 /**
  * ChatScreen component. This component is used to render the chat screen.
@@ -54,32 +54,13 @@ export const ChatScreen = ({ navigation, route }) => {
    const dispatch = useDispatch();
    const user = useSelector((state) => state.user.user);
    const messages = useSelector((state) => state.chat.currentChat.messages);
+   const { chats } = useSelector((state) => state.chat);
 
    useEffect(() => {
       const params = { page: page };
       chatInfo.leader ? (params.groupId = chatInfo.id) : (params.chatId = chatInfo.id);
       dispatch(fetchMessages(params));
    }, []);
-
-   useEffect(() => {
-      // const onChatEvents = (res) => {
-      //    setMessages((prev) => [res.data, ...prev]);
-      // };
-      // const onStatusChatEvents = (res) => {
-      //    const index = messages.findIndex((message) => message.id === res.data.id);
-      //    if (index !== -1) messages[index].isRecalls = 1;
-      //    setMessages([...messages]);
-      // };
-      // const idRoom = user.id < friendID ? `${user.id}${friendID}` : `${friendID}${user.id}`;
-      // socket.on(`Server-Chat-Room-${groupChat.members ? groupChat.id : idRoom}`, onChatEvents);
-      // socket.on(`Server-Status-Chat-${groupChat.members ? groupChat.id : idRoom}`, onStatusChatEvents);
-      // // socket.on(`Server-Group-Chats-${user.id}`);
-      // return () => {
-      //    socket.off(`Server-Chat-Room-${groupChat.members ? groupChat.id : idRoom}`, onChatEvents);
-      //    socket.off(`Server-Status-Chat-${groupChat.members ? groupChat.id : idRoom}`, onStatusChatEvents);
-      //    // socket.off(`Server-Group-Chats-${user.id}`);
-      // };
-   }, [socket, messages]);
 
    useEffect(() => {
       // return sound
@@ -139,7 +120,7 @@ export const ChatScreen = ({ navigation, route }) => {
             ? `${chatInfo.id}${user.id}`
             : `${user.id}${chatInfo.id}`,
       };
-      chatInfo.leader ? (params.chatInfo = chatInfo.id) : (params.receiver = chatInfo.id);
+      chatInfo.leader ? (params.groupChat = chatInfo.id) : (params.receiver = chatInfo.id);
       socket.emit('Client-Chat-Room', params);
    };
 
@@ -174,7 +155,7 @@ export const ChatScreen = ({ navigation, route }) => {
       socket.emit(`Client-Status-Chat`, params);
       hideModal();
       if (status === 'delete') {
-         // setMessages(messages.filter((message) => message.id !== chat));
+         dispatch(deleteMessage({ id: chat }));
       }
    };
 
@@ -330,17 +311,19 @@ export const ChatScreen = ({ navigation, route }) => {
                      style={{ flexGrow: 1, backgroundColor: '#E2E8F1' }}
                      onEndReached={() => {
                         if (!loading) {
+                           setLoading(true);
                            setPage((prevPage) => prevPage + 10);
                            const params = { page: page };
                            chatInfo.leader ? (params.groupId = chatInfo.id) : (params.chatId = chatInfo.id);
                            dispatch(fetchMessages(params));
+                           setLoading(false);
                         }
                      }}
                      onEndReachedThreshold={0.05} // Adjust this value as needed
                      keyExtractor={(_, index) => index.toString()}
                      renderItem={({ item, index }) => (
                         <Message
-                           data={item}
+                           data={{ ...item, imageFriend: chatInfo.image }}
                            index={index}
                            localUserID={user.id}
                            handleModal={showModal}

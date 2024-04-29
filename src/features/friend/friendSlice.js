@@ -24,7 +24,7 @@ const friendSlice = createSlice({
          })
          .addCase(fetchFriend.fulfilled, (state, action) => {
             state.status = 'succeeded';
-            state.friend = action.payload;
+            state.friend = action.payload.filter((item) => !item.leader);
          })
          .addCase(fetchFriend.rejected, (state, action) => {
             state.status = 'failed';

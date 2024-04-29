@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createReducer, createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { SERVER_HOST } from '@env';
 
@@ -33,11 +33,31 @@ const chatSlice = createSlice({
    name: 'chat',
    initialState,
    reducers: {
-      addMessage: (state, action) => {
-         state.messages.push(action.payload);
+      addMessage(state, action) {
+         if (state.currentChat.id === action.payload.chatRoom || action.payload.chatRoom.includes(state.currentChat.id))
+            state.currentChat.messages.unshift(action.payload);
       },
-      clearMessages: (state) => {
-         state.messages = [];
+      updateMessage(state, action) {
+         state.currentChat.messages.map((message) => {
+            if (message.id === action.payload.id) {
+               message.message = action.payload.message;
+               message.dateTimeSend = action.payload.dateTimeSend;
+               message.isRecalls = action.payload.isRecalls;
+            }
+         });
+      },
+      recallMessage(state, action) {
+         state.currentChat.messages.map((message) => {
+            if (message.id === action.payload.id) {
+               message.isRecalls = 1;
+            }
+         });
+      },
+      deleteMessage(state, action) {
+         state.currentChat.messages = state.currentChat.messages.filter((message) => message.id !== action.payload.id);
+      },
+      clearMessages(state) {
+         state.currentChat.messages = [];
       },
    },
    extraReducers: (builder) => {
@@ -47,7 +67,7 @@ const chatSlice = createSlice({
             state.status = 'loading';
          })
          .addCase(fetchChats.fulfilled, (state, action) => {
-            state.chats = action.payload;
+            state.chats = action.payload.sort((a, b) => new Date(b.dateTimeSend) - new Date(a.dateTimeSend));
          })
          .addCase(fetchChats.rejected, (state, action) => {
             state.status = 'failed';
@@ -71,6 +91,6 @@ const chatSlice = createSlice({
 });
 
 const { actions, reducer } = chatSlice;
-export const { addMessage, clearMessages } = actions;
+export const { addMessage, updateMessage, recallMessage, deleteMessage, clearMessages } = actions;
 export { fetchChats, fetchMessages };
 export default reducer;
