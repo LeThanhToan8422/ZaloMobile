@@ -54,6 +54,7 @@ export const ChatScreen = ({ navigation, route }) => {
    const dispatch = useDispatch();
    const user = useSelector((state) => state.user.user);
    const messages = useSelector((state) => state.chat.currentChat.messages);
+   const { chats } = useSelector((state) => state.chat);
 
    useEffect(() => {
       const params = { page: page };
@@ -119,7 +120,7 @@ export const ChatScreen = ({ navigation, route }) => {
             ? `${chatInfo.id}${user.id}`
             : `${user.id}${chatInfo.id}`,
       };
-      chatInfo.leader ? (params.chatInfo = chatInfo.id) : (params.receiver = chatInfo.id);
+      chatInfo.leader ? (params.groupChat = chatInfo.id) : (params.receiver = chatInfo.id);
       socket.emit('Client-Chat-Room', params);
    };
 
@@ -322,7 +323,7 @@ export const ChatScreen = ({ navigation, route }) => {
                      keyExtractor={(_, index) => index.toString()}
                      renderItem={({ item, index }) => (
                         <Message
-                           data={item}
+                           data={{ ...item, imageFriend: chatInfo.image }}
                            index={index}
                            localUserID={user.id}
                            handleModal={showModal}

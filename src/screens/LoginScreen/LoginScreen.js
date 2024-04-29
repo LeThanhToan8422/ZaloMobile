@@ -11,6 +11,7 @@ import { storeData } from '../../utils/storage';
 import styles from './styles';
 import { useDispatch, useSelector } from 'react-redux';
 import { login } from '../../features/user/userSlice';
+import { fetchChats } from '../../features/chat/chatSlice';
 
 export const LoginScreen = ({ navigation }) => {
    const [phone, setPhone] = useState('');
@@ -26,6 +27,7 @@ export const LoginScreen = ({ navigation }) => {
          .then((res) => {
             if (res) {
                storeData({ phone: res.phone, password: password, user: res.user });
+               dispatch(fetchChats());
                navigation.navigate('AppStack');
             } else {
                Toast.show({

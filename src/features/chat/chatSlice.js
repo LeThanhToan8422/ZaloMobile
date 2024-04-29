@@ -34,13 +34,6 @@ const chatSlice = createSlice({
    initialState,
    reducers: {
       addMessage(state, action) {
-         state.chats.map((chat) => {
-            if (chat.id === action.payload.chatRoom || action.payload.chatRoom.includes(chat.id)) {
-               chat.message = action.payload.message;
-               chat.dateTimeSend = action.payload.dateTimeSend;
-            }
-         });
-         state.chats.sort((a, b) => new Date(b.dateTimeSend) - new Date(a.dateTimeSend));
          if (state.currentChat.id === action.payload.chatRoom || action.payload.chatRoom.includes(state.currentChat.id))
             state.currentChat.messages.unshift(action.payload);
       },

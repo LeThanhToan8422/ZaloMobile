@@ -15,7 +15,8 @@ import SearchScreen from '../screens/SearchScreen';
 import AppTabs from './AppTabs';
 import { socket } from '../utils/socket';
 import { useDispatch, useSelector } from 'react-redux';
-import { addMessage, recallMessage, updateMessage } from '../features/chat/chatSlice';
+import { addMessage, fetchChats, recallMessage, updateMessage } from '../features/chat/chatSlice';
+import { updateUser } from '../features/user/userSlice';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -28,7 +29,8 @@ const AppStack = ({ navigation }) => {
 
    useEffect(() => {
       const onChatEvents = (res) => {
-         dispatch(addMessage({ ...res.data, chatRoom: String(res.data.chatRoom) }));
+         dispatch(addMessage({ ...res.data, chatRoom: String(res.data.chatRoom), file: {} }));
+         dispatch(fetchChats());
       };
       const onStatusChatEvents = (res) => {
          if (!res.data.chatFinal && res.data.id) dispatch(recallMessage(res.data));
@@ -47,6 +49,9 @@ const AppStack = ({ navigation }) => {
                onStatusChatEvents(res);
             }
          });
+         if (event === `Server-Reload-Page-${user.id}`) {
+            dispatch(updateUser({ ...user, image: res.data.image, background: res.data.background }));
+         }
       });
       return () => {
          socket.offAny();

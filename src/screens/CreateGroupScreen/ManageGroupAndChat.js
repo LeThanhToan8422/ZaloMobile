@@ -13,16 +13,15 @@ import {
    View,
 } from 'react-native';
 import { IconButton, TextInput } from 'react-native-paper';
-import { getUserID } from '../../utils/storage';
 import styles from './styles';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
 import Toast from 'react-native-toast-message';
 import { socket } from '../../utils/socket';
 import * as ImagePicker from 'expo-image-picker';
 import dayjs from 'dayjs';
+import { useSelector } from 'react-redux';
 
 export const ManageGroupAndChat = ({ navigation, route }) => {
-   const [userID, setUserID] = useState('');
    const [groupName, setGroupName] = useState('');
    const [search, setSearch] = useState('');
    const [avatarGroup, setAvatarGroup] = useState('');
@@ -30,6 +29,7 @@ export const ManageGroupAndChat = ({ navigation, route }) => {
    const [selectMembers, setSelectMembers] = useState([]);
    const type = route.params?.type;
    const data = route.params?.data;
+   const { user } = useSelector((state) => state.user);
    let searchTimeout = null;
 
    navigation.setOptions({
@@ -55,8 +55,8 @@ export const ManageGroupAndChat = ({ navigation, route }) => {
                type === 'addGroup'
                   ? socket.emit(`Client-Group-Chats`, {
                        name: groupName,
-                       members: JSON.stringify([userID, ...selectMembers]),
-                       leader: userID,
+                       members: JSON.stringify([user.id, ...selectMembers]),
+                       leader: user.id,
                     })
                   : type === 'addMember'
                   ? socket.emit(`Client-Update-Group-Chats`, {
@@ -71,7 +71,9 @@ export const ManageGroupAndChat = ({ navigation, route }) => {
       ),
    });
 
-   useEffect(() => {}, []);
+   useEffect(() => {
+      getFriends();
+   }, []);
 
    const checkValidate = () => {
       if (!groupName) {
@@ -94,13 +96,13 @@ export const ManageGroupAndChat = ({ navigation, route }) => {
    };
 
    const sendMessage = async (friendID) => {
-      const res = await axios.get(`${SERVER_HOST}/users/get-chats-by-id/${userID}`);
+      const res = await axios.get(`${SERVER_HOST}/users/get-chats-by-id/${user.id}`);
       const result = res.data.filter((item) => item.id === friendID)[0];
       const params = {
          message: data.message.trim(), // thông tin message
          dateTimeSend: dayjs().format('YYYY-MM-DD HH:mm:ss'),
-         sender: userID, // id người gửi
-         chatRoom: result.leader ? result.id : userID > friendID ? `${friendID}${userID}` : `${userID}${friendID}`,
+         sender: user.id, // id người gửi
+         chatRoom: result.leader ? result.id : user.id > friendID ? `${friendID}${user.id}` : `${user.id}${friendID}`,
       };
       result.leader ? (params.groupChat = result.id) : (params.receiver = friendID);
       socket.emit('Client-Chat-Room', params);
@@ -128,32 +130,33 @@ export const ManageGroupAndChat = ({ navigation, route }) => {
          let res = null;
          if (type === 'addMember') {
             res = text.trim()
-               ? await axios.get(`${SERVER_HOST}/users/get-friends-not-join-group/${userID}/${data.id}/${text}`)
-               : await axios.get(`${SERVER_HOST}/users/get-friends-not-join-group/${userID}/${data.id}`);
+               ? await axios.get(`${SERVER_HOST}/users/get-friends-not-join-group/${user.id}/${data.id}/${text}`)
+               : await axios.get(`${SERVER_HOST}/users/get-friends-not-join-group/${user.id}/${data.id}`);
          } else {
-            res = /^[0-9]*$/g.test(text)
+            res = /^[0-9]+$/g.test(text)
                ? await axios.get(`${SERVER_HOST}/users/phone/${text}`)
-               : await axios.get(`${SERVER_HOST}/users/friends/${userID}/${text}`);
+               : await axios.get(`${SERVER_HOST}/users/friends/${user.id}/${text}`);
          }
          if (res.data) {
-            setFriends(res.data);
+            if (type === 'addGroup') setFriends(res.data.filter((item) => !item.leader));
+            else setFriends(res.data);
          }
       };
-
       setSearch(text);
-      clearTimeout(searchTimeout);
-      searchTimeout = setTimeout(search, 500);
+      if (searchTimeout) clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(search, 300);
    };
 
-   const getFriends = async (userID) => {
+   const getFriends = async () => {
       const res =
          type === 'forward'
-            ? await axios.get(`${SERVER_HOST}/users/get-chats-by-id/${userID}`)
+            ? await axios.get(`${SERVER_HOST}/users/get-chats-by-id/${user.id}`)
             : type === 'addMember'
-            ? await axios.get(`${SERVER_HOST}/users/get-friends-not-join-group/${userID}/${data.id}`)
-            : await axios.get(`${SERVER_HOST}/users/friends/${userID}`);
+            ? await axios.get(`${SERVER_HOST}/users/get-friends-not-join-group/${user.id}/${data.id}`)
+            : await axios.get(`${SERVER_HOST}/users/friends/${user.id}`);
       if (res.data) {
-         setFriends(res.data);
+         if (type === 'addGroup') setFriends(res.data.filter((item) => !item.leader));
+         else setFriends();
       }
    };
 

@@ -6,6 +6,7 @@ import { formatTime } from '../../utils/func';
 import styles from './styles';
 import { FileIcon, defaultStyles } from 'react-native-file-icon';
 import { ResizeMode, Video } from 'expo-av';
+import { useSelector } from 'react-redux';
 
 /**
  * Message component. This component is used to render a message.
@@ -20,24 +21,10 @@ import { ResizeMode, Video } from 'expo-av';
  * @returns {JSX.Element} The rendered Message component.
  */
 export const Message = ({ data, index, localUserID, handleModal, onPress }) => {
-   const { name, message, dateTimeSend, isRecalls } = data;
+   const { name, message, dateTimeSend, isRecalls, imageUser, imageFriend } = data;
    const id = data.sender;
    const friendId = data.receiver;
-   const [avtFriend, setAvtFriend] = useState(
-      'https://s3-dynamodb-cloudfront-20040331.s3.ap-southeast-1.amazonaws.com/toan.jfif'
-   );
    const urlRegex = /^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/;
-
-   useEffect(() => {}, []);
-
-   const getAvatarFriend = async (id) => {
-      try {
-         const response = await axios.get(`${SERVER_HOST}/users/${id}`);
-         // setAvtFriend(response.data.image);
-      } catch (error) {
-         console.error(error);
-      }
-   };
 
    return (
       <Pressable onPress={isRecalls ? null : onPress} onLongPress={isRecalls ? null : () => handleModal(data)}>
@@ -48,7 +35,9 @@ export const Message = ({ data, index, localUserID, handleModal, onPress }) => {
                index === 0 ? { marginBottom: 20 } : {},
             ]}
          >
-            {id !== localUserID ? <Image source={{ uri: avtFriend }} style={styles.avatar} /> : null}
+            {id !== localUserID ? (
+               <Image source={{ uri: imageUser ? imageUser : imageFriend }} style={styles.avatar} />
+            ) : null}
             {isRecalls ? (
                <View style={[styles.messageContainer, id === localUserID ? { backgroundColor: '#CFF0FF' } : {}]}>
                   {name && id !== localUserID && <Text style={styles.name}>{name}</Text>}

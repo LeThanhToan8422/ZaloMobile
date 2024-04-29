@@ -7,15 +7,15 @@ import { Button } from 'react-native-paper';
 import ListChat from '../../../components/ListChat';
 import { getUserID } from '../../../utils/storage';
 import styles from './styles';
+import { useDispatch, useSelector } from 'react-redux';
 
 export const GroupTab = ({ navigation }) => {
-   const [data, setData] = useState([]);
-   useEffect(() => {}, []);
+   const dispatch = useDispatch();
+   const { chats } = useSelector((state) => state.chat);
 
-   useEffect(() => {
-      const unsubscribe = navigation.addListener('focus', () => {});
-      return unsubscribe;
-   }, [navigation]);
+   const getGroupChats = () => {
+      return chats.filter((chat) => chat.leader);
+   };
 
    return (
       <View>
@@ -30,7 +30,11 @@ export const GroupTab = ({ navigation }) => {
             Create New Group
          </Button>
 
-         <ListChat style={{ height: '100%', backgroundColor: '#fff' }} chats={data} navigation={navigation} />
+         <ListChat
+            style={{ height: '100%', backgroundColor: '#fff' }}
+            chats={getGroupChats()}
+            navigation={navigation}
+         />
       </View>
    );
 };
