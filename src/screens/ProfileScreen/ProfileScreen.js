@@ -35,19 +35,6 @@ export const ProfileScreen = ({ navigation, route }) => {
    const { user } = useSelector((state) => state.user);
 
    useEffect(() => {
-      // getUserID()
-      //    .then((id) => {
-      //       setUserID(id);
-      //       if (id === friendID) setFriendID(null);
-      //       friendID ? getProfile(friendID) : getProfile(id);
-      //       friendID && checkIsFriend(id, friendID);
-      //    })
-      //    .catch((err) => {
-      //       console.error(err);
-      //    });
-   }, []);
-
-   useEffect(() => {
       socket.on(`Server-update-avatar-${profile.id}`, (data) => {
          setAvatar(data.data.image);
       });
@@ -62,7 +49,7 @@ export const ProfileScreen = ({ navigation, route }) => {
 
    useEffect(() => {
       socket.on(
-         `Server-Make-Friends-${userID > friendID ? `${friendID}${userID}` : `${userID}${userID}`}`,
+         `Server-Make-Friends-${user.id > friendID ? `${friendID}${user.id}` : `${user.id}${user.id}`}`,
          (dataGot) => {
             if (dataGot.data) {
                setSendMakeFriend(true);
@@ -74,9 +61,9 @@ export const ProfileScreen = ({ navigation, route }) => {
          }
       );
       return () => {
-         socket.off(`Server-Make-Friends-${userID > friendID ? `${friendID}${userID}` : `${userID}${userID}`}`);
+         socket.off(`Server-Make-Friends-${userID > friendID ? `${friendID}${user.id}` : `${user.id}${user.id}`}`);
       };
-   }, [userID, friendID]);
+   }, [user, friendID]);
 
    const getProfile = async (userID) => {
       try {

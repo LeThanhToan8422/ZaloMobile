@@ -15,7 +15,7 @@ export const FriendTab = ({ navigation }) => {
    const contacts = useSelector((state) => state.friend.friend);
 
    useEffect(() => {
-      dispatch(fetchFriend(7));
+      dispatch(fetchFriend(user.id));
    }, []);
 
    const transformedData = () => {
