@@ -11,6 +11,7 @@ import { toastConfig } from '../utils/toastConfig';
 import AppStack from './AppStack';
 import AuthStack from './AuthStack';
 import { fetchChats } from '../features/chat/chatSlice';
+import { fetchFriend } from '../features/friend/friendSlice';
 
 const Stack = createNativeStackNavigator();
 
@@ -37,6 +38,7 @@ const Router = (props) => {
                navigationRef.navigate('AuthStack');
                storeData(null);
             } else {
+               dispatch(fetchFriend(response.id));
                dispatch(fetchChats());
             }
          })

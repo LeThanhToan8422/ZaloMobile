@@ -1,5 +1,6 @@
-import { SERVER_HOST } from '@env';
 import axios from 'axios';
+import dayjs from 'dayjs';
+import { Audio } from 'expo-av';
 import * as DocumentPicker from 'expo-document-picker';
 import * as ImagePicker from 'expo-image-picker';
 import React, { useEffect, useState } from 'react';
@@ -21,13 +22,12 @@ import RNFS, { stat } from 'react-native-fs';
 import ImageView from 'react-native-image-viewing';
 import { Button, Icon, IconButton, Modal, PaperProvider, Portal } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useDispatch, useSelector } from 'react-redux';
 import Message from '../../components/Message';
+import { deleteMessage, fetchMessages } from '../../features/chat/chatSlice';
+import { fetchDetailChat, fetchMembersInGroup } from '../../features/detailChat/detailChatSlice';
 import { socket } from '../../utils/socket';
 import styles from './styles';
-import dayjs from 'dayjs';
-import { Audio } from 'expo-av';
-import { useDispatch, useSelector } from 'react-redux';
-import { deleteMessage, fetchMessages } from '../../features/chat/chatSlice';
 
 /**
  * ChatScreen component. This component is used to render the chat screen.
@@ -53,13 +53,16 @@ export const ChatScreen = ({ navigation, route }) => {
 
    const dispatch = useDispatch();
    const user = useSelector((state) => state.user.user);
-   const messages = useSelector((state) => state.chat.currentChat.messages);
+   const { messages } = useSelector((state) => state.chat.currentChat);
    const { chats } = useSelector((state) => state.chat);
 
    useEffect(() => {
       const params = { page: page };
       chatInfo.leader ? (params.groupId = chatInfo.id) : (params.chatId = chatInfo.id);
       dispatch(fetchMessages(params));
+      const flag = chats.some((chat) => chatInfo.leader && chat.id === chatInfo.id);
+      dispatch(fetchDetailChat({ id: chatInfo.id, type: flag ? 'group' : 'user' }));
+      flag && dispatch(fetchMembersInGroup(chatInfo.id));
    }, []);
 
    useEffect(() => {

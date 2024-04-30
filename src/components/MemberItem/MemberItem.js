@@ -3,18 +3,22 @@ import { Image, Pressable, Text, View } from 'react-native';
 import { Icon, IconButton, Menu } from 'react-native-paper';
 import styles from './styles';
 import { socket } from '../../utils/socket';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchDetailChat, fetchMembersInGroup } from '../../features/detailChat/detailChatSlice';
 
-export const MemberItem = ({ data, item, userID, onFreshMember }) => {
-   const [group, setGroup] = useState(data);
+export const MemberItem = ({ item }) => {
+   const group = useSelector((state) => state.detailChat.info);
+   const { user } = useSelector((state) => state.user);
+   const dispatch = useDispatch();
    const [visible, setVisible] = useState(false);
 
    const handleRemoveMember = () => {
       socket.emit(`Client-Update-Group-Chats`, {
          group,
          mbs: item.id,
+         implementer: user.id,
       });
       setVisible(false);
-      onFreshMember();
    };
 
    const handlePassLeader = () => {
@@ -56,7 +60,7 @@ export const MemberItem = ({ data, item, userID, onFreshMember }) => {
          </View>
          <Text style={{ marginLeft: 12, fontSize: 18, flex: 1 }}>{item.name}</Text>
          {/* Trưởng nhóm và phó nhóm sẽ hiện menu, trưởng nhóm sẽ ko hiện menu item của trưởng nhóm, phó nhóm sẽ ko hiện menu item của trưởng nhóm và phó nhóm */}
-         {(userID === group.leader || userID === group.deputy) && item.id !== group.leader && userID !== item.id && (
+         {(user.id === group.leader || user.id === group.deputy) && item.id !== group.leader && user.id !== item.id && (
             <Menu
                visible={visible}
                onDismiss={() => setVisible(false)}
@@ -71,14 +75,14 @@ export const MemberItem = ({ data, item, userID, onFreshMember }) => {
                   />
                }
             >
-               {group.leader === userID && group.deputy !== item.id && (
+               {group.leader === user.id && group.deputy !== item.id && (
                   <Menu.Item
                      leadingIcon={() => <Icon source={'account-star-outline'} size={22} />}
                      title="Bổ nhiệm làm phó nhóm"
                      onPress={handleAddDeputy}
                   />
                )}
-               {group.leader === userID && (
+               {group.leader === user.id && (
                   <Menu.Item
                      leadingIcon={() => <Icon source={'account-key'} size={22} />}
                      title="Chuyển quyền trưởng nhóm"

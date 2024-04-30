@@ -14,8 +14,8 @@ export const SearchScreen = ({ navigation, route }) => {
    }, []);
 
    const getData = async () => {
-      const res = await axios.get(`${SERVER_HOST}/users/phone/${search}`);
-      if (res.data) setData(new Array(res.data));
+      const res = await axios.get(`${SERVER_HOST}/users/friends/7/${search}`);
+      if (res.data) setData(res.data);
    };
 
    return (

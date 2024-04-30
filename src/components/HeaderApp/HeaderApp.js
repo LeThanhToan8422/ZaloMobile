@@ -5,6 +5,7 @@ import { Appbar } from 'react-native-paper';
 import styles from './styles';
 import { IconButton } from 'react-native-paper';
 import { MaterialIcons } from '@expo/vector-icons';
+import { useSelector } from 'react-redux';
 
 /**
  * Represents the header component of the app.
@@ -13,9 +14,11 @@ import { MaterialIcons } from '@expo/vector-icons';
  * @param {string} type - The type of the header. Can be 'chat', 'message', 'contact' or 'personal'.
  * @returns {JSX.Element} The header component.
  */
-export const HeaderApp = ({ navigation, props, type, id, title, member }) => {
+export const HeaderApp = ({ navigation, props, type, id, title }) => {
    Platform.OS === 'ios' ? (height = 44) : (height = 56);
    const [search, setSearch] = useState('0981209501');
+   const { info } = useSelector((state) => state.detailChat);
+
    return (
       <Appbar.Header {...props} mode="small" style={{ height: height, backgroundColor: '#4D9DF7' }}>
          {type === 'chat' ? (
@@ -31,13 +34,15 @@ export const HeaderApp = ({ navigation, props, type, id, title, member }) => {
                   title={
                      <>
                         <Text style={{ color: '#fff', fontWeight: 500, fontSize: 20 }}>{title}</Text>
-                        {member ? (
-                           <Text style={{ color: '#BBE5FE', fontWeight: '300' }}>{member.length} members</Text>
+                        {info?.members ? (
+                           <Text style={{ color: '#BBE5FE', fontWeight: '300' }}>
+                              {info?.members.length} thành viên
+                           </Text>
                         ) : null}
                      </>
                   }
                />
-               {!member ? (
+               {!info?.members ? (
                   <Appbar.Action
                      color="#fff"
                      size={24}
@@ -53,7 +58,7 @@ export const HeaderApp = ({ navigation, props, type, id, title, member }) => {
                   animated={false}
                   onPress={() => {}}
                />
-               {member ? (
+               {info?.members ? (
                   <Appbar.Action
                      color="#fff"
                      size={24}
@@ -67,7 +72,7 @@ export const HeaderApp = ({ navigation, props, type, id, title, member }) => {
                   size={24}
                   icon={(props) => <AntDesign {...props} name="bars" />}
                   animated={false}
-                  onPress={() => navigation.navigate('DetailChatScreen', { id, member: member })}
+                  onPress={() => navigation.navigate('DetailChatScreen', { id, member: info?.members })}
                />
             </>
          ) : (

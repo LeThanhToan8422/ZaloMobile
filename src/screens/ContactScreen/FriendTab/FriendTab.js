@@ -14,18 +14,16 @@ export const FriendTab = ({ navigation }) => {
    const user = useSelector((state) => state.user.user);
    const contacts = useSelector((state) => state.friend.friend);
 
-   useEffect(() => {
-      dispatch(fetchFriend(user.id));
-   }, []);
-
    const transformedData = () => {
-      return contacts.reduce((acc, obj) => {
-         const title = obj.name.charAt(0).toUpperCase();
-         const existingTitle = acc.find((item) => item.title === title);
-         if (existingTitle) existingTitle.data.push(obj);
-         else acc.push({ title, data: [obj] });
-         return acc;
-      }, []);
+      return contacts
+         .filter((item) => !item.leader)
+         .reduce((acc, obj) => {
+            const title = obj.name.charAt(0).toUpperCase();
+            const existingTitle = acc.find((item) => item.title === title);
+            if (existingTitle) existingTitle.data.push(obj);
+            else acc.push({ title, data: [obj] });
+            return acc;
+         }, []);
    };
 
    return (
