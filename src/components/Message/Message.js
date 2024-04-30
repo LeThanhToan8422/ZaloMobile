@@ -1,12 +1,9 @@
-import { SERVER_HOST } from '@env';
-import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import { ResizeMode, Video } from 'expo-av';
+import React from 'react';
 import { Image, Pressable, Text, View } from 'react-native';
+import { FileIcon, defaultStyles } from 'react-native-file-icon';
 import { formatTime } from '../../utils/func';
 import styles from './styles';
-import { FileIcon, defaultStyles } from 'react-native-file-icon';
-import { ResizeMode, Video } from 'expo-av';
-import { useSelector } from 'react-redux';
 
 /**
  * Message component. This component is used to render a message.
@@ -25,13 +22,24 @@ export const Message = ({ data, index, localUserID, handleModal, onPress }) => {
    const id = data.sender;
    const friendId = data.receiver;
    const urlRegex = /^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/;
+   const resultTestNotify =
+      message.match(/(.+) đã thêm (.+) vào nhóm\./) ||
+      message.match(/(.+) đã xóa (.+) khỏi nhóm\./) ||
+      message.match('Chào mừng đến với nhóm (.+)');
 
    return (
-      <Pressable onPress={isRecalls ? null : onPress} onLongPress={isRecalls ? null : () => handleModal(data)}>
+      <Pressable
+         onPress={isRecalls || resultTestNotify ? null : onPress}
+         onLongPress={isRecalls || resultTestNotify ? null : () => handleModal(data)}
+      >
          <View
             style={[
                styles.container,
-               id === localUserID ? { alignSelf: 'flex-end' } : {},
+               resultTestNotify
+                  ? { alignSelf: 'center', maxWidth: '94%' }
+                  : id === localUserID
+                  ? { alignSelf: 'flex-end' }
+                  : {},
                index === 0 ? { marginBottom: 20 } : {},
             ]}
          >
@@ -94,10 +102,27 @@ export const Message = ({ data, index, localUserID, handleModal, onPress }) => {
                         </View>
                      )
                   ) : (
-                     <View style={[styles.messageContainer, id === localUserID ? { backgroundColor: '#CFF0FF' } : {}]}>
+                     <View
+                        style={[
+                           styles.messageContainer,
+                           resultTestNotify
+                              ? { flexDirection: 'row', alignItems: 'center', borderRadius: 20 }
+                              : id === localUserID
+                              ? { backgroundColor: '#CFF0FF' }
+                              : {},
+                        ]}
+                     >
+                        {resultTestNotify && (
+                           <Image
+                              source={{ uri: imageUser ? imageUser : imageFriend }}
+                              style={{ width: 20, height: 20, borderRadius: 10, marginRight: 8 }}
+                           />
+                        )}
                         {name && id !== localUserID && <Text style={styles.name}>{name}</Text>}
                         <Text style={styles.content}>{message}</Text>
-                        <Text style={styles.time}>{dateTimeSend && formatTime(dateTimeSend)}</Text>
+                        {!resultTestNotify && (
+                           <Text style={styles.time}>{dateTimeSend && formatTime(dateTimeSend)}</Text>
+                        )}
                      </View>
                   )}
                </>

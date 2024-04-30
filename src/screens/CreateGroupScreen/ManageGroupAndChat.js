@@ -63,6 +63,7 @@ export const ManageGroupAndChat = ({ navigation, route }) => {
                        group: dataGroup.data,
                        // group : thông tin của group đang chat
                        mbs: selectMembers,
+                       implementer: user.id,
                     })
                   : selectMembers.forEach((friendID) => sendMessage(friendID));
                navigation.goBack();
@@ -102,9 +103,9 @@ export const ManageGroupAndChat = ({ navigation, route }) => {
          message: data.message.trim(), // thông tin message
          dateTimeSend: dayjs().format('YYYY-MM-DD HH:mm:ss'),
          sender: user.id, // id người gửi
-         chatRoom: result.leader ? result.id : user.id > friendID ? `${friendID}${user.id}` : `${user.id}${friendID}`,
+         chatRoom: result?.leader ? result.id : user.id > friendID ? `${friendID}${user.id}` : `${user.id}${friendID}`,
       };
-      result.leader ? (params.groupChat = result.id) : (params.receiver = friendID);
+      result?.leader ? (params.groupChat = result.id) : (params.receiver = friendID);
       socket.emit('Client-Chat-Room', params);
    };
 
@@ -150,13 +151,13 @@ export const ManageGroupAndChat = ({ navigation, route }) => {
    const getFriends = async () => {
       const res =
          type === 'forward'
-            ? await axios.get(`${SERVER_HOST}/users/get-chats-by-id/${user.id}`)
+            ? await axios.get(`${SERVER_HOST}/users/friends/${user.id}`)
             : type === 'addMember'
             ? await axios.get(`${SERVER_HOST}/users/get-friends-not-join-group/${user.id}/${data.id}`)
             : await axios.get(`${SERVER_HOST}/users/friends/${user.id}`);
       if (res.data) {
          if (type === 'addGroup') setFriends(res.data.filter((item) => !item.leader));
-         else setFriends();
+         else setFriends(res.data);
       }
    };
 

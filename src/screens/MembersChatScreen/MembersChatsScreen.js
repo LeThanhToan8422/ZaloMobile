@@ -4,26 +4,12 @@ import React, { useEffect, useState } from 'react';
 import { FlatList, Text, View } from 'react-native';
 import { IconButton, PaperProvider } from 'react-native-paper';
 import MemberItem from '../../components/MemberItem';
+import { useSelector } from 'react-redux';
 
 export const MembersChatsScreen = ({ navigation, route }) => {
    const { data } = route.params;
-   const [members, setMembers] = useState([]);
-   const [userID, setUserID] = useState();
-   const [group, setGroup] = useState(data);
-
-   useEffect(() => {}, []);
-
-   useEffect(() => {
-      const unsubscribe = navigation.addListener('focus', () => {
-         getMembers();
-      });
-      return unsubscribe;
-   }, [navigation]);
-
-   const getMembers = async () => {
-      const res = await axios.get(`${SERVER_HOST}/users/get-members-in-group/${data.id}`);
-      if (res.data) setMembers(res.data);
-   };
+   const { user } = useSelector((state) => state.user);
+   const members = useSelector((state) => state.detailChat.membersInGroup);
 
    return (
       <PaperProvider>
@@ -43,7 +29,7 @@ export const MembersChatsScreen = ({ navigation, route }) => {
                data={members}
                keyExtractor={(_, index) => index.toString()}
                renderItem={({ item }) => {
-                  return <MemberItem userID={userID} data={data} item={item} onFreshMember={getMembers} />;
+                  return <MemberItem item={item} />;
                }}
             />
          </View>

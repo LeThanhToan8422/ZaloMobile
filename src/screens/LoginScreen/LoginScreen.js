@@ -12,6 +12,7 @@ import styles from './styles';
 import { useDispatch, useSelector } from 'react-redux';
 import { login } from '../../features/user/userSlice';
 import { fetchChats } from '../../features/chat/chatSlice';
+import { fetchFriend } from '../../features/friend/friendSlice';
 
 export const LoginScreen = ({ navigation }) => {
    const [phone, setPhone] = useState('');
@@ -27,6 +28,7 @@ export const LoginScreen = ({ navigation }) => {
          .then((res) => {
             if (res) {
                storeData({ phone: res.phone, password: password, user: res.user });
+               dispatch(fetchFriend(res.id));
                dispatch(fetchChats());
                navigation.navigate('AppStack');
             } else {
