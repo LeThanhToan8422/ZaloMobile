@@ -12,6 +12,7 @@ import AppStack from './AppStack';
 import AuthStack from './AuthStack';
 import { fetchChats } from '../features/chat/chatSlice';
 import { fetchFriend } from '../features/friend/friendSlice';
+import { fetchFriendRequests } from '../features/friendRequest/friendRequestSlice';
 
 const Stack = createNativeStackNavigator();
 
@@ -40,6 +41,7 @@ const Router = (props) => {
             } else {
                dispatch(fetchFriend(response.id));
                dispatch(fetchChats());
+               dispatch(fetchFriendRequests());
             }
          })
          .catch((err) => {

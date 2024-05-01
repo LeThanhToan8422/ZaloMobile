@@ -1,17 +1,12 @@
-import { SERVER_HOST } from '@env';
-import axios from 'axios';
-import React, { useEffect, useState } from 'react';
-import { Pressable, SectionList, Text, View } from 'react-native';
+import React from 'react';
+import { SectionList, Text, View } from 'react-native';
+import { useDispatch, useSelector } from 'react-redux';
 import { ContactItem } from '../../../components/ContactItem/ContactItem';
 import PressableItem from '../../../components/PressableItem';
-import { getUserID } from '../../../utils/storage';
 import styles from './styles';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchFriend } from '../../../features/friend/friendSlice';
 
 export const FriendTab = ({ navigation }) => {
-   const dispatch = useDispatch();
-   const user = useSelector((state) => state.user.user);
+   const { friendRequests } = useSelector((state) => state.friendRequest);
    const contacts = useSelector((state) => state.friend.friend);
 
    const transformedData = () => {
@@ -31,7 +26,7 @@ export const FriendTab = ({ navigation }) => {
          <PressableItem
             navParams={{ screen: 'FriendRequest' }}
             navigation={navigation}
-            title="Lời mời kết bạn"
+            title={`Lời mời kết bạn (${friendRequests.length && friendRequests.length})`}
             icon="account-multiple-outline"
             iconStyle={{ size: 28 }}
             action={null}

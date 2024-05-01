@@ -5,10 +5,12 @@ import HeaderApp from '../components/HeaderApp';
 import ContactScreen from '../screens/ContactScreen';
 import MessageScreen from '../screens/MessageScreen';
 import PersonalScreen from '../screens/PersonalScreen';
+import { useSelector } from 'react-redux';
 
 const Tab = createBottomTabNavigator();
 
 const AppTabs = () => {
+   const { friendRequests } = useSelector((state) => state.friendRequest);
    return (
       <Tab.Navigator
          initialRouteName="Message"
@@ -42,6 +44,7 @@ const AppTabs = () => {
             component={ContactScreen}
             options={{
                header: (props) => <HeaderApp {...props} type="contact" />,
+               tabBarBadge: friendRequests.length,
             }}
          />
          <Tab.Screen
