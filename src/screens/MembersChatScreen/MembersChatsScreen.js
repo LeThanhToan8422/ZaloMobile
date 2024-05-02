@@ -1,4 +1,3 @@
-import { SERVER_HOST } from '@env';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { FlatList, Text, View } from 'react-native';

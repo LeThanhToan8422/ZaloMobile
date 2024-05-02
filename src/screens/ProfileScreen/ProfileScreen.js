@@ -1,4 +1,4 @@
-import { SERVER_HOST } from '@env';
+import Constants from 'expo-constants';
 import DateTimePicker, { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import axios from 'axios';
 import dayjs from 'dayjs';
@@ -23,6 +23,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { updateUser } from '../../features/user/userSlice';
 
 export const ProfileScreen = ({ navigation, route }) => {
+   const SERVER_HOST = Constants.manifest.extra.SERVER_HOST;
    const [profileAU, setProfileAU] = useState({});
    const [name, setName] = useState('');
    const [dob, setDob] = useState(null);

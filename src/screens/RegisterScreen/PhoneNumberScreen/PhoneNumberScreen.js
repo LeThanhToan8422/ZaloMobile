@@ -1,4 +1,4 @@
-import { SERVER_HOST } from '@env';
+import Constants from 'expo-constants';
 import axios from 'axios';
 import React, { useRef, useState } from 'react';
 import { Keyboard, KeyboardAvoidingView, Platform, Text, TouchableWithoutFeedback, View } from 'react-native';
@@ -9,6 +9,7 @@ import Toast from 'react-native-toast-message';
 import styles from './styles';
 
 export const PhoneNumberScreen = ({ navigation, route }, props) => {
+   const SERVER_HOST = Constants.manifest.extra.SERVER_HOST;
    const [phone, setPhone] = useState('');
    const [code, setCode] = useState('+84');
    const insets = useSafeAreaInsets();

@@ -44,7 +44,7 @@ const AppTabs = () => {
             component={ContactScreen}
             options={{
                header: (props) => <HeaderApp {...props} type="contact" />,
-               tabBarBadge: friendRequests.length,
+               tabBarBadge: friendRequests.length > 0 ? friendRequests.length : null,
             }}
          />
          <Tab.Screen

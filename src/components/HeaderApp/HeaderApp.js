@@ -6,6 +6,9 @@ import styles from './styles';
 import { IconButton } from 'react-native-paper';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useSelector } from 'react-redux';
+import { CameraView } from '../Camera/CameraView';
+import { CameraType } from 'expo-camera';
+import Constants from 'expo-constants';
 
 /**
  * Represents the header component of the app.
@@ -104,7 +107,7 @@ export const HeaderApp = ({ navigation, props, type, id, title }) => {
                         size={20}
                         icon={(props) => <Ionicons {...props} name="ios-qr-code-outline" />}
                         animated={false}
-                        onPress={() => {}}
+                        onPress={() => navigation.navigate('Camera')}
                      />
                      <Appbar.Action
                         color="#fff"

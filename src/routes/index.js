@@ -5,14 +5,14 @@ import React, { useEffect, useState } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import { useDispatch } from 'react-redux';
-import { login } from '../features/user/userSlice';
+import { fetchChats } from '../features/chat/chatSlice';
+import { fetchFriend } from '../features/friend/friendSlice';
+import { fetchFriendRequests } from '../features/friendRequest/friendRequestSlice';
+import { fetchUser } from '../features/user/userSlice';
 import { storeData } from '../utils/storage';
 import { toastConfig } from '../utils/toastConfig';
 import AppStack from './AppStack';
 import AuthStack from './AuthStack';
-import { fetchChats } from '../features/chat/chatSlice';
-import { fetchFriend } from '../features/friend/friendSlice';
-import { fetchFriendRequests } from '../features/friendRequest/friendRequestSlice';
 
 const Stack = createNativeStackNavigator();
 
@@ -32,7 +32,7 @@ const Router = (props) => {
          setIsLogin(false);
          return;
       }
-      dispatch(login({ phone: params.phone, password: params.password }))
+      dispatch(fetchUser({ phone: params.phone }))
          .unwrap()
          .then((response) => {
             if (!response) {

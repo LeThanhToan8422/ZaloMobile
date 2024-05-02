@@ -1,4 +1,4 @@
-import { SERVER_HOST } from '@env';
+import Constants from 'expo-constants';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { FlatList, Image, Pressable, Text, View } from 'react-native';
@@ -6,6 +6,7 @@ import styles from './styles';
 import SearchItem from '../../components/SearchItem';
 
 export const SearchScreen = ({ navigation, route }) => {
+   const SERVER_HOST = Constants.manifest.extra.SERVER_HOST;
    const search = route.params.search;
    const [data, setData] = useState([]);
 

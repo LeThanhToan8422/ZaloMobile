@@ -1,6 +1,6 @@
 import React from 'react';
 import { SectionList, Text, View } from 'react-native';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { ContactItem } from '../../../components/ContactItem/ContactItem';
 import PressableItem from '../../../components/PressableItem';
 import styles from './styles';

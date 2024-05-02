@@ -1,4 +1,4 @@
-import { SERVER_HOST } from '@env';
+import Constants from 'expo-constants';
 import axios from 'axios';
 import React, { useState } from 'react';
 import { Keyboard, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, View } from 'react-native';
@@ -9,6 +9,7 @@ import { checkPassword } from '../../../utils/func';
 import { storeData } from '../../../utils/storage';
 
 export const PasswordScreen = ({ navigation, route }) => {
+   const SERVER_HOST = Constants.manifest.extra.SERVER_HOST;
    const [password, setPassword] = useState('');
    const [rePassword, setRePassword] = useState('');
    const [securePass, setSecurePass] = useState(true);

@@ -1,4 +1,3 @@
-import axios from 'axios';
 import dayjs from 'dayjs';
 import { Audio } from 'expo-av';
 import * as DocumentPicker from 'expo-document-picker';
@@ -28,6 +27,7 @@ import { deleteMessage, fetchMessages } from '../../features/chat/chatSlice';
 import { fetchDetailChat, fetchMembersInGroup } from '../../features/detailChat/detailChatSlice';
 import { socket } from '../../utils/socket';
 import styles from './styles';
+import { Buffer } from 'buffer';
 
 /**
  * ChatScreen component. This component is used to render the chat screen.
@@ -101,16 +101,17 @@ export const ChatScreen = ({ navigation, route }) => {
 
    const handleSendFile = async (file) => {
       let localUri = file.uri;
-      let filename = file.fileName || file.name;
+      let filename = file.fileName || file.name || localUri.split('/').pop();
       let type = file.type ? `${file.type}/${localUri.split('.').pop()}` : file.mimeType;
-      const buffer = await axios.get(localUri, { responseType: 'arraybuffer' }).then((res) => res.data);
+      const fileContent = await RNFS.readFile(localUri, 'base64');
+      const buffer = Buffer.from(fileContent, 'base64');
 
       const data = {
          originalname: filename,
          encoding: '7bit',
          mimetype: type,
          buffer: buffer,
-         size: file.fileSize,
+         size: file.fileSize || (file.width * file.height * 4) / 3,
       };
 
       const params = {

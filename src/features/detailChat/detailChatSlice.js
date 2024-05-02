@@ -1,6 +1,8 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
-import { SERVER_HOST } from '@env';
+import Constants from 'expo-constants';
+
+const SERVER_HOST = Constants.manifest.extra.SERVER_HOST;
 
 const initialState = {
    info: {},

@@ -18,6 +18,7 @@ import SearchScreen from '../screens/SearchScreen';
 import { socket } from '../utils/socket';
 import AppTabs from './AppTabs';
 import { fetchDetailChat, fetchMembersInGroup } from '../features/detailChat/detailChatSlice';
+import { CameraView } from '../components/Camera/CameraView';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -44,7 +45,7 @@ const AppStack = ({ navigation }) => {
                chat.leader ? chat.id : user.id < chat.id ? `${user.id}${chat.id}` : `${chat.id}${user.id}`
             )
             .forEach((id) => {
-               if (event === `Server-Chat-Room-${id}`) {
+               if (event === `Server-Chat-Room-${id}` && event.split('-').pop().length > 1) {
                   onChatEvents(res);
                }
                if (event === `Server-Status-Chat-${id}`) {
@@ -197,6 +198,14 @@ const AppStack = ({ navigation }) => {
                headerBackTitle: 'Lời mời kết bạn',
             }}
          />
+         <Stack.Group
+            screenOptions={{
+               presentation: 'containedModal',
+               headerShown: false,
+            }}
+         >
+            <Stack.Screen name="Camera" component={CameraView} />
+         </Stack.Group>
       </Stack.Navigator>
    );
 };

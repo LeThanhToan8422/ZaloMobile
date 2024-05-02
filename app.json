@@ -7,7 +7,7 @@
       "icon": "./assets/images/zalo_arc.png",
       "userInterfaceStyle": "light",
       "splash": {
-         "image": "./assets/splash.jpeg",
+         "image": "./assets/splash.png",
          "resizeMode": "contain",
          "backgroundColor": "#447DF4"
       },
@@ -69,7 +69,8 @@
       "extra": {
          "eas": {
             "projectId": "b811f300-26a6-45ff-bfbc-9614825f87fe"
-         }
+         },
+         "SERVER_HOST": "https://zalo-backend-team-6.onrender.com"
       }
    }
 }
