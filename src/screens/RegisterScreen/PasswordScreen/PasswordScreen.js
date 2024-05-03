@@ -2,14 +2,14 @@ import Constants from 'expo-constants';
 import axios from 'axios';
 import React, { useState } from 'react';
 import { Keyboard, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, View } from 'react-native';
-import reactNativeBcrypt from 'react-native-bcrypt';
+import bcrypt from 'react-native-bcrypt';
 import { Button, TextInput } from 'react-native-paper';
 import Toast from 'react-native-toast-message';
 import { checkPassword } from '../../../utils/func';
 import { storeData } from '../../../utils/storage';
 
 export const PasswordScreen = ({ navigation, route }) => {
-   const SERVER_HOST = Constants.manifest.extra.SERVER_HOST;
+   const SERVER_HOST = Constants.expoConfig.extra.SERVER_HOST;
    const [password, setPassword] = useState('');
    const [rePassword, setRePassword] = useState('');
    const [securePass, setSecurePass] = useState(true);
@@ -18,8 +18,8 @@ export const PasswordScreen = ({ navigation, route }) => {
 
    const handleRegister = async () => {
       if (!checkPassword(password, rePassword)) return;
-      const salt = reactNativeBcrypt.genSaltSync(10);
-      const hashPass = reactNativeBcrypt.hashSync(password, salt);
+      const salt = bcrypt.genSaltSync(10);
+      const hashPass = bcrypt.hashSync(password, salt);
       try {
          const dataUsers = await axios.post(`${SERVER_HOST}/users`, {
             name,
@@ -34,6 +34,9 @@ export const PasswordScreen = ({ navigation, route }) => {
                user: dataUsers.data.id,
             });
             if (dataAccount.data) {
+               dispatch(fetchFriend(dataUsers.id));
+               dispatch(fetchChats());
+               dispatch(fetchFriendRequests());
                storeData({ phone, password: hashPass, id: dataUsers.data.id });
                navigation.navigate('AppStack');
             }

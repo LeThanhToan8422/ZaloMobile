@@ -6,7 +6,7 @@ import styles from './styles';
 import SearchItem from '../../components/SearchItem';
 
 export const SearchScreen = ({ navigation, route }) => {
-   const SERVER_HOST = Constants.manifest.extra.SERVER_HOST;
+   const SERVER_HOST = Constants.expoConfig.extra.SERVER_HOST;
    const search = route.params.search;
    const [data, setData] = useState([]);
 

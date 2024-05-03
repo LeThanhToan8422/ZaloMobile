@@ -22,7 +22,7 @@ import dayjs from 'dayjs';
 import { useSelector } from 'react-redux';
 
 export const ManageGroupAndChat = ({ navigation, route }) => {
-   const SERVER_HOST = Constants.manifest.extra.SERVER_HOST;
+   const SERVER_HOST = Constants.expoConfig.extra.SERVER_HOST;
    const [groupName, setGroupName] = useState('');
    const [search, setSearch] = useState('');
    const [avatarGroup, setAvatarGroup] = useState('');

@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
 import Constants from 'expo-constants';
 
-const SERVER_HOST = Constants.manifest.extra.SERVER_HOST;
+const SERVER_HOST = Constants.expoConfig.extra.SERVER_HOST;
 
 const initialState = {
    friend: [],

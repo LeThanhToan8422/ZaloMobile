@@ -2,14 +2,14 @@ import Constants from 'expo-constants';
 import axios from 'axios';
 import React, { useState } from 'react';
 import { Keyboard, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, View } from 'react-native';
-import reactNativeBcrypt from 'react-native-bcrypt';
+import bcrypt from 'react-native-bcrypt';
 import { Button, TextInput } from 'react-native-paper';
 import Toast from 'react-native-toast-message';
 import { checkPassword } from '../../utils/func';
 import { storeData } from '../../utils/storage';
 
 export const ChangePassScreen = ({ navigation, route }) => {
-   const SERVER_HOST = Constants.manifest.extra.SERVER_HOST;
+   const SERVER_HOST = Constants.expoConfig.extra.SERVER_HOST;
    const [oldPass, setOldPass] = useState('');
    const [password, setPassword] = useState('');
    const [rePassword, setRePassword] = useState('');
@@ -17,14 +17,14 @@ export const ChangePassScreen = ({ navigation, route }) => {
    const [securePass, setSecurePass] = useState(true);
    const [secureRePass, setSecureRePass] = useState(true);
    const { phone } = route.params;
-   const salt = reactNativeBcrypt.genSaltSync(10);
+   const salt = bcrypt.genSaltSync(10);
 
    const handleChangePass = async () => {
       try {
          const dataUsers = await axios.get(`${SERVER_HOST}/accounts/phone/${phone}`);
-         if (reactNativeBcrypt.compareSync(oldPass, dataUsers.data.password)) {
+         if (bcrypt.compareSync(oldPass, dataUsers.data.password)) {
             if (!checkPassword(password, rePassword)) return;
-            const hashPass = reactNativeBcrypt.hashSync(password, salt);
+            const hashPass = bcrypt.hashSync(password, salt);
             const dataAccount = await axios.put(`${SERVER_HOST}/accounts`, {
                phone,
                password: hashPass,

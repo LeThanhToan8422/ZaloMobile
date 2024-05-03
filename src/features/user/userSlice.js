@@ -1,9 +1,9 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import Constants from 'expo-constants';
 import axios from 'axios';
-import reactNativeBcrypt from 'react-native-bcrypt';
+import bcrypt from 'react-native-bcrypt';
 
-const SERVER_HOST = Constants.manifest.extra.SERVER_HOST;
+const SERVER_HOST = Constants.expoConfig.extra.SERVER_HOST;
 
 const initialState = {
    user: null,
@@ -13,7 +13,7 @@ const initialState = {
 
 const login = createAsyncThunk('user/login', async ({ phone, password }) => {
    const response = await axios.get(`${SERVER_HOST}/accounts/phone/${phone}`);
-   if (!(response.data && reactNativeBcrypt.compareSync(password, response.data.password))) {
+   if (!(response.data && bcrypt.compareSync(password, response.data.password))) {
       return null;
    }
    const user = await axios.get(`${SERVER_HOST}/users/${response.data.user}`);

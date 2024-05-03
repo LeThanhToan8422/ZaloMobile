@@ -1,11 +1,13 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useHeaderHeight } from '@react-navigation/elements';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
+import { CameraView } from '../components/Camera/CameraView';
 import HeaderApp from '../components/HeaderApp';
 import { addMessage, fetchChats, fetchMessages, recallMessage } from '../features/chat/chatSlice';
+import { fetchDetailChat, fetchMembersInGroup } from '../features/detailChat/detailChatSlice';
 import { updateUser } from '../features/user/userSlice';
 import { ChangePassScreen } from '../screens/ChangePassScreen/ChangePassScreen';
 import ChatScreen from '../screens/ChatScreen';
@@ -17,8 +19,6 @@ import { ProfileScreen } from '../screens/ProfileScreen/ProfileScreen';
 import SearchScreen from '../screens/SearchScreen';
 import { socket } from '../utils/socket';
 import AppTabs from './AppTabs';
-import { fetchDetailChat, fetchMembersInGroup } from '../features/detailChat/detailChatSlice';
-import { CameraView } from '../components/Camera/CameraView';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -63,11 +63,6 @@ const AppStack = ({ navigation }) => {
                dispatch(fetchMessages({ groupId: res.data.id, page: currentChat.messages.length + 1 }));
             }
          }
-         chats.forEach((chat) => {
-            if (chat.leader && event === `Server-Chat-Room-${chat.id}`) {
-               onChatEvents(res);
-            }
-         });
       });
       return () => {
          socket.offAny();

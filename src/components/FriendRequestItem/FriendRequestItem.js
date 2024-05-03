@@ -9,7 +9,7 @@ import dayjs from 'dayjs';
 
 export const FriendRequestItem = ({ navigation, userID, data }) => {
    const [contentChat, setContentChat] = useState('');
-   const SERVER_HOST = Constants.manifest.extra.SERVER_HOST;
+   const SERVER_HOST = Constants.expoConfig.extra.SERVER_HOST;
 
    const handleAgreeMakeFriend = async (friendRequest) => {
       const dataDelete = await axios.delete(`${SERVER_HOST}/make-friends/${friendRequest.makeFriendId}`);

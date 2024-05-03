@@ -1,4 +1,3 @@
-import { PORT, SERVER_HOST } from '@env';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { Image, ScrollView } from 'react-native';

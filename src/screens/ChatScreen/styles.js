@@ -22,10 +22,8 @@ const styles = StyleSheet.create({
       borderRadius: 10,
    },
    modalActionContainer: {
-      flexDirection: 'row',
-      justifyContent: 'flex-end',
+      alignItems: 'flex-end',
       flexWrap: 'wrap',
-      justifyContent: 'flex-end',
       backgroundColor: '#E2E8F1',
       borderRadius: 10,
    },
@@ -44,6 +42,15 @@ const styles = StyleSheet.create({
       height: win.height * 0.3,
       objectFit: 'fill',
       borderRadius: 10,
+   },
+   emojiContainer: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      padding: 10,
+      gap: 4,
+   },
+   emoji: {
+      fontSize: 28,
    },
 });
 

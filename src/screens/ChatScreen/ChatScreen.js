@@ -28,6 +28,7 @@ import { fetchDetailChat, fetchMembersInGroup } from '../../features/detailChat/
 import { socket } from '../../utils/socket';
 import styles from './styles';
 import { Buffer } from 'buffer';
+import Toast from 'react-native-toast-message';
 
 /**
  * ChatScreen component. This component is used to render the chat screen.
@@ -55,7 +56,7 @@ export const ChatScreen = ({ navigation, route }) => {
    const user = useSelector((state) => state.user.user);
    const { messages } = useSelector((state) => state.chat.currentChat);
    const { chats } = useSelector((state) => state.chat);
-
+   const emoji = ['👍', '❤️', '😂', '😮', '😭', '😡'];
    useEffect(() => {
       const params = { page: page };
       chatInfo.leader ? (params.groupId = chatInfo.id) : (params.chatId = chatInfo.id);
@@ -173,7 +174,7 @@ export const ChatScreen = ({ navigation, route }) => {
                return url.split(/[#?]/)[0].split('.').pop().trim();
             }
             const extension = getUrlExtension(item.message);
-            const localFile = `${RNFS.DocumentDirectoryPath}/${item.message.split('--').slice(1)}.${extension}`;
+            const localFile = `${RNFS.DocumentDirectoryPath}/${item.message.split('--').slice(1)}`;
             const options = {
                fromUrl: item.message,
                toFile: localFile,
@@ -184,7 +185,11 @@ export const ChatScreen = ({ navigation, route }) => {
                   // success
                })
                .catch((error) => {
-                  // error
+                  Toast.show({
+                     type: 'error',
+                     text1: 'Không thể mở file. Vui lòng cài thêm ứng dụng hỗ trợ',
+                     position: 'bottom',
+                  });
                });
          }
       }
@@ -278,6 +283,17 @@ export const ChatScreen = ({ navigation, route }) => {
                            <Text style={styles.messageContainer}>{modalData?.message}</Text>
                         )}
                         <View style={styles.modalActionContainer}>
+                           <View style={styles.emojiContainer}>
+                              {emoji.map((item, index) => (
+                                 <Text
+                                    key={index}
+                                    style={styles.emoji}
+                                    onPress={() => setMessage((prev) => prev + item)}
+                                 >
+                                    {item}
+                                 </Text>
+                              ))}
+                           </View>
                            <Button
                               icon={() => <Icon source="delete" size={24} iconColor="#333" />}
                               contentStyle={{ flexDirection: 'row-reverse' }}
@@ -353,7 +369,7 @@ export const ChatScreen = ({ navigation, route }) => {
                   />
                   {!message ? (
                      <>
-                        <IconButton icon="file" size={32} iconColor="#333" onPress={pickFile} />
+                        <IconButton icon="file-document" size={32} iconColor="#333" onPress={pickFile} />
                         <IconButton
                            icon={recording ? 'microphone-off' : 'microphone-outline'}
                            size={32}
