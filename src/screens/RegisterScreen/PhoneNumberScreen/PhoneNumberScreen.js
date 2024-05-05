@@ -1,4 +1,4 @@
-import { SERVER_HOST } from '@env';
+import Constants from 'expo-constants';
 import axios from 'axios';
 import React, { useRef, useState } from 'react';
 import { Keyboard, KeyboardAvoidingView, Platform, Text, TouchableWithoutFeedback, View } from 'react-native';
@@ -9,6 +9,7 @@ import Toast from 'react-native-toast-message';
 import styles from './styles';
 
 export const PhoneNumberScreen = ({ navigation, route }, props) => {
+   const SERVER_HOST = Constants.expoConfig.extra.SERVER_HOST;
    const [phone, setPhone] = useState('');
    const [code, setCode] = useState('+84');
    const insets = useSafeAreaInsets();
@@ -22,12 +23,12 @@ export const PhoneNumberScreen = ({ navigation, route }, props) => {
          Toast.show({ type: 'error', text1: 'Số điện thoại không hợp lệ', position: 'bottom' });
          return;
       }
-      const checkPhone = await axios.get(`${SERVER_HOST}/accounts/phone/${phone}`);
-      if (checkPhone.data) {
-         Toast.show({ type: 'error', text1: 'Số điện thoại đã tồn tại', position: 'bottom' });
-         return;
-      }
-      navigation.navigate('VerifyPhone', { code, phone, ...route.params });
+      // const checkPhone = await axios.get(`${SERVER_HOST}/accounts/phone/${phone}`);
+      // if (checkPhone.data) {
+      //    Toast.show({ type: 'error', text1: 'Số điện thoại đã tồn tại', position: 'bottom' });
+      //    return;
+      // }
+      navigation.navigate('VerifyPhone', { code, phone: phone.replace(' ', ''), ...route.params });
    };
 
    return (

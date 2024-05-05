@@ -1,4 +1,3 @@
-import axios from 'axios';
 import dayjs from 'dayjs';
 import { Audio } from 'expo-av';
 import * as DocumentPicker from 'expo-document-picker';
@@ -13,6 +12,7 @@ import {
    Platform,
    Text,
    TextInput,
+   TouchableOpacity,
    TouchableWithoutFeedback,
    View,
 } from 'react-native';
@@ -28,6 +28,8 @@ import { deleteMessage, fetchMessages } from '../../features/chat/chatSlice';
 import { fetchDetailChat, fetchMembersInGroup } from '../../features/detailChat/detailChatSlice';
 import { socket } from '../../utils/socket';
 import styles from './styles';
+import { Buffer } from 'buffer';
+import Toast from 'react-native-toast-message';
 
 /**
  * ChatScreen component. This component is used to render the chat screen.
@@ -55,7 +57,7 @@ export const ChatScreen = ({ navigation, route }) => {
    const user = useSelector((state) => state.user.user);
    const { messages } = useSelector((state) => state.chat.currentChat);
    const { chats } = useSelector((state) => state.chat);
-
+   const emoji = ['👍', '❤️', '😂', '😮', '😭', '😡'];
    useEffect(() => {
       const params = { page: page };
       chatInfo.leader ? (params.groupId = chatInfo.id) : (params.chatId = chatInfo.id);
@@ -101,16 +103,17 @@ export const ChatScreen = ({ navigation, route }) => {
 
    const handleSendFile = async (file) => {
       let localUri = file.uri;
-      let filename = file.fileName || file.name;
+      let filename = file.fileName || file.name || localUri.split('/').pop();
       let type = file.type ? `${file.type}/${localUri.split('.').pop()}` : file.mimeType;
-      const buffer = await axios.get(localUri, { responseType: 'arraybuffer' }).then((res) => res.data);
+      const fileContent = await RNFS.readFile(localUri, 'base64');
+      const buffer = Buffer.from(fileContent, 'base64');
 
       const data = {
          originalname: filename,
          encoding: '7bit',
          mimetype: type,
          buffer: buffer,
-         size: file.fileSize,
+         size: file.fileSize || (file.width * file.height * 4) / 3,
       };
 
       const params = {
@@ -172,7 +175,7 @@ export const ChatScreen = ({ navigation, route }) => {
                return url.split(/[#?]/)[0].split('.').pop().trim();
             }
             const extension = getUrlExtension(item.message);
-            const localFile = `${RNFS.DocumentDirectoryPath}/${item.message.split('--').slice(1)}.${extension}`;
+            const localFile = `${RNFS.DocumentDirectoryPath}/${item.message.split('--').slice(1)}`;
             const options = {
                fromUrl: item.message,
                toFile: localFile,
@@ -183,7 +186,11 @@ export const ChatScreen = ({ navigation, route }) => {
                   // success
                })
                .catch((error) => {
-                  // error
+                  Toast.show({
+                     type: 'error',
+                     text1: 'Không thể mở file. Vui lòng cài thêm ứng dụng hỗ trợ',
+                     position: 'bottom',
+                  });
                });
          }
       }
@@ -277,25 +284,35 @@ export const ChatScreen = ({ navigation, route }) => {
                            <Text style={styles.messageContainer}>{modalData?.message}</Text>
                         )}
                         <View style={styles.modalActionContainer}>
+                           <View style={styles.emojiContainer}>
+                              {emoji.map((item, index) => (
+                                 <TouchableOpacity key={index} onPress={() => {}}>
+                                    <Text style={styles.emoji}>{item}</Text>
+                                 </TouchableOpacity>
+                              ))}
+                           </View>
                            <Button
-                              icon={() => <Icon source="delete" size={24} iconColor="#333" />}
+                              icon={() => <Icon source="delete-outline" size={24} color="#D41E19" />}
                               contentStyle={{ flexDirection: 'row-reverse' }}
+                              labelStyle={{ color: '#000' }}
                               onPress={() => handleClickStatusChat('delete', modalData?.id)}
                            >
                               Xóa
                            </Button>
                            {user.id === modalData?.sender && (
                               <Button
-                                 icon={() => <Icon source="backup-restore" size={24} iconColor="#333" />}
+                                 icon={() => <Icon source="backup-restore" size={24} color="#F07F2D" />}
                                  contentStyle={{ flexDirection: 'row-reverse' }}
+                                 labelStyle={{ color: '#000' }}
                                  onPress={() => handleClickStatusChat('recalls', modalData?.id)}
                               >
                                  Thu hồi
                               </Button>
                            )}
                            <Button
-                              icon={() => <Icon source="message-arrow-right-outline" size={24} iconColor="#333" />}
+                              icon={() => <Icon source="message-arrow-right-outline" size={24} color="#457DF6" />}
                               contentStyle={{ flexDirection: 'row-reverse' }}
+                              labelStyle={{ color: '#000' }}
                               onPress={() => {
                                  navigation.navigate('ManageGroupAndChatScreen', {
                                     data: modalData,
@@ -352,7 +369,7 @@ export const ChatScreen = ({ navigation, route }) => {
                   />
                   {!message ? (
                      <>
-                        <IconButton icon="file" size={32} iconColor="#333" onPress={pickFile} />
+                        <IconButton icon="file-document" size={32} iconColor="#333" onPress={pickFile} />
                         <IconButton
                            icon={recording ? 'microphone-off' : 'microphone-outline'}
                            size={32}

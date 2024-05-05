@@ -42,6 +42,20 @@ const styles = StyleSheet.create({
       color: '#888',
       marginTop: 5,
    },
+   emojiContainer: {
+      backgroundColor: '#f8f8f8',
+      alignItems: 'center',
+      borderRadius: 20,
+      position: 'absolute',
+      paddingHorizontal: 4,
+      bottom: 0,
+      right: 10,
+      flexDirection: 'row',
+      gap: 4,
+   },
+   emoji: {
+      fontSize: 12,
+   },
 });
 
 export default styles;

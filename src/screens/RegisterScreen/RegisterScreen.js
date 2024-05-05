@@ -1,16 +1,16 @@
+import DateTimePicker, { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import dayjs from 'dayjs';
 import React, { useState } from 'react';
 import { Keyboard, KeyboardAvoidingView, Platform, Text, TouchableWithoutFeedback, View } from 'react-native';
-import { IconButton, RadioButton, TextInput } from 'react-native-paper';
+import { Button, IconButton, RadioButton, TextInput } from 'react-native-paper';
 import Toast from 'react-native-toast-message';
-import DateTimePicker from 'react-native-ui-datepicker';
 import { OpenURLText } from '../../components/OpenURLText/OpenURLText';
 import styles from './styles';
 
 export const RegisterScreen = ({ navigation }) => {
    const [name, setName] = useState('');
-   const [value, setValue] = useState(0);
-   const [date, setDate] = useState(dayjs());
+   const [value, setValue] = useState(1);
+   const [date, setDate] = useState(dayjs('2000-01-01'));
 
    const handleNext = () => {
       if (dayjs().diff(date, 'year') < 16) {
@@ -22,6 +22,18 @@ export const RegisterScreen = ({ navigation }) => {
          return;
       }
       navigation.navigate('PhoneNumber', { name, gender: value, dob: date.format('YYYY-MM-DD') });
+   };
+
+   const onChange = (event, selectedDate) => {
+      setDate(dayjs(selectedDate));
+   };
+
+   const showMode = () => {
+      DateTimePickerAndroid.open({
+         value: date.toDate(),
+         onChange,
+         mode: 'date',
+      });
    };
 
    return (
@@ -43,7 +55,7 @@ export const RegisterScreen = ({ navigation }) => {
                   value={name}
                />
                <Text style={{ fontWeight: 600 }}>Giới tính</Text>
-               <RadioButton.Group onValueChange={(newValue) => setValue(newValue)} value={value}>
+               <RadioButton.Group onValueChange={(newValue) => setValue(newValue)} value={value ? true : false}>
                   <View style={styles.radioButtonView}>
                      <Text>Nam</Text>
                      <RadioButton value={true} />
@@ -53,13 +65,23 @@ export const RegisterScreen = ({ navigation }) => {
                      <RadioButton value={false} />
                   </View>
                </RadioButton.Group>
-               <Text style={{ fontWeight: '600', marginTop: 16 }}>Ngày sinh</Text>
-               <DateTimePicker
-                  mode="single"
-                  date={date}
-                  initialView="year"
-                  onChange={(params) => setDate(params.date)}
-               />
+               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <Text style={{ fontWeight: '600' }}>Ngày sinh: </Text>
+                  {Platform.OS === 'android' ? (
+                     <Button mode="contained-tonal" onPress={showMode} labelStyle={{ color: '#000', fontSize: 16 }}>
+                        {date.format('DD/MM/YYYY')}
+                     </Button>
+                  ) : (
+                     <DateTimePicker
+                        style={{ alignSelf: 'flex-start' }}
+                        visible={false}
+                        testID="dateTimePicker"
+                        value={date.toDate()}
+                        mode="date"
+                        onChange={onChange}
+                     />
+                  )}
+               </View>
 
                <View style={{ rowGap: 6, marginTop: 16 }}>
                   <Text>Lưu ý khi đặt tên:</Text>

@@ -1,6 +1,8 @@
 import { createAsyncThunk, createReducer, createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
-import { SERVER_HOST } from '@env';
+import Constants from 'expo-constants';
+
+const SERVER_HOST = Constants.expoConfig.extra.SERVER_HOST;
 
 const initialState = {
    chats: [],
@@ -40,9 +42,12 @@ const chatSlice = createSlice({
       updateMessage(state, action) {
          state.currentChat.messages.map((message) => {
             if (message.id === action.payload.id) {
-               message.message = action.payload.message;
-               message.dateTimeSend = action.payload.dateTimeSend;
-               message.isRecalls = action.payload.isRecalls;
+               message.message = action.payload.message || message.message;
+               message.dateTimeSend = action.payload.dateTimeSend || message.dateTimeSend;
+               message.isRecalls = action.payload.isRecalls || message.isRecalls;
+               message.emojis === null
+                  ? (message = action.payload.emojis)
+                  : (message.emojis += `,${action.payload.emojis}`);
             }
          });
       },

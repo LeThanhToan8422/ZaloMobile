@@ -1,4 +1,4 @@
-import { SERVER_HOST } from '@env';
+import Constants from 'expo-constants';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import {
@@ -22,6 +22,7 @@ import dayjs from 'dayjs';
 import { useSelector } from 'react-redux';
 
 export const ManageGroupAndChat = ({ navigation, route }) => {
+   const SERVER_HOST = Constants.expoConfig.extra.SERVER_HOST;
    const [groupName, setGroupName] = useState('');
    const [search, setSearch] = useState('');
    const [avatarGroup, setAvatarGroup] = useState('');

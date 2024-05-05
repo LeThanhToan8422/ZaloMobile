@@ -1,53 +1,53 @@
 {
   "project_info": {
-    "project_number": "850416716627",
-    "project_id": "zalo2-16113",
-    "storage_bucket": "zalo2-16113.appspot.com"
+    "project_number": "294638203599",
+    "project_id": "zalo-77560",
+    "storage_bucket": "zalo-77560.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:850416716627:android:1a25c8215b937e63556fa6",
+        "mobilesdk_app_id": "1:294638203599:android:d41fdb9b429be3166bbdba",
         "android_client_info": {
           "package_name": "fit.se.zalomobile"
         }
       },
       "oauth_client": [
         {
-          "client_id": "850416716627-qktstcs0b97m2goadg1dnutka7cr04n2.apps.googleusercontent.com",
+          "client_id": "294638203599-j50ieoqpusl318ir65h54rt1s8o5pon3.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "fit.se.zalomobile",
-            "certificate_hash": "e5a07a550ed2b622082635878ff0a8c395884ea7"
+            "certificate_hash": "bb40f794539df1fbd3daa426a3acf0d755315677"
           }
         },
         {
-          "client_id": "850416716627-r0kjia7ihg3ue63l8is570s19qsrb5dg.apps.googleusercontent.com",
+          "client_id": "294638203599-vgmi73vkuam94mrpri1m7phu8eeva3u5.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "fit.se.zalomobile",
-            "certificate_hash": "e1a814c13e2ce0aa766b9ab114eadac382c346d6"
+            "certificate_hash": "9f8eb1f9c610370ebf33579f3844e79251fbf3d3"
           }
         },
         {
-          "client_id": "850416716627-sop80n95o9pfvgv6gd4ij2qgimffnkvh.apps.googleusercontent.com",
+          "client_id": "294638203599-mmbpo098pipg5mn564hr2r1rvfsp80ca.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDgXJoBO_fylvpgcrAF2Wju8WYnzZVV5C0"
+          "current_key": "AIzaSyAhNo9vM6e019msh70fTdIyhmplkgVXhJE"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "850416716627-sop80n95o9pfvgv6gd4ij2qgimffnkvh.apps.googleusercontent.com",
+              "client_id": "294638203599-mmbpo098pipg5mn564hr2r1rvfsp80ca.apps.googleusercontent.com",
               "client_type": 3
             },
             {
-              "client_id": "850416716627-1o5n360luembbueih92e9j65jjp298d0.apps.googleusercontent.com",
+              "client_id": "294638203599-vtuogp86i2l34otqmgchoc6rp50l9pup.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
                 "bundle_id": "fit.se.zalomobile"

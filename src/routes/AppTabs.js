@@ -5,10 +5,12 @@ import HeaderApp from '../components/HeaderApp';
 import ContactScreen from '../screens/ContactScreen';
 import MessageScreen from '../screens/MessageScreen';
 import PersonalScreen from '../screens/PersonalScreen';
+import { useSelector } from 'react-redux';
 
 const Tab = createBottomTabNavigator();
 
 const AppTabs = () => {
+   const { friendRequests } = useSelector((state) => state.friendRequest);
    return (
       <Tab.Navigator
          initialRouteName="Message"
@@ -16,11 +18,11 @@ const AppTabs = () => {
             tabBarIcon: ({ focused, color, size }) => {
                let iconName;
                if (route.name === 'Tin nhắn') {
-                  iconName = focused ? 'ios-chatbubbles' : 'ios-chatbubbles-outline';
+                  iconName = focused ? 'chatbubbles' : 'chatbubbles-outline';
                } else if (route.name === 'Danh bạ') {
-                  iconName = focused ? 'ios-people' : 'ios-people-outline';
+                  iconName = focused ? 'people' : 'people-outline';
                } else if (route.name === 'Cá nhân') {
-                  iconName = focused ? 'ios-person' : 'ios-person-outline';
+                  iconName = focused ? 'person' : 'person-outline';
                }
                return <Ionicons name={iconName} size={size} color={color} />;
             },
@@ -42,6 +44,7 @@ const AppTabs = () => {
             component={ContactScreen}
             options={{
                header: (props) => <HeaderApp {...props} type="contact" />,
+               tabBarBadge: friendRequests.length > 0 ? friendRequests.length : null,
             }}
          />
          <Tab.Screen

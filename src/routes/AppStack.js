@@ -1,11 +1,13 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useHeaderHeight } from '@react-navigation/elements';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
+import { Camera } from '../components/Camera/Camera';
 import HeaderApp from '../components/HeaderApp';
-import { addMessage, fetchChats, fetchMessages, recallMessage } from '../features/chat/chatSlice';
+import { addMessage, fetchChats, fetchMessages, recallMessage, updateMessage } from '../features/chat/chatSlice';
+import { fetchDetailChat, fetchMembersInGroup } from '../features/detailChat/detailChatSlice';
 import { updateUser } from '../features/user/userSlice';
 import { ChangePassScreen } from '../screens/ChangePassScreen/ChangePassScreen';
 import ChatScreen from '../screens/ChatScreen';
@@ -17,7 +19,6 @@ import { ProfileScreen } from '../screens/ProfileScreen/ProfileScreen';
 import SearchScreen from '../screens/SearchScreen';
 import { socket } from '../utils/socket';
 import AppTabs from './AppTabs';
-import { fetchDetailChat, fetchMembersInGroup } from '../features/detailChat/detailChatSlice';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -39,16 +40,22 @@ const AppStack = ({ navigation }) => {
       };
 
       socket.onAny((event, res) => {
+         console.log(event, res);
          friend
             .map((chat) =>
                chat.leader ? chat.id : user.id < chat.id ? `${user.id}${chat.id}` : `${chat.id}${user.id}`
             )
             .forEach((id) => {
-               if (event === `Server-Chat-Room-${id}`) {
+               if (event === `Server-Chat-Room-${id}` && event.split('-').pop().length > 1) {
                   onChatEvents(res);
                }
                if (event === `Server-Status-Chat-${id}`) {
                   onStatusChatEvents(res);
+               }
+               if (event === `Server-Emotion-Chats-${id}`) {
+                  console.log(res.data);
+                  console.log({ id: res.data.id, emojis: res.data.type });
+                  // dispatch(updateMessage({ id: res.data.id, emojis: res.data.type }));
                }
             });
          if (event === `Server-Reload-Page-${user.id}`) {
@@ -62,11 +69,6 @@ const AppStack = ({ navigation }) => {
                dispatch(fetchMessages({ groupId: res.data.id, page: currentChat.messages.length + 1 }));
             }
          }
-         chats.forEach((chat) => {
-            if (chat.leader && event === `Server-Chat-Room-${chat.id}`) {
-               onChatEvents(res);
-            }
-         });
       });
       return () => {
          socket.offAny();
@@ -197,6 +199,14 @@ const AppStack = ({ navigation }) => {
                headerBackTitle: 'Lời mời kết bạn',
             }}
          />
+         <Stack.Group
+            screenOptions={{
+               presentation: 'containedModal',
+               headerShown: false,
+            }}
+         >
+            <Stack.Screen name="Camera" component={Camera} />
+         </Stack.Group>
       </Stack.Navigator>
    );
 };

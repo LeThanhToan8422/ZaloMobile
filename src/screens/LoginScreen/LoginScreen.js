@@ -1,18 +1,15 @@
-import { PORT, SERVER_HOST } from '@env';
-import axios from 'axios';
 import React, { useState } from 'react';
 import { Text, View } from 'react-native';
-import reactNativeBcrypt from 'react-native-bcrypt';
 import { Button, TextInput } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
-import OpenURLText from '../../components/OpenURLText';
-import { storeData } from '../../utils/storage';
-import styles from './styles';
 import { useDispatch, useSelector } from 'react-redux';
-import { login } from '../../features/user/userSlice';
+import OpenURLText from '../../components/OpenURLText';
 import { fetchChats } from '../../features/chat/chatSlice';
 import { fetchFriend } from '../../features/friend/friendSlice';
+import { login } from '../../features/user/userSlice';
+import { storeData } from '../../utils/storage';
+import styles from './styles';
 
 export const LoginScreen = ({ navigation }) => {
    const [phone, setPhone] = useState('');

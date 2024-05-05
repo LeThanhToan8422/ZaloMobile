@@ -1,7 +1,8 @@
-import { SERVER_HOST } from '@env';
 import DateTimePicker, { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import axios from 'axios';
+import { Buffer } from 'buffer';
 import dayjs from 'dayjs';
+import Constants from 'expo-constants';
 import * as ImagePicker from 'expo-image-picker';
 import React, { useEffect, useState } from 'react';
 import {
@@ -15,14 +16,16 @@ import {
    TouchableWithoutFeedback,
    View,
 } from 'react-native';
+import RNFS from 'react-native-fs';
 import { Avatar, Button, Icon, IconButton, Menu, PaperProvider, RadioButton, TextInput } from 'react-native-paper';
 import Toast from 'react-native-toast-message';
-import { socket } from '../../utils/socket';
-import styles from './styles';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateUser } from '../../features/user/userSlice';
+import { socket } from '../../utils/socket';
+import styles from './styles';
 
 export const ProfileScreen = ({ navigation, route }) => {
+   const SERVER_HOST = Constants.expoConfig.extra.SERVER_HOST;
    const [profileAU, setProfileAU] = useState({});
    const [name, setName] = useState('');
    const [dob, setDob] = useState(null);
@@ -107,7 +110,8 @@ export const ProfileScreen = ({ navigation, route }) => {
          let filename = localUri.split('/').pop();
          let match = /\.(\w+)$/.exec(filename);
          let typeImage = match ? `image/${match[1]}` : `image/jpg`;
-         const buffer = await axios.get(localUri, { responseType: 'arraybuffer' }).then((res) => res.data);
+         const fileContent = await RNFS.readFile(localUri, 'base64');
+         const buffer = Buffer.from(fileContent, 'base64');
 
          const data = {
             fieldname: 'image',

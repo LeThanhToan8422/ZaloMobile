@@ -3,12 +3,13 @@ import React, { useState } from 'react';
 import { Image, Text, View } from 'react-native';
 import { Button, Icon } from 'react-native-paper';
 import styles from './styles';
-import { SERVER_HOST } from '@env';
+import Constants from 'expo-constants';
 import { socket } from '../../utils/socket';
 import dayjs from 'dayjs';
 
 export const FriendRequestItem = ({ navigation, userID, data }) => {
    const [contentChat, setContentChat] = useState('');
+   const SERVER_HOST = Constants.expoConfig.extra.SERVER_HOST;
 
    const handleAgreeMakeFriend = async (friendRequest) => {
       const dataDelete = await axios.delete(`${SERVER_HOST}/make-friends/${friendRequest.makeFriendId}`);

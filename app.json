@@ -7,7 +7,7 @@
       "icon": "./assets/images/zalo_arc.png",
       "userInterfaceStyle": "light",
       "splash": {
-         "image": "./assets/splash.jpeg",
+         "image": "./assets/splash.png",
          "resizeMode": "contain",
          "backgroundColor": "#447DF4"
       },
@@ -31,20 +31,7 @@
       "plugins": [
          "@react-native-firebase/app",
          "@react-native-firebase/auth",
-         [
-            "expo-build-properties",
-            {
-               "android": {
-                  "compileSdkVersion": 33,
-                  "targetSdkVersion": 33,
-                  "buildToolsVersion": "33.0.0"
-               },
-               "ios": {
-                  "useFrameworks": "static",
-                  "deploymentTarget": "13.0"
-               }
-            }
-         ],
+         ["expo-build-properties"],
          [
             "expo-image-picker",
             {
@@ -56,12 +43,21 @@
             {
                "iCloudContainerEnvironment": "Production"
             }
+         ],
+         [
+            "expo-camera",
+            {
+               "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera",
+               "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone",
+               "recordAudioAndroid": true
+            }
          ]
       ],
       "extra": {
          "eas": {
             "projectId": "b811f300-26a6-45ff-bfbc-9614825f87fe"
-         }
+         },
+         "SERVER_HOST": "https://zalo-backend-team-6.onrender.com"
       }
    }
 }

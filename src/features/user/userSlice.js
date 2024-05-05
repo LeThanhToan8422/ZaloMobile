@@ -1,7 +1,9 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { SERVER_HOST } from '@env';
+import Constants from 'expo-constants';
 import axios from 'axios';
-import reactNativeBcrypt from 'react-native-bcrypt';
+import bcrypt from 'react-native-bcrypt';
+
+const SERVER_HOST = Constants.expoConfig.extra.SERVER_HOST;
 
 const initialState = {
    user: null,
@@ -11,9 +13,16 @@ const initialState = {
 
 const login = createAsyncThunk('user/login', async ({ phone, password }) => {
    const response = await axios.get(`${SERVER_HOST}/accounts/phone/${phone}`);
-   if (!(response.data && reactNativeBcrypt.compareSync(password, response.data.password))) {
+   if (!(response.data && bcrypt.compareSync(password, response.data.password))) {
       return null;
    }
+   const user = await axios.get(`${SERVER_HOST}/users/${response.data.user}`);
+   return { ...response.data, ...user.data };
+});
+
+const fetchUser = createAsyncThunk('user/fetchUser', async ({ phone }) => {
+   const response = await axios.get(`${SERVER_HOST}/accounts/phone/${phone}`);
+   if (!response.data) return null;
    const user = await axios.get(`${SERVER_HOST}/users/${response.data.user}`);
    return { ...response.data, ...user.data };
 });
@@ -46,11 +55,22 @@ const userSlice = createSlice({
          .addCase(login.rejected, (state, action) => {
             state.status = 'failed';
             state.error = action.error.message;
+         })
+         .addCase(fetchUser.pending, (state) => {
+            state.status = 'loading';
+         })
+         .addCase(fetchUser.fulfilled, (state, action) => {
+            state.status = 'succeeded';
+            state.user = action.payload;
+         })
+         .addCase(fetchUser.rejected, (state, action) => {
+            state.status = 'failed';
+            state.error = action.error.message;
          });
    },
 });
 
 const { actions, reducer } = userSlice;
 export const { updateUser, logout } = actions;
-export { login, register };
+export { login, register, fetchUser };
 export default reducer;
