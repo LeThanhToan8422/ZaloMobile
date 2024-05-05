@@ -4,7 +4,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React, { useEffect } from 'react';
 import { View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import { CameraView } from '../components/Camera/CameraView';
+import { Camera } from '../components/Camera/Camera';
 import HeaderApp from '../components/HeaderApp';
 import { addMessage, fetchChats, fetchMessages, recallMessage } from '../features/chat/chatSlice';
 import { fetchDetailChat, fetchMembersInGroup } from '../features/detailChat/detailChatSlice';
@@ -199,7 +199,7 @@ const AppStack = ({ navigation }) => {
                headerShown: false,
             }}
          >
-            <Stack.Screen name="Camera" component={CameraView} />
+            <Stack.Screen name="Camera" component={Camera} />
          </Stack.Group>
       </Stack.Navigator>
    );

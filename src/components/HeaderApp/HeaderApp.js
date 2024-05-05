@@ -6,7 +6,7 @@ import styles from './styles';
 import { IconButton } from 'react-native-paper';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useSelector } from 'react-redux';
-import { CameraView } from '../Camera/CameraView';
+import { CameraView } from '../Camera/Camera';
 import { CameraType } from 'expo-camera';
 import Constants from 'expo-constants';
 
@@ -84,7 +84,7 @@ export const HeaderApp = ({ navigation, props, type, id, title }) => {
                   title={
                      <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft: 12 }}>
                         <IconButton
-                           icon={() => <Ionicons name="ios-search-outline" size={22} color="white" />}
+                           icon={() => <Ionicons name="search-outline" size={22} color="white" />}
                            onPress={() => search.trim() && navigation.navigate('SearchScreen', { search: search })}
                         />
                         <TextInput
@@ -105,13 +105,13 @@ export const HeaderApp = ({ navigation, props, type, id, title }) => {
                      <Appbar.Action
                         color="#fff"
                         size={20}
-                        icon={(props) => <Ionicons {...props} name="ios-qr-code-outline" />}
+                        icon={(props) => <Ionicons {...props} name="qr-code-outline" />}
                         animated={false}
                         onPress={() => navigation.navigate('Camera')}
                      />
                      <Appbar.Action
                         color="#fff"
-                        size={32}
+                        size={26}
                         icon={(props) => <MaterialIcons {...props} name="group-add" />}
                         animated={false}
                         onPress={() => navigation.navigate('ManageGroupAndChatScreen', { type: 'addGroup' })}
@@ -121,7 +121,7 @@ export const HeaderApp = ({ navigation, props, type, id, title }) => {
                   <Appbar.Action
                      color="#fff"
                      size={22}
-                     icon={(props) => <Ionicons {...props} name="ios-person-add-outline" />}
+                     icon={(props) => <Ionicons {...props} name="person-add-outline" />}
                      animated={false}
                      onPress={() => {}}
                   />

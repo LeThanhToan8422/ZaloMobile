@@ -31,20 +31,7 @@
       "plugins": [
          "@react-native-firebase/app",
          "@react-native-firebase/auth",
-         [
-            "expo-build-properties",
-            {
-               "android": {
-                  "compileSdkVersion": 33,
-                  "targetSdkVersion": 33,
-                  "buildToolsVersion": "33.0.0"
-               },
-               "ios": {
-                  "useFrameworks": "static",
-                  "deploymentTarget": "13.0"
-               }
-            }
-         ],
+         ["expo-build-properties"],
          [
             "expo-image-picker",
             {
