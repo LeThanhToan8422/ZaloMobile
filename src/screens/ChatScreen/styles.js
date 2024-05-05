@@ -47,7 +47,7 @@ const styles = StyleSheet.create({
       flexDirection: 'row',
       justifyContent: 'space-between',
       padding: 10,
-      gap: 4,
+      gap: 6,
    },
    emoji: {
       fontSize: 28,

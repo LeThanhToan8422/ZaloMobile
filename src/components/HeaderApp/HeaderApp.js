@@ -107,7 +107,7 @@ export const HeaderApp = ({ navigation, props, type, id, title }) => {
                         size={20}
                         icon={(props) => <Ionicons {...props} name="qr-code-outline" />}
                         animated={false}
-                        onPress={() => navigation.navigate('Camera')}
+                        onPress={() => navigation.navigate('Camera', { type: 'qr' })}
                      />
                      <Appbar.Action
                         color="#fff"

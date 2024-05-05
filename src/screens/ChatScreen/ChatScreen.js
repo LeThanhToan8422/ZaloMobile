@@ -12,6 +12,7 @@ import {
    Platform,
    Text,
    TextInput,
+   TouchableOpacity,
    TouchableWithoutFeedback,
    View,
 } from 'react-native';
@@ -285,34 +286,33 @@ export const ChatScreen = ({ navigation, route }) => {
                         <View style={styles.modalActionContainer}>
                            <View style={styles.emojiContainer}>
                               {emoji.map((item, index) => (
-                                 <Text
-                                    key={index}
-                                    style={styles.emoji}
-                                    onPress={() => setMessage((prev) => prev + item)}
-                                 >
-                                    {item}
-                                 </Text>
+                                 <TouchableOpacity key={index} onPress={() => {}}>
+                                    <Text style={styles.emoji}>{item}</Text>
+                                 </TouchableOpacity>
                               ))}
                            </View>
                            <Button
-                              icon={() => <Icon source="delete" size={24} iconColor="#333" />}
+                              icon={() => <Icon source="delete-outline" size={24} color="#D41E19" />}
                               contentStyle={{ flexDirection: 'row-reverse' }}
+                              labelStyle={{ color: '#000' }}
                               onPress={() => handleClickStatusChat('delete', modalData?.id)}
                            >
                               Xóa
                            </Button>
                            {user.id === modalData?.sender && (
                               <Button
-                                 icon={() => <Icon source="backup-restore" size={24} iconColor="#333" />}
+                                 icon={() => <Icon source="backup-restore" size={24} color="#F07F2D" />}
                                  contentStyle={{ flexDirection: 'row-reverse' }}
+                                 labelStyle={{ color: '#000' }}
                                  onPress={() => handleClickStatusChat('recalls', modalData?.id)}
                               >
                                  Thu hồi
                               </Button>
                            )}
                            <Button
-                              icon={() => <Icon source="message-arrow-right-outline" size={24} iconColor="#333" />}
+                              icon={() => <Icon source="message-arrow-right-outline" size={24} color="#457DF6" />}
                               contentStyle={{ flexDirection: 'row-reverse' }}
+                              labelStyle={{ color: '#000' }}
                               onPress={() => {
                                  navigation.navigate('ManageGroupAndChatScreen', {
                                     data: modalData,

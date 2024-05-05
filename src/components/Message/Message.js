@@ -4,6 +4,9 @@ import { Image, Pressable, Text, View } from 'react-native';
 import { FileIcon, defaultStyles } from 'react-native-file-icon';
 import { formatTime } from '../../utils/func';
 import styles from './styles';
+import { IconButton } from 'react-native-paper';
+import { socket } from '../../utils/socket';
+import { useSelector } from 'react-redux';
 
 /**
  * Message component. This component is used to render a message.
@@ -18,14 +21,41 @@ import styles from './styles';
  * @returns {JSX.Element} The rendered Message component.
  */
 export const Message = ({ data, index, localUserID, handleModal, onPress }) => {
-   const { name, message, dateTimeSend, isRecalls, imageUser, imageFriend } = data;
-   const id = data.sender;
+   const { id, name, message, emojis, dateTimeSend, isRecalls, imageUser, imageFriend } = data;
+   const userId = data.sender;
    const friendId = data.receiver;
+   const { currentChat } = useSelector((state) => state.chat);
    const urlRegex = /^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/;
+   const emoji = { like: '👍', love: '❤️', haha: '😂', wow: '😮', sad: '😭', angry: '😡' };
    const resultTestNotify =
       message.match(/(.+) đã thêm (.+) vào nhóm\./) ||
       message.match(/(.+) đã xóa (.+) khỏi nhóm\./) ||
       message.match('Chào mừng đến với nhóm (.+)');
+
+   const handleSortEmoji = (emojis) => {
+      const wordsArray = emojis.split(',');
+      const wordCount = {};
+      wordsArray.forEach((word) => {
+         wordCount[word] = (wordCount[word] || 0) + 1;
+      });
+      const sortedWords = wordsArray.sort((a, b) => {
+         const countComparison = wordCount[b] - wordCount[a];
+         if (countComparison !== 0) {
+            return countComparison;
+         }
+         return wordsArray.indexOf(a) - wordsArray.indexOf(b);
+      });
+      return Array.from(new Set(sortedWords.slice(0, 4)));
+   };
+
+   const handleLoveMessage = () => {
+      socket.emit(`Client-Emotion-Chats`, {
+         type: 'love',
+         implementer: userId,
+         chat: id,
+         chatRoom: currentChat.id,
+      });
+   };
 
    return (
       <Pressable
@@ -37,18 +67,18 @@ export const Message = ({ data, index, localUserID, handleModal, onPress }) => {
                styles.container,
                resultTestNotify
                   ? { alignSelf: 'center', maxWidth: '94%' }
-                  : id === localUserID
+                  : userId === localUserID
                   ? { alignSelf: 'flex-end' }
                   : {},
-               index === 0 ? { marginBottom: 20 } : {},
+               emojis ? { marginBottom: 12 } : {},
             ]}
          >
-            {id !== localUserID ? (
+            {userId !== localUserID ? (
                <Image source={{ uri: imageUser ? imageUser : imageFriend }} style={styles.avatar} />
             ) : null}
             {isRecalls ? (
-               <View style={[styles.messageContainer, id === localUserID ? { backgroundColor: '#CFF0FF' } : {}]}>
-                  {name && id !== localUserID && <Text style={styles.name}>{name}</Text>}
+               <View style={[styles.messageContainer, userId === localUserID ? { backgroundColor: '#CFF0FF' } : {}]}>
+                  {name && userId !== localUserID && <Text style={styles.name}>{name}</Text>}
                   <Text style={[styles.content, { color: '#333' }]}>Tin nhắn đã được thu hồi</Text>
                   <Text style={styles.time}>{dateTimeSend && formatTime(dateTimeSend)}</Text>
                </View>
@@ -57,13 +87,13 @@ export const Message = ({ data, index, localUserID, handleModal, onPress }) => {
                   {urlRegex.test(message) ? (
                      /(jpg|jpeg|png|bmp|bmp)$/i.test(message.split('.').pop()) ? (
                         <View>
-                           {name && id !== localUserID && <Text style={styles.name}>{name}</Text>}
+                           {name && userId !== localUserID && <Text style={styles.name}>{name}</Text>}
                            <Image source={{ uri: message }} style={styles.imageMessage} />
                            <Text style={styles.time}>{dateTimeSend && formatTime(dateTimeSend)}</Text>
                         </View>
                      ) : /(mp4|avi|mkv|mov|wmv|flv|webm)$/i.test(message.split('.').pop()) ? (
                         <View>
-                           {name && id !== localUserID && <Text style={styles.name}>{name}</Text>}
+                           {name && userId !== localUserID && <Text style={styles.name}>{name}</Text>}
                            <View style={{ backgroundColor: '#000', borderRadius: 10 }}>
                               <Video
                                  source={{ uri: message }}
@@ -84,7 +114,7 @@ export const Message = ({ data, index, localUserID, handleModal, onPress }) => {
                               },
                            ]}
                         >
-                           {name && id !== localUserID && <Text style={styles.name}>{name}</Text>}
+                           {name && userId !== localUserID && <Text style={styles.name}>{name}</Text>}
                            <View style={{ width: 100, height: 120 }}>
                               <FileIcon
                                  extension={message.split('.').pop()}
@@ -107,7 +137,7 @@ export const Message = ({ data, index, localUserID, handleModal, onPress }) => {
                            styles.messageContainer,
                            resultTestNotify
                               ? { flexDirection: 'row', alignItems: 'center', borderRadius: 20 }
-                              : id === localUserID
+                              : userId === localUserID
                               ? { backgroundColor: '#CFF0FF' }
                               : {},
                         ]}
@@ -118,7 +148,7 @@ export const Message = ({ data, index, localUserID, handleModal, onPress }) => {
                               style={{ width: 20, height: 20, borderRadius: 10, marginRight: 8 }}
                            />
                         )}
-                        {name && id !== localUserID && <Text style={styles.name}>{name}</Text>}
+                        {name && userId !== localUserID && <Text style={styles.name}>{name}</Text>}
                         <Text style={styles.content}>{message}</Text>
                         {!resultTestNotify && (
                            <Text style={styles.time}>{dateTimeSend && formatTime(dateTimeSend)}</Text>
@@ -127,7 +157,24 @@ export const Message = ({ data, index, localUserID, handleModal, onPress }) => {
                   )}
                </>
             )}
+            <IconButton
+               mode="contained-tonal"
+               icon="heart-outline"
+               size={20}
+               style={{ position: 'absolute', left: -60 }}
+               onPress={handleLoveMessage}
+            />
          </View>
+         {emojis && (
+            <View style={styles.emojiContainer}>
+               {handleSortEmoji(emojis).map((e, i) => (
+                  <Text key={i} style={styles.emoji}>
+                     {emoji[e]}
+                  </Text>
+               ))}
+               <Text style={{ fontSize: 14, color: '#444' }}>{emojis.split(',').length}</Text>
+            </View>
+         )}
       </Pressable>
    );
 };

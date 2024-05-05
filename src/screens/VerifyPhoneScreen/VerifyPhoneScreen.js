@@ -1,5 +1,5 @@
 import auth from '@react-native-firebase/auth';
-import OTPInputView from '@twotalltotems/react-native-otp-input';
+import { OtpInput } from 'react-native-otp-entry';
 import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
 import { Button } from 'react-native-paper';
@@ -13,16 +13,16 @@ export const VerifyPhoneScreen = ({ navigation, route }) => {
 
    // Handle login
    function onAuthStateChanged(user) {
-      if (user) {
-         console.log(user);
-         navigation.navigate('PasswordScreen', { ...route.params });
-      }
+      console.log(user);
+      // if (user) {
+      //    navigation.navigate('PasswordScreen', { ...route.params });
+      // }
    }
 
    useEffect(() => {
-      const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
-      signInWithPhoneNumber(phone);
-      return subscriber; // unsubscribe on unmount
+      // const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
+      // signInWithPhoneNumber(phone);
+      // return subscriber; // unsubscribe on unmount
    }, []);
 
    // Handle the button press
@@ -47,14 +47,22 @@ export const VerifyPhoneScreen = ({ navigation, route }) => {
 
    return (
       <View>
-         <OTPInputView
-            style={styles.container}
-            pinCount={6}
-            code={code}
-            onCodeChanged={(code) => setCode(code)}
-            codeInputFieldStyle={styles.codeInput}
-            codeInputHighlightStyle={styles.inputHighlight}
-            onCodeFilled={(code) => confirmCode(code)}
+         <OtpInput
+            numberOfDigits={6}
+            focusColor="green"
+            focusStickBlinkingDuration={500}
+            autoFocus
+            onTextChange={(code) => setCode(code)}
+            onFilled={(code) => confirmCode(code)}
+            theme={{
+               containerStyle: {
+                  marginTop: 20,
+                  marginHorizontal: 8,
+               },
+            }}
+            textInputProps={{
+               accessibilityLabel: 'One-Time Password',
+            }}
          />
 
          <Button

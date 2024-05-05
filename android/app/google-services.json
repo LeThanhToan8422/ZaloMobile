@@ -45,6 +45,13 @@
             {
               "client_id": "294638203599-mmbpo098pipg5mn564hr2r1rvfsp80ca.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "294638203599-vtuogp86i2l34otqmgchoc6rp50l9pup.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "fit.se.zalomobile"
+              }
             }
           ]
         }

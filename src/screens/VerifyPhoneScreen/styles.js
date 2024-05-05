@@ -14,10 +14,6 @@ const styles = StyleSheet.create({
       borderColor: '#666',
       color: '#000',
    },
-
-   inputHighlight: {
-      borderColor: '#03DAC6',
-   },
 });
 
 export default styles;
