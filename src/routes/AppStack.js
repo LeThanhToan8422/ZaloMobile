@@ -1,12 +1,16 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useHeaderHeight } from '@react-navigation/elements';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import {
+   ZegoUIKitPrebuiltCallInCallScreen,
+   ZegoUIKitPrebuiltCallWaitingScreen,
+} from '@zegocloud/zego-uikit-prebuilt-call-rn';
 import React, { useEffect } from 'react';
 import { View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { Camera } from '../components/Camera/Camera';
 import HeaderApp from '../components/HeaderApp';
-import { addMessage, fetchChats, fetchMessages, recallMessage, updateMessage } from '../features/chat/chatSlice';
+import { addMessage, fetchChats, fetchMessages, recallMessage } from '../features/chat/chatSlice';
 import { fetchDetailChat, fetchMembersInGroup } from '../features/detailChat/detailChatSlice';
 import { updateUser } from '../features/user/userSlice';
 import { ChangePassScreen } from '../screens/ChangePassScreen/ChangePassScreen';
@@ -18,6 +22,7 @@ import MembersChatsScreen from '../screens/MembersChatScreen';
 import { ProfileScreen } from '../screens/ProfileScreen/ProfileScreen';
 import SearchScreen from '../screens/SearchScreen';
 import { socket } from '../utils/socket';
+import { onUserLogin } from '../utils/zego';
 import AppTabs from './AppTabs';
 
 const Tab = createBottomTabNavigator();
@@ -29,6 +34,10 @@ const AppStack = ({ navigation }) => {
    const { user } = useSelector((state) => state.user);
    const { chats, currentChat } = useSelector((state) => state.chat);
    const { friend } = useSelector((state) => state.friend);
+
+   useEffect(() => {
+      user && onUserLogin(user.id, user.name);
+   }, [user]);
 
    useEffect(() => {
       const onChatEvents = (res) => {
@@ -207,6 +216,16 @@ const AppStack = ({ navigation }) => {
          >
             <Stack.Screen name="Camera" component={Camera} />
          </Stack.Group>
+         <Stack.Screen
+            options={{ headerShown: false }}
+            name="ZegoUIKitPrebuiltCallWaitingScreen"
+            component={ZegoUIKitPrebuiltCallWaitingScreen}
+         />
+         <Stack.Screen
+            options={{ headerShown: false }}
+            name="ZegoUIKitPrebuiltCallInCallScreen"
+            component={ZegoUIKitPrebuiltCallInCallScreen}
+         />
       </Stack.Navigator>
    );
 };
