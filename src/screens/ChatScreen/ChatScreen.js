@@ -158,11 +158,9 @@ export const ChatScreen = ({ navigation, route }) => {
             : `${user.id}${chatInfo.id}`,
       };
       !chatInfo.leader && (params.objectId = chatInfo.id);
-      socket.emit(`Client-Status-Chat`, params);
+      if (status === 'delete') dispatch(deleteMessage({ id: chat }));
+      else socket.emit(`Client-Status-Chat`, params);
       hideModal();
-      if (status === 'delete') {
-         dispatch(deleteMessage({ id: chat }));
-      }
    };
 
    const handlePressMessage = async (item) => {

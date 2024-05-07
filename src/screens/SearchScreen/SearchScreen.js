@@ -16,7 +16,11 @@ export const SearchScreen = ({ navigation, route }) => {
 
    const getData = async () => {
       const res = await axios.get(`${SERVER_HOST}/users/friends/7/${search}`);
-      if (res.data) setData(res.data);
+      if (res.data.length !== 0) setData(res.data);
+      else {
+         const resPhone = await axios.get(`${SERVER_HOST}/users/phone/${search}`);
+         if (resPhone.data !== null) setData([resPhone.data]);
+      }
    };
 
    return (

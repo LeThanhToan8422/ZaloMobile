@@ -10,7 +10,7 @@ import { View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { Camera } from '../components/Camera/Camera';
 import HeaderApp from '../components/HeaderApp';
-import { addMessage, fetchChats, fetchMessages, recallMessage } from '../features/chat/chatSlice';
+import { addMessage, fetchChats, fetchMessages, recallMessage, updateMessage } from '../features/chat/chatSlice';
 import { fetchDetailChat, fetchMembersInGroup } from '../features/detailChat/detailChatSlice';
 import { updateUser } from '../features/user/userSlice';
 import { ChangePassScreen } from '../screens/ChangePassScreen/ChangePassScreen';
@@ -49,7 +49,6 @@ const AppStack = ({ navigation }) => {
       };
 
       socket.onAny((event, res) => {
-         console.log(event, res);
          friend
             .map((chat) =>
                chat.leader ? chat.id : user.id < chat.id ? `${user.id}${chat.id}` : `${chat.id}${user.id}`
@@ -61,12 +60,10 @@ const AppStack = ({ navigation }) => {
                if (event === `Server-Status-Chat-${id}`) {
                   onStatusChatEvents(res);
                }
-               if (event === `Server-Emotion-Chats-${id}`) {
-                  console.log(res.data);
-                  console.log({ id: res.data.id, emojis: res.data.type });
-                  // dispatch(updateMessage({ id: res.data.id, emojis: res.data.type }));
-               }
             });
+         if (event === `Server-Emotion-Chats-${currentChat.id}`) {
+            dispatch(updateMessage({ id: res.data.chat, emojis: res.data.type }));
+         }
          if (event === `Server-Reload-Page-${user.id}`) {
             dispatch(updateUser({ ...user, image: res.data.image, background: res.data.background }));
          }

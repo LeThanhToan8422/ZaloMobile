@@ -51,6 +51,9 @@ export const HeaderApp = ({ navigation, props, type, id, title }) => {
                            key={info.id}
                            isVideoCall={false}
                            resourceID={'zego_call'}
+                           width={32}
+                           height={32}
+                           backgroundColor={'transparent'}
                         />
                      )}
                      animated={false}
@@ -59,7 +62,17 @@ export const HeaderApp = ({ navigation, props, type, id, title }) => {
                <Appbar.Action
                   color="#fff"
                   size={24}
-                  icon={(props) => <Feather {...props} name="video" />}
+                  icon={(props) => (
+                     <ZegoSendCallInvitationButton
+                        invitees={[{ userID: String(info.id), userName: info.name, avatar: info.avatar }]}
+                        key={info.id}
+                        isVideoCall={true}
+                        resourceID={'zego_call'}
+                        width={32}
+                        height={32}
+                        backgroundColor={'transparent'}
+                     />
+                  )}
                   animated={false}
                   onPress={() => {}}
                />

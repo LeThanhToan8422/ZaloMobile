@@ -31,6 +31,9 @@ export const Message = ({ data, index, localUserID, handleModal, onPress }) => {
       message.match(/(.+) đã thêm (.+) vào nhóm\./) ||
       message.match(/(.+) đã xóa (.+) khỏi nhóm\./) ||
       message.match('Chào mừng đến với nhóm (.+)');
+   const checkImage = /(jpg|jpeg|png|bmp|bmp)$/i.test(message.split('.').pop());
+   const checkVideo = /(mp4|avi|mkv|mov|wmv|flv|webm)$/i.test(message.split('.').pop());
+   const checkVoice = /(m4a|wav|aac|flac|ogg)$/i.test(message.split('.').pop());
 
    const handleSortEmoji = (emojis) => {
       const wordsArray = emojis.split(',');
@@ -85,13 +88,13 @@ export const Message = ({ data, index, localUserID, handleModal, onPress }) => {
             ) : (
                <>
                   {urlRegex.test(message) ? (
-                     /(jpg|jpeg|png|bmp|bmp)$/i.test(message.split('.').pop()) ? (
+                     checkImage ? (
                         <View>
                            {name && userId !== localUserID && <Text style={styles.name}>{name}</Text>}
                            <Image source={{ uri: message }} style={styles.imageMessage} />
                            <Text style={styles.time}>{dateTimeSend && formatTime(dateTimeSend)}</Text>
                         </View>
-                     ) : /(mp4|avi|mkv|mov|wmv|flv|webm)$/i.test(message.split('.').pop()) ? (
+                     ) : checkVideo ? (
                         <View>
                            {name && userId !== localUserID && <Text style={styles.name}>{name}</Text>}
                            <View style={{ backgroundColor: '#000', borderRadius: 10 }}>
@@ -122,11 +125,7 @@ export const Message = ({ data, index, localUserID, handleModal, onPress }) => {
                               />
                            </View>
                            <View>
-                              {/(m4a|wav|aac|flac|ogg)$/i.test(message.split('.').pop()) ? (
-                                 <Text>Tin nhắn thoại</Text>
-                              ) : (
-                                 <Text>{message.split('--').slice(1)}</Text>
-                              )}
+                              {checkVoice ? <Text>Tin nhắn thoại</Text> : <Text>{message.split('--').slice(1)}</Text>}
                            </View>
                            <Text style={styles.time}>{dateTimeSend && formatTime(dateTimeSend)}</Text>
                         </View>
@@ -157,24 +156,26 @@ export const Message = ({ data, index, localUserID, handleModal, onPress }) => {
                   )}
                </>
             )}
-            <IconButton
-               mode="contained-tonal"
-               icon="heart-outline"
-               size={20}
-               style={{ position: 'absolute', left: -60 }}
-               onPress={handleLoveMessage}
-            />
+            {!isRecalls && (
+               <IconButton
+                  mode="contained-tonal"
+                  icon="heart-outline"
+                  size={20}
+                  style={{ position: 'absolute', left: -60 }}
+                  onPress={handleLoveMessage}
+               />
+            )}
+            {emojis && !isRecalls && (
+               <View style={[styles.emojiContainer, checkImage && { bottom: 12 }]}>
+                  {handleSortEmoji(emojis).map((e, i) => (
+                     <Text key={i} style={styles.emoji}>
+                        {emoji[e]}
+                     </Text>
+                  ))}
+                  <Text style={{ fontSize: 14, color: '#444' }}>{emojis.split(',').length}</Text>
+               </View>
+            )}
          </View>
-         {emojis && (
-            <View style={styles.emojiContainer}>
-               {handleSortEmoji(emojis).map((e, i) => (
-                  <Text key={i} style={styles.emoji}>
-                     {emoji[e]}
-                  </Text>
-               ))}
-               <Text style={{ fontSize: 14, color: '#444' }}>{emojis.split(',').length}</Text>
-            </View>
-         )}
       </Pressable>
    );
 };

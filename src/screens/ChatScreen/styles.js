@@ -15,7 +15,7 @@ const styles = StyleSheet.create({
       flex: 1,
    },
    modalContainer: {
-      padding: 20,
+      padding: 4,
       backgroundColor: '#E2E8F1',
       width: '80%',
       alignSelf: 'center',
@@ -23,7 +23,7 @@ const styles = StyleSheet.create({
    },
    modalActionContainer: {
       alignItems: 'flex-end',
-      flexWrap: 'wrap',
+      rowGap: 6,
       backgroundColor: '#E2E8F1',
       borderRadius: 10,
    },
@@ -42,6 +42,7 @@ const styles = StyleSheet.create({
       height: win.height * 0.3,
       objectFit: 'fill',
       borderRadius: 10,
+      alignSelf: 'center',
    },
    emojiContainer: {
       flexDirection: 'row',
