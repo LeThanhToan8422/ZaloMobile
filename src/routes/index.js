@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NavigationContainer, useNavigationContainerRef } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { ZegoCallInvitationDialog } from '@zegocloud/zego-uikit-prebuilt-call-rn';
 import React, { useEffect, useState } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
@@ -56,6 +57,7 @@ const Router = (props) => {
    return (
       <SafeAreaProvider>
          <NavigationContainer ref={navigationRef}>
+            <ZegoCallInvitationDialog />
             <Stack.Navigator initialRouteName={isLogin ? 'AppStack' : 'AuthStack'}>
                <Stack.Screen name="AppStack" component={AppStack} options={{ headerShown: false }} />
                <Stack.Screen name="AuthStack" component={AuthStack} options={{ headerShown: false }} />

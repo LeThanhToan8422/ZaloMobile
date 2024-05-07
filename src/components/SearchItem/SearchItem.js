@@ -28,7 +28,11 @@ export const SearchItem = ({ navigation, data }) => {
          style={styles.container}
          onPress={() => {
             navigation.goBack();
-            leader ? navigation.navigate('ChatScreen', data) : navigation.navigate('ProfileScreen', { friend: id });
+            leader
+               ? navigation.navigate('ChatScreen', data)
+               : user.id === id
+               ? navigation.navigate('ProfileScreen')
+               : navigation.navigate('ProfileScreen', { friend: id });
          }}
       >
          <View style={{ flexDirection: 'row', alignItems: 'center' }}>

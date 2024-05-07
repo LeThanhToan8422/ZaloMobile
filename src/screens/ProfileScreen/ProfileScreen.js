@@ -45,6 +45,7 @@ export const ProfileScreen = ({ navigation, route }) => {
          setDob(user.dob);
          setGender(user.gender);
       }
+      checkIsFriend(user.id, friendID);
    }, []);
 
    // useEffect(() => {

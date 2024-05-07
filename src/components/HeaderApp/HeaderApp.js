@@ -1,14 +1,10 @@
-import { AntDesign, Entypo, Feather, Ionicons } from '@expo/vector-icons';
+import { AntDesign, Entypo, Feather, Ionicons, MaterialIcons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import { Platform, Text, TextInput, View } from 'react-native';
-import { Appbar } from 'react-native-paper';
-import styles from './styles';
-import { IconButton } from 'react-native-paper';
-import { MaterialIcons } from '@expo/vector-icons';
+import { Appbar, IconButton } from 'react-native-paper';
 import { useSelector } from 'react-redux';
-import { CameraView } from '../Camera/Camera';
-import { CameraType } from 'expo-camera';
-import Constants from 'expo-constants';
+import styles from './styles';
+import { ZegoSendCallInvitationButton } from '@zegocloud/zego-uikit-prebuilt-call-rn';
 
 /**
  * Represents the header component of the app.
@@ -49,15 +45,34 @@ export const HeaderApp = ({ navigation, props, type, id, title }) => {
                   <Appbar.Action
                      color="#fff"
                      size={24}
-                     icon={(props) => <Ionicons {...props} name="call-outline" />}
+                     icon={(props) => (
+                        <ZegoSendCallInvitationButton
+                           invitees={[{ userID: String(info.id), userName: info.name }]}
+                           key={info.id}
+                           isVideoCall={false}
+                           resourceID={'zego_call'}
+                           width={32}
+                           height={32}
+                           backgroundColor={'transparent'}
+                        />
+                     )}
                      animated={false}
-                     onPress={() => {}}
                   />
                ) : null}
                <Appbar.Action
                   color="#fff"
                   size={24}
-                  icon={(props) => <Feather {...props} name="video" />}
+                  icon={(props) => (
+                     <ZegoSendCallInvitationButton
+                        invitees={[{ userID: String(info.id), userName: info.name, avatar: info.avatar }]}
+                        key={info.id}
+                        isVideoCall={true}
+                        resourceID={'zego_call'}
+                        width={32}
+                        height={32}
+                        backgroundColor={'transparent'}
+                     />
+                  )}
                   animated={false}
                   onPress={() => {}}
                />

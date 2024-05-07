@@ -1,6 +1,10 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useHeaderHeight } from '@react-navigation/elements';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import {
+   ZegoUIKitPrebuiltCallInCallScreen,
+   ZegoUIKitPrebuiltCallWaitingScreen,
+} from '@zegocloud/zego-uikit-prebuilt-call-rn';
 import React, { useEffect } from 'react';
 import { View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
@@ -18,6 +22,7 @@ import MembersChatsScreen from '../screens/MembersChatScreen';
 import { ProfileScreen } from '../screens/ProfileScreen/ProfileScreen';
 import SearchScreen from '../screens/SearchScreen';
 import { socket } from '../utils/socket';
+import { onUserLogin } from '../utils/zego';
 import AppTabs from './AppTabs';
 
 const Tab = createBottomTabNavigator();
@@ -31,6 +36,10 @@ const AppStack = ({ navigation }) => {
    const { friend } = useSelector((state) => state.friend);
 
    useEffect(() => {
+      user && onUserLogin(user.id, user.name);
+   }, [user]);
+
+   useEffect(() => {
       const onChatEvents = (res) => {
          dispatch(addMessage({ ...res.data, chatRoom: String(res.data.chatRoom), file: {} }));
          dispatch(fetchChats());
@@ -40,7 +49,6 @@ const AppStack = ({ navigation }) => {
       };
 
       socket.onAny((event, res) => {
-         console.log(event, res);
          friend
             .map((chat) =>
                chat.leader ? chat.id : user.id < chat.id ? `${user.id}${chat.id}` : `${chat.id}${user.id}`
@@ -52,12 +60,10 @@ const AppStack = ({ navigation }) => {
                if (event === `Server-Status-Chat-${id}`) {
                   onStatusChatEvents(res);
                }
-               if (event === `Server-Emotion-Chats-${id}`) {
-                  console.log(res.data);
-                  console.log({ id: res.data.id, emojis: res.data.type });
-                  // dispatch(updateMessage({ id: res.data.id, emojis: res.data.type }));
-               }
             });
+         if (event === `Server-Emotion-Chats-${currentChat.id}`) {
+            dispatch(updateMessage({ id: res.data.chat, emojis: res.data.type }));
+         }
          if (event === `Server-Reload-Page-${user.id}`) {
             dispatch(updateUser({ ...user, image: res.data.image, background: res.data.background }));
          }
@@ -207,6 +213,16 @@ const AppStack = ({ navigation }) => {
          >
             <Stack.Screen name="Camera" component={Camera} />
          </Stack.Group>
+         <Stack.Screen
+            options={{ headerShown: false }}
+            name="ZegoUIKitPrebuiltCallWaitingScreen"
+            component={ZegoUIKitPrebuiltCallWaitingScreen}
+         />
+         <Stack.Screen
+            options={{ headerShown: false }}
+            name="ZegoUIKitPrebuiltCallInCallScreen"
+            component={ZegoUIKitPrebuiltCallInCallScreen}
+         />
       </Stack.Navigator>
    );
 };
