@@ -64,7 +64,7 @@ export const HeaderApp = ({ navigation, props, type, id, title }) => {
                   size={24}
                   icon={(props) => (
                      <ZegoSendCallInvitationButton
-                        invitees={[{ userID: String(info.id), userName: info.name, avatar: info.avatar }]}
+                        invitees={[{ userID: String(info.id), userName: info.name, avatar: info.image }]}
                         key={info.id}
                         isVideoCall={true}
                         resourceID={'zego_call'}

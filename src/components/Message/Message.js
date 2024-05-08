@@ -86,7 +86,7 @@ export const Message = ({ data, index, localUserID, handleModal, onPress }) => {
                   <Text style={styles.time}>{dateTimeSend && formatTime(dateTimeSend)}</Text>
                </View>
             ) : (
-               <>
+               <View>
                   {urlRegex.test(message) ? (
                      checkImage ? (
                         <View>
@@ -154,25 +154,28 @@ export const Message = ({ data, index, localUserID, handleModal, onPress }) => {
                         )}
                      </View>
                   )}
-               </>
-            )}
-            {!isRecalls && (
-               <IconButton
-                  mode="contained-tonal"
-                  icon="heart-outline"
-                  size={20}
-                  style={{ position: 'absolute', left: -60 }}
-                  onPress={handleLoveMessage}
-               />
-            )}
-            {emojis && !isRecalls && (
-               <View style={[styles.emojiContainer, checkImage && { bottom: 12 }]}>
-                  {handleSortEmoji(emojis).map((e, i) => (
-                     <Text key={i} style={styles.emoji}>
-                        {emoji[e]}
-                     </Text>
-                  ))}
-                  <Text style={{ fontSize: 14, color: '#444' }}>{emojis.split(',').length}</Text>
+                  {emojis && !isRecalls && (
+                     <View style={[styles.emojiContainer, checkImage && { bottom: 12 }]}>
+                        {handleSortEmoji(emojis).map((e, i) => (
+                           <Text key={i} style={styles.emoji}>
+                              {emoji[e]}
+                           </Text>
+                        ))}
+                        <Text style={{ fontSize: 14, color: '#444' }}>{emojis.split(',').length}</Text>
+                     </View>
+                  )}
+                  {!isRecalls && (
+                     <IconButton
+                        mode="contained-tonal"
+                        icon="heart-outline"
+                        size={20}
+                        style={[
+                           { position: 'absolute', top: '50%', transform: [{ translateY: -25 }] },
+                           userId === localUserID ? { left: -60 } : { right: -60 },
+                        ]}
+                        onPress={handleLoveMessage}
+                     />
+                  )}
                </View>
             )}
          </View>
