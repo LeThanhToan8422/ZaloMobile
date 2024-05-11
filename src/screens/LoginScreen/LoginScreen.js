@@ -4,14 +4,14 @@ import AnimatedLoader from 'react-native-animated-loader';
 import { Button, TextInput } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import OpenURLText from '../../components/OpenURLText';
 import { fetchChats } from '../../features/chat/chatSlice';
 import { fetchFriend } from '../../features/friend/friendSlice';
 import { login } from '../../features/user/userSlice';
 import { storeData } from '../../utils/storage';
-import styles from './styles';
 import { onUserLogin } from '../../utils/zego';
+import styles from './styles';
 
 export const LoginScreen = ({ navigation }) => {
    const [phone, setPhone] = useState('');
@@ -20,7 +20,6 @@ export const LoginScreen = ({ navigation }) => {
    const [visible, setVisible] = useState(false);
    const insets = useSafeAreaInsets();
    const dispatch = useDispatch();
-   const { user, status, error } = useSelector((state) => state.user);
 
    const handleLogin = async () => {
       setVisible(true);

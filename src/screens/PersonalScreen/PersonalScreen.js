@@ -39,8 +39,8 @@ export const PersonalScreen = ({ navigation }) => {
          <PressableItem
             navigation={navigation}
             navParams={{ screen: 'ProfileScreen' }}
-            icon={() => <Image style={styles.imageAvt} source={{ uri: profile.image }} />}
-            title={profile.name}
+            icon={() => <Image style={styles.imageAvt} source={{ uri: profile?.image }} />}
+            title={profile?.name}
             subtitle="Xem trang cá nhân"
             actionRight={
                <IconButton
@@ -60,7 +60,7 @@ export const PersonalScreen = ({ navigation }) => {
          <PressableItem icon="contacts-outline" title="Danh bạ" style={{ marginBottom: 8 }} />
          <PressableItem
             navigation={navigation}
-            navParams={{ screen: 'ChangePassScreen', params: { phone: profile.phone } }}
+            navParams={{ screen: 'ChangePassScreen', params: { phone: profile?.phone } }}
             icon="onepassword"
             title="Đổi mật khẩu"
          />

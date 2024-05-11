@@ -56,6 +56,12 @@ const styles = StyleSheet.create({
    emoji: {
       fontSize: 12,
    },
+   audioContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingHorizontal: 8,
+   },
 });
 
 export default styles;

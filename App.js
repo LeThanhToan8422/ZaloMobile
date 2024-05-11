@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import * as encoding from 'text-encoding';
+// import * as encoding from 'text-encoding';
 import Router from './src/routes';
 import bcrypt from 'react-native-bcrypt';
 import isaac from 'isaac';

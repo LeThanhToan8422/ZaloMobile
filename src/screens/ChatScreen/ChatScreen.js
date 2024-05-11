@@ -1,11 +1,12 @@
+import { Buffer } from 'buffer';
 import dayjs from 'dayjs';
 import { Audio } from 'expo-av';
 import * as DocumentPicker from 'expo-document-picker';
 import * as ImagePicker from 'expo-image-picker';
 import React, { useEffect, useState } from 'react';
+import { FlashList } from '@shopify/flash-list';
 import {
    ActivityIndicator,
-   FlatList,
    Image,
    Keyboard,
    KeyboardAvoidingView,
@@ -22,14 +23,14 @@ import RNFS, { stat } from 'react-native-fs';
 import ImageView from 'react-native-image-viewing';
 import { Button, Icon, IconButton, Modal, PaperProvider, Portal } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Toast from 'react-native-toast-message';
 import { useDispatch, useSelector } from 'react-redux';
 import Message from '../../components/Message';
 import { deleteMessage, fetchMessages } from '../../features/chat/chatSlice';
 import { fetchDetailChat, fetchMembersInGroup } from '../../features/detailChat/detailChatSlice';
 import { socket } from '../../utils/socket';
 import styles from './styles';
-import { Buffer } from 'buffer';
-import Toast from 'react-native-toast-message';
+import { onDisplayNotification } from '../../utils/notification';
 
 /**
  * ChatScreen component. This component is used to render the chat screen.
@@ -42,22 +43,20 @@ export const ChatScreen = ({ navigation, route }) => {
    const insets = useSafeAreaInsets();
    const [chatInfo, setChatInfo] = useState(route.params);
    const [message, setMessage] = useState('');
-   const [image, setImage] = useState(null);
    const [visible, setVisible] = useState(false);
    const [modalData, setModalData] = useState(null);
    const [imagesView, setImagesView] = useState([]);
    const [visibleImage, setIsVisibleImage] = useState(false);
-   const [loading, setLoading] = useState(false);
    const [page, setPage] = useState(10); // Keep track of the current page
-   const [sound, setSound] = useState();
    const [recording, setRecording] = useState();
    const [permissionResponse, requestPermission] = Audio.usePermissions();
 
    const dispatch = useDispatch();
    const user = useSelector((state) => state.user.user);
-   const { messages } = useSelector((state) => state.chat.currentChat);
+   const { id, messages } = useSelector((state) => state.chat.currentChat);
    const { chats } = useSelector((state) => state.chat);
-   const emoji = ['👍', '❤️', '😂', '😮', '😭', '😡'];
+   const emoji = [{ like: '👍' }, { love: '❤️' }, { haha: '😂' }, { wow: '😮' }, { sad: '😭' }, { angry: '😡' }];
+
    useEffect(() => {
       const params = { page: page };
       chatInfo.leader ? (params.groupId = chatInfo.id) : (params.chatId = chatInfo.id);
@@ -66,15 +65,6 @@ export const ChatScreen = ({ navigation, route }) => {
       dispatch(fetchDetailChat({ id: chatInfo.id, type: flag ? 'group' : 'user' }));
       flag && dispatch(fetchMembersInGroup(chatInfo.id));
    }, []);
-
-   useEffect(() => {
-      // return sound
-      //    ? () => {
-      //         console.log('Unloading Sound');
-      //         sound.unloadAsync();
-      //      }
-      //    : undefined;
-   }, [sound]);
 
    const pickImage = async () => {
       // No permissions request is necessary for launching the image library
@@ -163,6 +153,15 @@ export const ChatScreen = ({ navigation, route }) => {
       hideModal();
    };
 
+   const handleReactMessage = (type, chat, chatRoom) => {
+      socket.emit(`Client-Emotion-Chats`, {
+         type,
+         implementer: user.id,
+         chat,
+         chatRoom,
+      });
+   };
+
    const handlePressMessage = async (item) => {
       if (urlRegex.test(item.message)) {
          if (item.message.split('.').pop() === ('jpg' || 'png')) {
@@ -199,14 +198,6 @@ export const ChatScreen = ({ navigation, route }) => {
    const showModal = (item) => {
       setModalData(item);
       setVisible(true);
-   };
-
-   const playSound = async () => {
-      console.log('Loading Sound');
-      const { sound } = await Audio.Sound.createAsync();
-      setSound(sound);
-      console.log('Playing Sound');
-      await sound.playAsync();
    };
 
    const startRecording = async () => {
@@ -284,11 +275,41 @@ export const ChatScreen = ({ navigation, route }) => {
                         <View style={styles.modalActionContainer}>
                            <View style={styles.emojiContainer}>
                               {emoji.map((item, index) => (
-                                 <TouchableOpacity key={index} onPress={() => {}}>
-                                    <Text style={styles.emoji}>{item}</Text>
+                                 <TouchableOpacity
+                                    key={index}
+                                    onPress={() => {
+                                       handleReactMessage(
+                                          (type = Object.keys(item)[0]),
+                                          (chat = modalData.id),
+                                          (chatRoom = chatInfo.leader ? chatInfo.id : id)
+                                       );
+                                       hideModal();
+                                    }}
+                                 >
+                                    <Text style={styles.emoji}>{Object.values(item)}</Text>
                                  </TouchableOpacity>
                               ))}
                            </View>
+                           <Button
+                              icon={() => <Icon source="reply" size={24} color="#457DF6" />}
+                              contentStyle={{ flexDirection: 'row-reverse' }}
+                              labelStyle={{ color: '#000' }}
+                           >
+                              Trả lời
+                           </Button>
+                           <Button
+                              icon={() => <Icon source="message-arrow-right-outline" size={24} color="#457DF6" />}
+                              contentStyle={{ flexDirection: 'row-reverse' }}
+                              labelStyle={{ color: '#000' }}
+                              onPress={() => {
+                                 navigation.navigate('ManageGroupAndChatScreen', {
+                                    data: modalData,
+                                    type: 'forward',
+                                 });
+                              }}
+                           >
+                              Chuyển tiếp
+                           </Button>
                            <Button
                               icon={() => <Icon source="delete-outline" size={24} color="#D41E19" />}
                               contentStyle={{ flexDirection: 'row-reverse' }}
@@ -307,52 +328,34 @@ export const ChatScreen = ({ navigation, route }) => {
                                  Thu hồi
                               </Button>
                            )}
-                           <Button
-                              icon={() => <Icon source="message-arrow-right-outline" size={24} color="#457DF6" />}
-                              contentStyle={{ flexDirection: 'row-reverse' }}
-                              labelStyle={{ color: '#000' }}
-                              onPress={() => {
-                                 navigation.navigate('ManageGroupAndChatScreen', {
-                                    data: modalData,
-                                    type: 'forward',
-                                 });
-                              }}
-                           >
-                              Chuyển tiếp
-                           </Button>
                         </View>
                      </Modal>
                   </Portal>
-                  <FlatList
-                     inverted
-                     data={messages}
-                     style={{ flexGrow: 1, backgroundColor: '#E2E8F1' }}
-                     onEndReached={() => {
-                        if (!loading) {
-                           setLoading(true);
+                  <View style={{ backgroundColor: '#E2E8F1', flexGrow: 1 }}>
+                     <FlashList
+                        inverted
+                        data={messages}
+                        estimatedItemSize={10}
+                        overrideProps={{ isInvertedVirtualizedList: true }}
+                        onEndReached={() => {
                            setPage((prevPage) => prevPage + 10);
                            const params = { page: page };
                            chatInfo.leader ? (params.groupId = chatInfo.id) : (params.chatId = chatInfo.id);
                            dispatch(fetchMessages(params));
-                           setLoading(false);
-                        }
-                     }}
-                     onEndReachedThreshold={0.05} // Adjust this value as needed
-                     keyExtractor={(_, index) => index.toString()}
-                     renderItem={({ item, index }) => (
-                        <Message
-                           data={{ ...item, imageFriend: chatInfo.image }}
-                           index={index}
-                           localUserID={user.id}
-                           handleModal={showModal}
-                           onPress={() => handlePressMessage(item)}
-                        />
-                     )}
-                     ListFooterComponent={() =>
-                        // Render a loading indicator at the bottom of the list
-                        loading && <ActivityIndicator size="large" color="#ccc" />
-                     }
-                  />
+                        }}
+                        onEndReachedThreshold={0.7} // Adjust this value as needed
+                        keyExtractor={(_, index) => index.toString()}
+                        renderItem={({ item }) => (
+                           <Message
+                              data={{ ...item, imageFriend: chatInfo.image }}
+                              localUserID={user.id}
+                              handleModal={showModal}
+                              onPress={() => handlePressMessage(item)}
+                              handleReactMessage={handleReactMessage}
+                           />
+                        )}
+                     />
+                  </View>
                </PaperProvider>
                <View style={[styles.chatContainer, { paddingBottom: insets.bottom }]}>
                   <IconButton icon="sticker-emoji" size={28} iconColor="#333" />

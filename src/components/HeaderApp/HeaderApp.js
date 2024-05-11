@@ -15,7 +15,7 @@ import { ZegoSendCallInvitationButton } from '@zegocloud/zego-uikit-prebuilt-cal
  */
 export const HeaderApp = ({ navigation, props, type, id, title }) => {
    Platform.OS === 'ios' ? (height = 44) : (height = 56);
-   const [search, setSearch] = useState('0981209501');
+   const [search, setSearch] = useState('');
    const { info } = useSelector((state) => state.detailChat);
 
    return (

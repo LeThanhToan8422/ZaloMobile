@@ -207,7 +207,7 @@ export const ManageGroupAndChat = ({ navigation, route }) => {
                      return (
                         <View style={{ paddingHorizontal: 8 }}>
                            <BouncyCheckbox
-                              id={item.id}
+                              id={String(item.id)}
                               size={22}
                               fillColor="#447DF4"
                               unfillColor="#fff"

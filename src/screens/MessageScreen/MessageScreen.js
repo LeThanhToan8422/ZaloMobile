@@ -1,13 +1,17 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { ListChat } from '../../components/ListChat/ListChat';
-import { fetchChats } from '../../features/chat/chatSlice';
-import { socket } from '../../utils/socket';
+import { clearCurrentChat } from '../../features/chat/chatSlice';
 
 export const MessageScreen = ({ navigation }) => {
    const dispatch = useDispatch();
-   const user = useSelector((state) => state.user.user);
    const chats = useSelector((state) => state.chat.chats);
+
+   useEffect(() => {
+      navigation.addListener('focus', () => {
+         dispatch(clearCurrentChat());
+      });
+   }, [navigation]);
 
    return <ListChat style={{ height: '100%' }} navigation={navigation} chats={chats} />;
 };

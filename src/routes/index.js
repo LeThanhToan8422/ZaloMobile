@@ -42,6 +42,7 @@ const Router = (props) => {
             } else {
                dispatch(fetchFriend(response.id));
                dispatch(fetchChats());
+               dispatch(fetchChats());
                dispatch(fetchFriendRequests());
             }
          })
