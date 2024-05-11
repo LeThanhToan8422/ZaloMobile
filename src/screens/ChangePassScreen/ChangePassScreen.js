@@ -36,7 +36,7 @@ export const ChangePassScreen = ({ navigation, route }) => {
                   text1: 'Đổi mật khẩu thành công',
                   position: 'bottom',
                });
-               storeData({ phone, password: hashPass, id: dataUsers.data.id });
+               storeData('@user', { phone, password: hashPass, id: dataUsers.data.id });
             }
          } else {
             Toast.show({

@@ -1,15 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const getUserID = async () => {
-   try {
-      const jsonValue = await AsyncStorage.getItem('@user');
-      const userID = jsonValue != null ? JSON.parse(jsonValue).id : null;
-      return userID;
-   } catch (e) {
-      console.error(e);
-   }
-};
-
 /**
  * Store data in local, when user login
  *
@@ -18,22 +8,42 @@ const getUserID = async () => {
  * @param {string} value.password - The password of the user.
  * @param {string} value.id - The id of the user.
  */
-const storeData = async (value) => {
+const storeData = async (key, value) => {
    try {
       const jsonValue = JSON.stringify(value);
-      await AsyncStorage.setItem('@user', jsonValue);
+      await AsyncStorage.setItem(key, jsonValue);
    } catch (e) {
-      // saving error
+      console.error(e);
    }
 };
 
-const getData = async () => {
+const multiStoreData = async (data) => {
    try {
-      const jsonValue = await AsyncStorage.getItem('@user');
+      const multiData = data.map((item) => {
+         return [item[0], JSON.stringify(item[1])];
+      });
+      await AsyncStorage.multiSet(multiData);
+   } catch (e) {
+      console.error(e);
+   }
+};
+
+const mergeData = async (key, value) => {
+   try {
+      const jsonValue = JSON.stringify(value);
+      await AsyncStorage.mergeItem(key, jsonValue);
+   } catch (e) {
+      console.error(e);
+   }
+};
+
+const getData = async (key) => {
+   try {
+      const jsonValue = await AsyncStorage.getItem(key);
       return jsonValue != null ? JSON.parse(jsonValue) : null;
    } catch (e) {
-      // error reading value
+      console.error(e);
    }
 };
 
-export { getUserID, getData, storeData };
+export { getData, storeData, mergeData, multiStoreData };

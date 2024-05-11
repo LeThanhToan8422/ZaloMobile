@@ -1,12 +1,12 @@
 import { Audio, ResizeMode, Video } from 'expo-av';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { FileIcon, defaultStyles } from 'react-native-file-icon';
 import { IconButton } from 'react-native-paper';
+import Animated, { Easing, FadeInLeft, FadeOutLeft, useSharedValue, withSpring } from 'react-native-reanimated';
 import { useSelector } from 'react-redux';
 import { formatTime } from '../../utils/func';
-import { socket } from '../../utils/socket';
 import styles from './styles';
 
 /**
@@ -22,7 +22,9 @@ import styles from './styles';
  * @returns {JSX.Element} The rendered Message component.
  */
 export const Message = ({ data, localUserID, handleModal, onPress, handleReactMessage }) => {
-   const { id, name, message, emojis, dateTimeSend, isRecalls, imageUser, imageFriend } = data;
+   const { id, name, message, dateTimeSend, emojis, isRecalls, imageUser, imageFriend } = data;
+   const emojiRef = useRef(null);
+   const display = useSharedValue('none');
    const userId = data.sender;
    const { currentChat } = useSelector((state) => state.chat);
    const urlRegex = /^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/;

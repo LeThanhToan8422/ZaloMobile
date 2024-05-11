@@ -37,7 +37,7 @@ export const PasswordScreen = ({ navigation, route }) => {
                dispatch(fetchFriend(dataUsers.id));
                dispatch(fetchChats());
                dispatch(fetchFriendRequests());
-               storeData({ phone, password: hashPass, id: dataUsers.data.id });
+               storeData('@user', { phone, password: hashPass, id: dataUsers.data.id });
                navigation.navigate('AppStack');
             }
          }

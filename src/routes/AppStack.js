@@ -82,7 +82,7 @@ const AppStack = ({ navigation }) => {
       return () => {
          socket.offAny();
       };
-   }, [chats]);
+   }, [chats, currentChat.id]);
 
    return (
       <Stack.Navigator>

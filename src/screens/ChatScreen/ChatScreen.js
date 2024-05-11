@@ -26,11 +26,12 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import { useDispatch, useSelector } from 'react-redux';
 import Message from '../../components/Message';
-import { deleteMessage, fetchMessages } from '../../features/chat/chatSlice';
+import { deleteMessage, fetchMessages, setMessages } from '../../features/chat/chatSlice';
 import { fetchDetailChat, fetchMembersInGroup } from '../../features/detailChat/detailChatSlice';
 import { socket } from '../../utils/socket';
 import styles from './styles';
 import { onDisplayNotification } from '../../utils/notification';
+import { getData } from '../../utils/storage';
 
 /**
  * ChatScreen component. This component is used to render the chat screen.
@@ -58,6 +59,10 @@ export const ChatScreen = ({ navigation, route }) => {
    const emoji = [{ like: '👍' }, { love: '❤️' }, { haha: '😂' }, { wow: '😮' }, { sad: '😭' }, { angry: '😡' }];
 
    useEffect(() => {
+      (async () => {
+         const messages = await getData(`@${chatInfo.id}`);
+         dispatch(setMessages({ id: chatInfo.id, messages: messages }));
+      })();
       const params = { page: page };
       chatInfo.leader ? (params.groupId = chatInfo.id) : (params.chatId = chatInfo.id);
       dispatch(fetchMessages(params));
