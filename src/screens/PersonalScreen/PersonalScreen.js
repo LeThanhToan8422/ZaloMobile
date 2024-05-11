@@ -1,16 +1,18 @@
-import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { Image, ScrollView } from 'react-native';
+import AnimatedLoader from 'react-native-animated-loader';
 import { Button, IconButton } from 'react-native-paper';
-import PressableItem from '../../components/PressableItem';
-import { getUserID, storeData } from '../../utils/storage';
-import styles from './styles';
 import { useDispatch, useSelector } from 'react-redux';
+import PressableItem from '../../components/PressableItem';
+import { storeData } from '../../utils/storage';
+import { onUserLogout } from '../../utils/zego';
+import styles from './styles';
 
 export const PersonalScreen = ({ navigation }) => {
    // const [profile, setProfile] = useState({});
    const dispatch = useDispatch();
    const profile = useSelector((state) => state.user.user);
+   const [visible, setVisible] = useState(false);
 
    useEffect(() => {
       // getUserID()
@@ -24,11 +26,21 @@ export const PersonalScreen = ({ navigation }) => {
 
    return (
       <ScrollView>
+         <AnimatedLoader
+            visible={visible}
+            overlayColor="rgba(255,255,255,1)"
+            source={require('../../../assets/lotties/loader.json')}
+            animationStyle={{
+               width: 200,
+               height: 200,
+            }}
+            speed={2}
+         />
          <PressableItem
             navigation={navigation}
             navParams={{ screen: 'ProfileScreen' }}
-            icon={() => <Image style={styles.imageAvt} source={{ uri: profile.image }} />}
-            title={profile.name}
+            icon={() => <Image style={styles.imageAvt} source={{ uri: profile?.image }} />}
+            title={profile?.name}
             subtitle="Xem trang cá nhân"
             actionRight={
                <IconButton
@@ -48,7 +60,7 @@ export const PersonalScreen = ({ navigation }) => {
          <PressableItem icon="contacts-outline" title="Danh bạ" style={{ marginBottom: 8 }} />
          <PressableItem
             navigation={navigation}
-            navParams={{ screen: 'ChangePassScreen', params: { phone: profile.phone } }}
+            navParams={{ screen: 'ChangePassScreen', params: { phone: profile?.phone } }}
             icon="onepassword"
             title="Đổi mật khẩu"
          />
@@ -60,11 +72,16 @@ export const PersonalScreen = ({ navigation }) => {
             contentStyle={{ flexDirection: 'row-reverse' }}
             style={{ margin: 8, backgroundColor: '#666' }}
             onPress={() => {
-               storeData(null);
-               navigation.reset({
-                  index: 0,
-                  routes: [{ name: 'AuthStack' }],
-               });
+               setVisible(true);
+               setTimeout(() => {
+                  onUserLogout();
+                  storeData(null);
+                  setVisible(false);
+                  navigation.reset({
+                     index: 0,
+                     routes: [{ name: 'AuthStack' }],
+                  });
+               }, 500);
             }}
          >
             Đăng xuất

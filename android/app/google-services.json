@@ -22,6 +22,14 @@
           }
         },
         {
+          "client_id": "294638203599-rjhcrqb3v80bd74dn6un6elthi8sso0r.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "fit.se.zalomobile",
+            "certificate_hash": "deabada30c1b906a0fd9adf900bb2dbc52b72180"
+          }
+        },
+        {
           "client_id": "294638203599-vgmi73vkuam94mrpri1m7phu8eeva3u5.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

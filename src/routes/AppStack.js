@@ -24,6 +24,7 @@ import SearchScreen from '../screens/SearchScreen';
 import { socket } from '../utils/socket';
 import { onUserLogin } from '../utils/zego';
 import AppTabs from './AppTabs';
+import { onDisplayNotification } from '../utils/notification';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -41,7 +42,8 @@ const AppStack = ({ navigation }) => {
 
    useEffect(() => {
       const onChatEvents = (res) => {
-         dispatch(addMessage({ ...res.data, chatRoom: String(res.data.chatRoom), file: {} }));
+         dispatch(addMessage({ ...res.data, chatRoom: String(res.data.chatRoom) }));
+         res.data.sender !== user.id && onDisplayNotification(res.data.name, res.data.message, res.data.imageUser);
          dispatch(fetchChats());
       };
       const onStatusChatEvents = (res) => {
@@ -49,6 +51,7 @@ const AppStack = ({ navigation }) => {
       };
 
       socket.onAny((event, res) => {
+         console.log(event, res);
          friend
             .map((chat) =>
                chat.leader ? chat.id : user.id < chat.id ? `${user.id}${chat.id}` : `${chat.id}${user.id}`

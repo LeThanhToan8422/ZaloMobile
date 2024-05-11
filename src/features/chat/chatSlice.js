@@ -64,6 +64,12 @@ const chatSlice = createSlice({
       clearMessages(state) {
          state.currentChat.messages = [];
       },
+      clearCurrentChat(state) {
+         state.currentChat = {
+            id: null,
+            messages: [],
+         };
+      },
    },
    extraReducers: (builder) => {
       builder
@@ -96,6 +102,6 @@ const chatSlice = createSlice({
 });
 
 const { actions, reducer } = chatSlice;
-export const { addMessage, updateMessage, recallMessage, deleteMessage, clearMessages } = actions;
+export const { addMessage, updateMessage, recallMessage, deleteMessage, clearMessages, clearCurrentChat } = actions;
 export { fetchChats, fetchMessages };
 export default reducer;

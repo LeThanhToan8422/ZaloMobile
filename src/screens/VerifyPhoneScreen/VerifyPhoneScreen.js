@@ -13,16 +13,15 @@ export const VerifyPhoneScreen = ({ navigation, route }) => {
 
    // Handle login
    function onAuthStateChanged(user) {
-      console.log(user);
       // if (user) {
       //    navigation.navigate('PasswordScreen', { ...route.params });
       // }
    }
 
    useEffect(() => {
-      // const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
-      // signInWithPhoneNumber(phone);
-      // return subscriber; // unsubscribe on unmount
+      const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
+      signInWithPhoneNumber(phone);
+      return subscriber; // unsubscribe on unmount
    }, []);
 
    // Handle the button press

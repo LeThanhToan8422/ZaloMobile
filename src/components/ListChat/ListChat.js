@@ -1,5 +1,8 @@
-import React from 'react';
-import { FlatList, View } from 'react-native';
+import { FlashList } from '@shopify/flash-list';
+import React, { useState } from 'react';
+import { View } from 'react-native';
+import { useDispatch } from 'react-redux';
+import { fetchChats } from '../../features/chat/chatSlice';
 import ChatItem from '../ChatItem';
 
 /**
@@ -12,13 +15,20 @@ import ChatItem from '../ChatItem';
  * @returns {JSX.Element} The rendered ListChat component.
  */
 export const ListChat = ({ chats, navigation, ...props }) => {
-   // const { chats, navigation } = props;
+   const dispatch = useDispatch();
+   const [loading, setLoading] = useState(false);
+
    return (
       <View {...props}>
-         <FlatList
+         <FlashList
             data={chats}
             keyExtractor={(_, index) => index.toString()}
+            estimatedItemSize={10}
             renderItem={({ item }) => <ChatItem navigation={navigation} data={item} />}
+            refreshing={loading}
+            onRefresh={() => {
+               dispatch(fetchChats());
+            }}
          />
       </View>
    );

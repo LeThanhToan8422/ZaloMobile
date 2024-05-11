@@ -15,7 +15,7 @@ import { ZegoSendCallInvitationButton } from '@zegocloud/zego-uikit-prebuilt-cal
  */
 export const HeaderApp = ({ navigation, props, type, id, title }) => {
    Platform.OS === 'ios' ? (height = 44) : (height = 56);
-   const [search, setSearch] = useState('0981209501');
+   const [search, setSearch] = useState('');
    const { info } = useSelector((state) => state.detailChat);
 
    return (
@@ -64,7 +64,7 @@ export const HeaderApp = ({ navigation, props, type, id, title }) => {
                   size={24}
                   icon={(props) => (
                      <ZegoSendCallInvitationButton
-                        invitees={[{ userID: String(info.id), userName: info.name, avatar: info.avatar }]}
+                        invitees={[{ userID: String(info.id), userName: info.name, avatar: info.image }]}
                         key={info.id}
                         isVideoCall={true}
                         resourceID={'zego_call'}

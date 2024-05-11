@@ -1,25 +1,28 @@
 import React, { useState } from 'react';
 import { Text, View } from 'react-native';
+import AnimatedLoader from 'react-native-animated-loader';
 import { Button, TextInput } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import OpenURLText from '../../components/OpenURLText';
 import { fetchChats } from '../../features/chat/chatSlice';
 import { fetchFriend } from '../../features/friend/friendSlice';
 import { login } from '../../features/user/userSlice';
 import { storeData } from '../../utils/storage';
+import { onUserLogin } from '../../utils/zego';
 import styles from './styles';
 
 export const LoginScreen = ({ navigation }) => {
    const [phone, setPhone] = useState('');
    const [password, setPassword] = useState('');
    const [secPass, setSecPass] = useState(true);
+   const [visible, setVisible] = useState(false);
    const insets = useSafeAreaInsets();
    const dispatch = useDispatch();
-   const { user, status, error } = useSelector((state) => state.user);
 
    const handleLogin = async () => {
+      setVisible(true);
       dispatch(login({ phone, password }))
          .unwrap()
          .then((res) => {
@@ -27,8 +30,11 @@ export const LoginScreen = ({ navigation }) => {
                storeData({ phone: res.phone, password: password, user: res.user });
                dispatch(fetchFriend(res.id));
                dispatch(fetchChats());
+               onUserLogin(res.id, res.name);
+               setVisible(false);
                navigation.navigate('AppStack');
             } else {
+               setVisible(false);
                Toast.show({
                   type: 'error',
                   text1: `Đăng nhập thất bại. Sai số điện thoại hoặc mật khẩu`,
@@ -37,6 +43,7 @@ export const LoginScreen = ({ navigation }) => {
             }
          })
          .catch((err) => {
+            setVisible(false);
             Toast.show({
                type: 'error',
                text1: `Đăng nhập thất bại. ${err.message}`,
@@ -47,6 +54,16 @@ export const LoginScreen = ({ navigation }) => {
 
    return (
       <View style={[styles.container, { paddingBottom: insets.bottom }]}>
+         <AnimatedLoader
+            visible={visible}
+            overlayColor="rgba(255,255,255,1)"
+            source={require('../../../assets/lotties/loader.json')}
+            animationStyle={{
+               width: 200,
+               height: 200,
+            }}
+            speed={2}
+         />
          <View style={{ flex: 1, width: '100%' }}>
             <Text style={styles.title}>Vui lòng nhập số điện thoại và mật khẩu để đăng nhập</Text>
             <TextInput
@@ -54,10 +71,11 @@ export const LoginScreen = ({ navigation }) => {
                mode="flat"
                activeUnderlineColor="skyblue"
                style={{ backgroundColor: '#fff' }}
+               value={phone}
+               enterKeyHint="next"
                onChangeText={(text) => {
                   setPhone(text);
                }}
-               value={phone}
             />
             <TextInput
                placeholder="Mật khẩu"
