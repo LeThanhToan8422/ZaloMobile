@@ -53,6 +53,17 @@ const styles = StyleSheet.create({
    emoji: {
       fontSize: 28,
    },
+   replyModalContainer: {
+      paddingLeft: 6,
+      backgroundColor: '#fff',
+      width: '100%',
+      elevation: 1,
+      justifyContent: 'space-between',
+      borderTopLeftRadius: 12,
+      borderTopRightRadius: 12,
+      flexDirection: 'row',
+      alignItems: 'center',
+   },
 });
 
 export default styles;

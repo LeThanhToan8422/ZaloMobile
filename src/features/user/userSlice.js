@@ -1,9 +1,9 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import Constants from 'expo-constants';
 import axios from 'axios';
-import bcrypt from 'react-native-bcrypt';
 
 const SERVER_HOST = Constants.expoConfig.extra.SERVER_HOST;
+var bcrypt = require('bcryptjs');
 
 const initialState = {
    user: null,

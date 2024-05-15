@@ -39,12 +39,13 @@ const fetchMessages = createAsyncThunk('chat/fetchMessages', async ({ chatId, gr
    };
 });
 
-const fetchMessagesOfChats = createAsyncThunk('chat/fetchMessagesOfChats', async (_, { getState }) => {
+const fetchMessagesOfChats = createAsyncThunk('chat/fetchMessagesOfChats', async (_, { getState, dispatch }) => {
+   await dispatch(fetchChats()).unwrap();
    const userID = getState().user.user.id;
    const listChat = getState().chat.chats.map(async (chat) => {
       const response = !chat.leader
-         ? await axios.get(`${SERVER_HOST}/chats/content-chats-between-users/${userID}-and-${chat.id}/10`)
-         : await axios.get(`${SERVER_HOST}/group-chats/content-chats-between-group/${chat.id}/${userID}/10`);
+         ? await axios.get(`${SERVER_HOST}/chats/content-chats-between-users/${userID}-and-${chat.id}/20`)
+         : await axios.get(`${SERVER_HOST}/group-chats/content-chats-between-group/${chat.id}/${userID}/20`);
       return {
          id: chat.id,
          messages: response.data,
@@ -64,9 +65,7 @@ const chatSlice = createSlice({
       },
       setMessages: (state, action) => {
          state.currentChat.id = action.payload.id;
-         state.currentChat.messages = action.payload.messages.sort(
-            (a, b) => new Date(b.dateTimeSend) - new Date(a.dateTimeSend)
-         );
+         state.currentChat.messages = action.payload.messages;
       },
       addMessage(state, action) {
          if (state.currentChat.id === action.payload.chatRoom || action.payload.chatRoom.includes(state.currentChat.id))
@@ -86,13 +85,13 @@ const chatSlice = createSlice({
       },
       recallMessage(state, action) {
          state.currentChat.messages.map((message) => {
-            if (message.id === action.payload.id) {
+            if (message.id === action.payload) {
                message.isRecalls = 1;
             }
          });
       },
       deleteMessage(state, action) {
-         state.currentChat.messages = state.currentChat.messages.filter((message) => message.id !== action.payload.id);
+         state.currentChat.messages = state.currentChat.messages.filter((message) => message.idTemp !== action.payload);
       },
       clearMessages(state) {
          state.currentChat.messages = [];
@@ -137,7 +136,10 @@ const chatSlice = createSlice({
          })
          .addCase(fetchMessagesOfChats.fulfilled, (state, action) => {
             const dataSet = action.payload.map((chat) => {
-               return [`@${chat.id}`, chat.messages];
+               return [
+                  `@${chat.id}`,
+                  chat.messages.sort((a, b) => new Date(b.dateTimeSend) - new Date(a.dateTimeSend)),
+               ];
             });
             multiStoreData(dataSet);
          })

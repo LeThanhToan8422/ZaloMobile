@@ -1,16 +1,11 @@
+import notifee from '@notifee/react-native';
 import { StyleSheet } from 'react-native';
-// import * as encoding from 'text-encoding';
-import Router from './src/routes';
-import bcrypt from 'react-native-bcrypt';
-import isaac from 'isaac';
-import store from './src/app/store';
 import { Provider } from 'react-redux';
+import store from './src/app/store';
+import Router from './src/routes';
 
 export default function App() {
-   bcrypt.setRandomFallback((len) => {
-      const buf = new Uint8Array(len);
-      return buf.map(() => Math.floor(isaac.random() * 256));
-   });
+   notifee.onBackgroundEvent(async ({}) => {});
 
    return (
       <Provider store={store}>

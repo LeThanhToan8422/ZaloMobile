@@ -2,11 +2,11 @@ import Constants from 'expo-constants';
 import axios from 'axios';
 import React, { useState } from 'react';
 import { Keyboard, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, View } from 'react-native';
-import bcrypt from 'react-native-bcrypt';
 import { Button, TextInput } from 'react-native-paper';
 import Toast from 'react-native-toast-message';
 import { checkPassword } from '../../../utils/func';
 import { storeData } from '../../../utils/storage';
+var bcrypt = require('bcryptjs');
 
 export const PasswordScreen = ({ navigation, route }) => {
    const SERVER_HOST = Constants.expoConfig.extra.SERVER_HOST;

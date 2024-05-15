@@ -41,7 +41,6 @@ const Router = (props) => {
                storeData('@user', null);
             } else {
                dispatch(fetchFriend(response.id));
-               dispatch(fetchChats());
                dispatch(fetchFriendRequests());
                dispatch(fetchMessagesOfChats());
             }

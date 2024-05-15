@@ -13,9 +13,9 @@ export const VerifyPhoneScreen = ({ navigation, route }) => {
 
    // Handle login
    function onAuthStateChanged(user) {
-      // if (user) {
-      //    navigation.navigate('PasswordScreen', { ...route.params });
-      // }
+      if (user) {
+         navigation.navigate('PasswordScreen', { ...route.params });
+      }
    }
 
    useEffect(() => {

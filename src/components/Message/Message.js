@@ -1,10 +1,9 @@
 import { Audio, ResizeMode, Video } from 'expo-av';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { FileIcon, defaultStyles } from 'react-native-file-icon';
 import { IconButton } from 'react-native-paper';
-import Animated, { Easing, FadeInLeft, FadeOutLeft, useSharedValue, withSpring } from 'react-native-reanimated';
 import { useSelector } from 'react-redux';
 import { formatTime } from '../../utils/func';
 import styles from './styles';
@@ -21,10 +20,8 @@ import styles from './styles';
  * @param {number} props.index - The index of the message.
  * @returns {JSX.Element} The rendered Message component.
  */
-export const Message = ({ data, localUserID, handleModal, onPress, handleReactMessage }) => {
-   const { id, name, message, dateTimeSend, emojis, isRecalls, imageUser, imageFriend } = data;
-   const emojiRef = useRef(null);
-   const display = useSharedValue('none');
+export const Message = ({ data, localUserID, replyInfo, handleModal, onPress, handleReactMessage }) => {
+   const { id, message, dateTimeSend, chatReply, name, emojis, isRecalls, imageUser, imageFriend } = data;
    const userId = data.sender;
    const { currentChat } = useSelector((state) => state.chat);
    const urlRegex = /^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/;
@@ -95,18 +92,6 @@ export const Message = ({ data, localUserID, handleModal, onPress, handleReactMe
    };
 
    useEffect(() => {
-      checkVoice &&
-         (async () => {
-            if (sound) {
-               await sound.unloadAsync();
-            }
-            const { sound: newSound } = await Audio.Sound.createAsync({ uri: message }, { shouldPlay: true });
-            setSound(newSound);
-            getSoundDuration(newSound);
-         })();
-   }, []);
-
-   useEffect(() => {
       setTimeout(
          () => {
             if (isPlaying) {
@@ -147,7 +132,7 @@ export const Message = ({ data, localUserID, handleModal, onPress, handleReactMe
             </View>
          ) : (
             <Pressable onPress={onPress} onLongPress={() => handleModal(data)}>
-               {urlRegex.test(message) ? (
+               {urlRegex.test(message) || message.split(':')[0] === 'file' ? (
                   checkImage ? (
                      <View>
                         {name && userId !== localUserID && <Text style={styles.name}>{name}</Text>}
@@ -185,7 +170,6 @@ export const Message = ({ data, localUserID, handleModal, onPress, handleReactMe
                         ]}
                      >
                         {name && userId !== localUserID && <Text style={styles.name}>{name}</Text>}
-
                         {checkVoice ? (
                            <View>
                               {name && userId !== localUserID && <Text style={styles.name}>{name}</Text>}
@@ -204,6 +188,9 @@ export const Message = ({ data, localUserID, handleModal, onPress, handleReactMe
                                  extension={message.split('.').pop()}
                                  {...defaultStyles[message.split('.').pop()]}
                               />
+                              <Text style={{ marginTop: 2 }}>
+                                 {message.split('/').pop().substring(0, 9) + '...' + message.split('.').pop()}
+                              </Text>
                            </View>
                         )}
                         <Text style={[styles.time, checkVoice && { marginTop: 0 }]}>
@@ -229,6 +216,33 @@ export const Message = ({ data, localUserID, handleModal, onPress, handleReactMe
                         />
                      )}
                      {name && userId !== localUserID && <Text style={styles.name}>{name}</Text>}
+                     {replyInfo?.name && (
+                        <View style={styles.replyContainer}>
+                           <View
+                              style={{
+                                 position: 'absolute',
+                                 top: 0,
+                                 bottom: 0,
+                                 left: -2,
+                                 borderWidth: 1,
+                                 borderColor: '#FF5F00',
+                                 borderRadius: 2,
+                              }}
+                           ></View>
+                           <Text style={{ fontSize: 12 }}>{replyInfo.name}</Text>
+                           <Text style={{ fontSize: 11, color: '#666' }}>
+                              {/(jpg|jpeg|png|bmp|bmp)$/i.test(replyInfo.message.split('.').pop())
+                                 ? '[Hình ảnh]'
+                                 : /(mp4|avi|mkv|mov|wmv|flv|webm)$/i.test(replyInfo.message.split('.').pop())
+                                 ? '[Video]'
+                                 : /(m4a|wav|aac|flac|ogg)$/i.test(replyInfo.message.split('.').pop())
+                                 ? '[Ghi âm]'
+                                 : replyInfo.message.length > 30
+                                 ? replyInfo.message.substring(0, 30) + '...'
+                                 : replyInfo.message}
+                           </Text>
+                        </View>
+                     )}
                      <Text style={styles.content}>{message}</Text>
                      {!resultTestNotify && <Text style={styles.time}>{dateTimeSend && formatTime(dateTimeSend)}</Text>}
                   </View>

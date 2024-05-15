@@ -3136,6 +3136,11 @@ batch@0.6.1:
   resolved "https://registry.yarnpkg.com/batch/-/batch-0.6.1.tgz#dc34314f4e679318093fc760272525f94bf25c16"
   integrity sha512-x+VAiMRL6UPkx+kudNvxTl6hB2XNNCG2r+7wixVfIYwu/2HKRXimwQyaumLjMveWvT2Hkd/cAJw+QBMfJ/EKVw==
 
+bcryptjs@^2.4.3:
+  version "2.4.3"
+  resolved "https://registry.yarnpkg.com/bcryptjs/-/bcryptjs-2.4.3.tgz#9ab5627b93e60621ff7cdac5da9733027df1d0cb"
+  integrity sha512-V/Hy/X9Vt7f3BbPJEi8BdVFMByHi+jNXrYkW3huaybV/kQ0KJg0Y6PkEMbn+zeT+i+SiKZ/HMqJGIIt4LZDqNQ==
+
 better-opn@~3.0.2:
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/better-opn/-/better-opn-3.0.2.tgz#f96f35deaaf8f34144a4102651babcf00d1d8817"
@@ -7970,11 +7975,6 @@ react-native-animated-loader@^1.0.0:
   integrity sha512-XI4xk5SQr8BX+qUF9yL2RpoALYmMk4kt233PtOl1o7iUrR/jyXWpZ7+iwHDitV6Q+WB+obxzK6dyf/XtMPIVfQ==
   dependencies:
     prop-types "^15.6.2"
-
-react-native-bcrypt@^2.4.0:
-  version "2.4.0"
-  resolved "https://registry.yarnpkg.com/react-native-bcrypt/-/react-native-bcrypt-2.4.0.tgz#95dff2dbc849c22b25f0b9379ab7bfebd2140bfd"
-  integrity sha512-nC8SR/YCCLIluxd1YEkUX2/xjKELLkO0pgIZc1JGUw9o+wnsfpujm0J8NSPmPEqFUe1n2EkysHnAmuKInDusoQ==
 
 react-native-bouncy-checkbox@^4.0.0:
   version "4.0.0"

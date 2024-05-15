@@ -62,6 +62,14 @@ const styles = StyleSheet.create({
       justifyContent: 'space-between',
       paddingHorizontal: 8,
    },
+   replyContainer: {
+      // paddingBottom: 2,
+      // backgroundColor: '#CFF0FF',
+      // borderRadius: 6,
+      paddingHorizontal: 4,
+      // paddingVertical: 2,
+      marginBottom: 4,
+   },
 });
 
 export default styles;
