@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { useState } from 'react';
 import { Image, ScrollView } from 'react-native';
 import AnimatedLoader from 'react-native-animated-loader';
 import { Button, IconButton } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
 import PressableItem from '../../components/PressableItem';
-import { storeData } from '../../utils/storage';
 import { onUserLogout } from '../../utils/zego';
 import styles from './styles';
 
@@ -13,16 +13,6 @@ export const PersonalScreen = ({ navigation }) => {
    const dispatch = useDispatch();
    const profile = useSelector((state) => state.user.user);
    const [visible, setVisible] = useState(false);
-
-   useEffect(() => {
-      // getUserID()
-      //    .then((id) => {
-      //       getProfile(id);
-      //    })
-      //    .catch((err) => {
-      //       console.error(err);
-      //    });
-   }, []);
 
    return (
       <ScrollView>
@@ -73,9 +63,9 @@ export const PersonalScreen = ({ navigation }) => {
             style={{ margin: 8, backgroundColor: '#666' }}
             onPress={() => {
                setVisible(true);
-               setTimeout(() => {
+               setTimeout(async () => {
                   onUserLogout();
-                  storeData(null);
+                  await AsyncStorage.clear();
                   setVisible(false);
                   navigation.reset({
                      index: 0,

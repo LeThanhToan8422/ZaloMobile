@@ -1,10 +1,10 @@
+import { FlashList } from '@shopify/flash-list';
 import { Buffer } from 'buffer';
 import dayjs from 'dayjs';
 import { Audio } from 'expo-av';
 import * as DocumentPicker from 'expo-document-picker';
 import * as ImagePicker from 'expo-image-picker';
-import React, { useEffect, useState } from 'react';
-import { FlashList } from '@shopify/flash-list';
+import React, { useEffect, useRef, useState } from 'react';
 import {
    ActivityIndicator,
    Image,
@@ -26,11 +26,11 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import { useDispatch, useSelector } from 'react-redux';
 import Message from '../../components/Message';
-import { deleteMessage, fetchMessages } from '../../features/chat/chatSlice';
+import { addMessage, deleteMessage, fetchMessages, setMessages, updateMessage } from '../../features/chat/chatSlice';
 import { fetchDetailChat, fetchMembersInGroup } from '../../features/detailChat/detailChatSlice';
 import { socket } from '../../utils/socket';
+import { getData } from '../../utils/storage';
 import styles from './styles';
-import { onDisplayNotification } from '../../utils/notification';
 
 /**
  * ChatScreen component. This component is used to render the chat screen.
@@ -39,17 +39,23 @@ import { onDisplayNotification } from '../../utils/notification';
  * @returns {JSX.Element} The rendered ChatScreen component.
  */
 export const ChatScreen = ({ navigation, route }) => {
+   const inputRef = useRef(null);
    const urlRegex = /^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/;
+   const checkImage = /(jpg|jpeg|png|bmp|bmp)$/i;
+   const checkVideo = /(mp4|avi|mkv|mov|wmv|flv|webm)$/i;
+   const checkVoice = /(m4a|wav|aac|flac|ogg)$/i;
    const insets = useSafeAreaInsets();
    const [chatInfo, setChatInfo] = useState(route.params);
    const [message, setMessage] = useState('');
    const [visible, setVisible] = useState(false);
+   const [replyVisible, setReplyVisible] = useState(false);
    const [modalData, setModalData] = useState(null);
    const [imagesView, setImagesView] = useState([]);
    const [visibleImage, setIsVisibleImage] = useState(false);
-   const [page, setPage] = useState(10); // Keep track of the current page
+   const [page, setPage] = useState(20);
    const [recording, setRecording] = useState();
    const [permissionResponse, requestPermission] = Audio.usePermissions();
+   const [loading, setLoading] = useState(false);
 
    const dispatch = useDispatch();
    const user = useSelector((state) => state.user.user);
@@ -58,6 +64,14 @@ export const ChatScreen = ({ navigation, route }) => {
    const emoji = [{ like: '👍' }, { love: '❤️' }, { haha: '😂' }, { wow: '😮' }, { sad: '😭' }, { angry: '😡' }];
 
    useEffect(() => {
+      setLoading(false);
+   }, [messages]);
+
+   useEffect(() => {
+      (async () => {
+         const messages = await getData(`@${chatInfo.id}`);
+         dispatch(setMessages({ id: chatInfo.id, messages: messages }));
+      })();
       const params = { page: page };
       chatInfo.leader ? (params.groupId = chatInfo.id) : (params.chatId = chatInfo.id);
       dispatch(fetchMessages(params));
@@ -107,6 +121,7 @@ export const ChatScreen = ({ navigation, route }) => {
       };
 
       const params = {
+         idTemp: dayjs().valueOf(),
          file: data,
          dateTimeSend: dayjs().format('YYYY-MM-DD HH:mm:ss'),
          sender: user.id,
@@ -118,10 +133,15 @@ export const ChatScreen = ({ navigation, route }) => {
       };
       chatInfo.leader ? (params.groupChat = chatInfo.id) : (params.receiver = chatInfo.id);
       socket.emit('Client-Chat-Room', params);
+      params.message = localUri;
+      delete params.file;
+      dispatch(addMessage(params));
+      setLoading(true);
    };
 
    const sendMessage = () => {
       const params = {
+         idTemp: dayjs().valueOf(),
          message: message.trim(), // thông tin message
          dateTimeSend: dayjs().format('YYYY-MM-DD HH:mm:ss'),
          sender: user.id, // id người gửi
@@ -132,7 +152,9 @@ export const ChatScreen = ({ navigation, route }) => {
             : `${user.id}${chatInfo.id}`,
       };
       chatInfo.leader ? (params.groupChat = chatInfo.id) : (params.receiver = chatInfo.id);
+      replyVisible && (params.chatReply = modalData.id) && setReplyVisible(false);
       socket.emit('Client-Chat-Room', params);
+      dispatch(addMessage(params));
       setMessage('');
    };
 
@@ -160,11 +182,12 @@ export const ChatScreen = ({ navigation, route }) => {
          chat,
          chatRoom,
       });
+      dispatch(updateMessage({ id: chat, emojis: type }));
    };
 
    const handlePressMessage = async (item) => {
       if (urlRegex.test(item.message)) {
-         if (item.message.split('.').pop() === ('jpg' || 'png')) {
+         if (checkImage.test(item.message.split('.').pop())) {
             setImagesView([{ uri: item.message }]);
             setIsVisibleImage(true);
          } else {
@@ -247,7 +270,7 @@ export const ChatScreen = ({ navigation, route }) => {
                   <Portal>
                      <Modal visible={visible} onDismiss={hideModal} contentContainerStyle={styles.modalContainer}>
                         {urlRegex.test(modalData?.message) ? (
-                           modalData?.message.split('.').pop() === ('jpg' || 'png') ? (
+                           checkImage.test(modalData?.message.split('.').pop()) ? (
                               <Image source={{ uri: modalData?.message }} style={styles.imageMessage} />
                            ) : (
                               <View
@@ -294,6 +317,11 @@ export const ChatScreen = ({ navigation, route }) => {
                               icon={() => <Icon source="reply" size={24} color="#457DF6" />}
                               contentStyle={{ flexDirection: 'row-reverse' }}
                               labelStyle={{ color: '#000' }}
+                              onPress={() => {
+                                 setVisible(false);
+                                 setReplyVisible(true);
+                                 inputRef.current.focus();
+                              }}
                            >
                               Trả lời
                            </Button>
@@ -318,7 +346,7 @@ export const ChatScreen = ({ navigation, route }) => {
                            >
                               Xóa
                            </Button>
-                           {user.id === modalData?.sender && (
+                           {user?.id === modalData?.sender && dayjs().diff(modalData?.dateTimeSend, 'hour') < 24 && (
                               <Button
                                  icon={() => <Icon source="backup-restore" size={24} color="#F07F2D" />}
                                  contentStyle={{ flexDirection: 'row-reverse' }}
@@ -348,18 +376,49 @@ export const ChatScreen = ({ navigation, route }) => {
                         renderItem={({ item }) => (
                            <Message
                               data={{ ...item, imageFriend: chatInfo.image }}
-                              localUserID={user.id}
+                              localUserID={user?.id}
                               handleModal={showModal}
                               onPress={() => handlePressMessage(item)}
                               handleReactMessage={handleReactMessage}
+                              replyInfo={Object.entries(messages.find((message) => message.id === item.chatReply) || {})
+                                 .filter(([key]) => key === 'message' || key === 'name')
+                                 .reduce((acc, [key, value]) => {
+                                    acc[key] = value;
+                                    return acc;
+                                 }, {})}
                            />
                         )}
                      />
+                     {loading && (
+                        <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+                           <Text style={{ color: '#333' }}>Đang gửi... </Text>
+                           <ActivityIndicator size="small" color="#666" />
+                        </View>
+                     )}
                   </View>
                </PaperProvider>
+               {replyVisible && (
+                  <View style={styles.replyModalContainer}>
+                     <View>
+                        <View style={{ flexDirection: 'row' }}>
+                           <Text style={{ fontSize: 14 }}>Đang trả lời </Text>
+                           <Text style={{ fontSize: 14, fontWeight: '500' }}>{modalData?.name}</Text>
+                        </View>
+                        <Text style={{ fontSize: 13, color: '#666' }}>{modalData?.message}</Text>
+                     </View>
+                     <IconButton
+                        icon="close"
+                        size={20}
+                        onPress={() => {
+                           setReplyVisible(false);
+                        }}
+                     />
+                  </View>
+               )}
                <View style={[styles.chatContainer, { paddingBottom: insets.bottom }]}>
                   <IconButton icon="sticker-emoji" size={28} iconColor="#333" />
                   <TextInput
+                     ref={inputRef}
                      multiline
                      style={styles.input}
                      value={message}

@@ -6,7 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import { useDispatch } from 'react-redux';
 import OpenURLText from '../../components/OpenURLText';
-import { fetchChats } from '../../features/chat/chatSlice';
+import { fetchChats, fetchMessagesOfChats } from '../../features/chat/chatSlice';
 import { fetchFriend } from '../../features/friend/friendSlice';
 import { login } from '../../features/user/userSlice';
 import { storeData } from '../../utils/storage';
@@ -27,9 +27,9 @@ export const LoginScreen = ({ navigation }) => {
          .unwrap()
          .then((res) => {
             if (res) {
-               storeData({ phone: res.phone, password: password, user: res.user });
+               storeData('@user', { phone: res.phone, password: password, user: res.user });
                dispatch(fetchFriend(res.id));
-               dispatch(fetchChats());
+               dispatch(fetchMessagesOfChats());
                onUserLogin(res.id, res.name);
                setVisible(false);
                navigation.navigate('AppStack');

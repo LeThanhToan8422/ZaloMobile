@@ -58,8 +58,7 @@
          "eas": {
             "projectId": "b811f300-26a6-45ff-bfbc-9614825f87fe"
          },
-         "SERVER_HOST": "https://zalo-backend-team-6.onrender.com",
-         "SERVER_HOST": "http://172.20.34.106:8080"
+         "SERVER_HOST": "https://zalo-backend-team-6.onrender.com"
       }
    }
 }
