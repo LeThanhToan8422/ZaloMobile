@@ -8,7 +8,7 @@ import { useDispatch } from 'react-redux';
 import { fetchChats, fetchMessagesOfChats, setChat } from '../features/chat/chatSlice';
 import { fetchFriend } from '../features/friend/friendSlice';
 import { fetchFriendRequests } from '../features/friendRequest/friendRequestSlice';
-import { fetchUser } from '../features/user/userSlice';
+import { fetchUser, updateUser } from '../features/user/userSlice';
 import { getData, storeData } from '../utils/storage';
 import { toastConfig } from '../utils/toastConfig';
 import AppStack from './AppStack';
@@ -31,6 +31,8 @@ const Router = (props) => {
          setIsLogin(false);
          return;
       }
+      params.id = params.user;
+      dispatch(updateUser(params));
       const chats = await getData('@chats');
       dispatch(setChat(chats));
       dispatch(fetchUser({ phone: params.phone }))
@@ -40,7 +42,7 @@ const Router = (props) => {
                navigationRef.navigate('AuthStack');
                storeData('@user', null);
             } else {
-               dispatch(fetchFriend(response.id));
+               dispatch(fetchFriend());
                dispatch(fetchFriendRequests());
                dispatch(fetchMessagesOfChats());
             }

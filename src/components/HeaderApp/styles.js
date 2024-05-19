@@ -19,7 +19,7 @@ const styles = StyleSheet.create({
       alignItems: 'center',
    },
    searchInput: {
-      flex: 1,
+      // flex: 1,
       backgroundColor: 'transparent',
       marginLeft: 8,
       fontSize: 16,

@@ -42,8 +42,6 @@ export const ChatScreen = ({ navigation, route }) => {
    const inputRef = useRef(null);
    const urlRegex = /^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/;
    const checkImage = /(jpg|jpeg|png|bmp|bmp)$/i;
-   const checkVideo = /(mp4|avi|mkv|mov|wmv|flv|webm)$/i;
-   const checkVoice = /(m4a|wav|aac|flac|ogg)$/i;
    const insets = useSafeAreaInsets();
    const [chatInfo, setChatInfo] = useState(route.params);
    const [message, setMessage] = useState('');
@@ -439,7 +437,7 @@ export const ChatScreen = ({ navigation, route }) => {
                         <IconButton icon="image" size={32} iconColor="#333" onPress={pickImage} />
                      </>
                   ) : (
-                     <IconButton icon="send-circle" size={32} iconColor="#4D9DF7" onPress={sendMessage} />
+                     <IconButton icon="send-circle" size={36} iconColor="#4D9DF7" onPress={sendMessage} />
                   )}
                </View>
                <ImageView

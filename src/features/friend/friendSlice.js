@@ -10,8 +10,8 @@ const initialState = {
    error: null,
 };
 
-const fetchFriend = createAsyncThunk('friend/fetchFriend', async (userID) => {
-   const response = await axios.get(`${SERVER_HOST}/users/friends/${userID}`);
+const fetchFriend = createAsyncThunk('friend/fetchFriend', async (_, { getState }) => {
+   const response = await axios.get(`${SERVER_HOST}/users/friends/${getState().user.user.id}`);
    return response.data;
 });
 

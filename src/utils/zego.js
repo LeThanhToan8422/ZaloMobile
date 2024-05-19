@@ -5,6 +5,7 @@ import ZegoUIKitPrebuiltCallService, {
    ONE_ON_ONE_VOICE_CALL_CONFIG,
    ZegoInvitationType,
 } from '@zegocloud/zego-uikit-prebuilt-call-rn';
+import { ZegoMenuBarButtonName } from '@zegocloud/zego-uikit-prebuilt-call-rn/lib/commonjs/services/defines';
 import * as ZIM from 'zego-zim-react-native';
 import * as ZPNs from 'zego-zpns-react-native';
 
@@ -37,7 +38,6 @@ const onUserLogin = async (userID, userName, props) => {
                   : ONE_ON_ONE_VOICE_CALL_CONFIG;
             return {
                ...callConfig,
-               turnOnCameraWhenJoining: false,
                useSpeakerWhenJoining: false,
                // layout: {
                //    mode: ZegoLayoutMode.pictureInPicture,
@@ -48,6 +48,9 @@ const onUserLogin = async (userID, userName, props) => {
                //       largeViewBackgroundImage: 'your_server_image_url',
                //    },
                // },
+               topMenuBarConfig: {
+                  buttons: [ZegoMenuBarButtonName.minimizingButton],
+               },
             };
          },
          notifyWhenAppRunningInBackgroundOrQuit: true,

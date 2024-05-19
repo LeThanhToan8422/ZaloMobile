@@ -34,6 +34,7 @@ export const PersonalScreen = ({ navigation }) => {
             subtitle="Xem trang cá nhân"
             actionRight={
                <IconButton
+                  disabled
                   icon="account-sync-outline"
                   size={24}
                   iconColor="#375FD1"
@@ -43,19 +44,31 @@ export const PersonalScreen = ({ navigation }) => {
             }
             style={{ marginBottom: 8 }}
          />
-         <PressableItem navigation={navigation} icon="security" title="Tài khoản và bảo mật" />
-         <PressableItem navigation={navigation} icon="lock" title="Quyền riêng tư" style={{ marginBottom: 8 }} />
-         <PressableItem icon="bell-outline" title="Thông báo" />
-         <PressableItem icon="chat-processing-outline" title="Tin nhắn" />
-         <PressableItem icon="contacts-outline" title="Danh bạ" style={{ marginBottom: 8 }} />
+         <PressableItem disabled navigation={navigation} icon="security" title="Tài khoản và bảo mật" />
+         <PressableItem
+            disabled
+            navigation={navigation}
+            icon="lock"
+            title="Quyền riêng tư"
+            style={{ marginBottom: 8 }}
+         />
+         <PressableItem disabled icon="bell-outline" title="Thông báo" />
+         <PressableItem disabled icon="chat-processing-outline" title="Tin nhắn" />
+         <PressableItem disabled icon="contacts-outline" title="Danh bạ" style={{ marginBottom: 8 }} />
          <PressableItem
             navigation={navigation}
             navParams={{ screen: 'ChangePassScreen', params: { phone: profile?.phone } }}
             icon="onepassword"
             title="Đổi mật khẩu"
          />
-         <PressableItem icon="help-circle-outline" title="Trợ giúp" />
-         <PressableItem icon="information-outline" title="Thông tin về Zalo" style={{ marginBottom: 8 }} />
+         <PressableItem disabled icon="help-circle-outline" title="Trợ giúp" />
+         <PressableItem
+            icon="information-outline"
+            title="Thông tin về Zalo"
+            style={{ marginBottom: 8 }}
+            navigation={navigation}
+            navParams={{ screen: 'InfoApp' }}
+         />
          <Button
             mode="contained"
             icon="logout"
