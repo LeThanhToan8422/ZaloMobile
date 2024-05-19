@@ -143,6 +143,9 @@ const AppStack = ({ navigation }) => {
             dispatch(fetchMessagesOfChats());
             if (currentChat.id === res.data.id) {
                dispatch(fetchMessages({ groupId: res.data.id, page: currentChat.messages.length + 1 }));
+               if (!JSON.parse(res.data.members).some((member) => member === user.id)) {
+                  navigation.navigate('AppTabs');
+               }
             }
          }
          if (

@@ -37,6 +37,13 @@ export const MemberItem = ({ item }) => {
       setVisible(false);
    };
 
+   const handleRemoveDeputy = () => {
+      socket.emit(`Client-Change-Leader-And-Deputy-Group-Chats`, {
+         group: { ...group, deputy: null },
+      });
+      setVisible(false);
+   };
+
    return (
       <Pressable
          style={{
@@ -55,7 +62,14 @@ export const MemberItem = ({ item }) => {
                </View>
             )}
          </View>
-         <Text style={{ marginLeft: 12, fontSize: 18, flex: 1 }}>{item.name}</Text>
+         <View style={{ flex: 1 }}>
+            <Text style={{ marginLeft: 12, fontSize: 18, flex: 1 }}>{item.name}</Text>
+            {(group.leader === item.id || group.deputy === item.id) && (
+               <Text style={{ marginLeft: 12, fontSize: 14, flex: 1 }}>
+                  {group.leader === item.id ? 'Trưởng nhóm' : 'Phó nhóm'}
+               </Text>
+            )}
+         </View>
          {/* Trưởng nhóm và phó nhóm sẽ hiện menu, trưởng nhóm sẽ ko hiện menu item của trưởng nhóm, phó nhóm sẽ ko hiện menu item của trưởng nhóm và phó nhóm */}
          {(user.id === group.leader || user.id === group.deputy) && item.id !== group.leader && user.id !== item.id && (
             <Menu
@@ -84,6 +98,13 @@ export const MemberItem = ({ item }) => {
                      leadingIcon={() => <Icon source={'account-key'} size={22} />}
                      title="Chuyển quyền trưởng nhóm"
                      onPress={handlePassLeader}
+                  />
+               )}
+               {group.leader === user.id && group.deputy === item.id && (
+                  <Menu.Item
+                     leadingIcon={() => <Icon source={'account-cancel-outline'} size={22} />}
+                     title="Xóa phó nhóm"
+                     onPress={handleRemoveDeputy}
                   />
                )}
                <Menu.Item
