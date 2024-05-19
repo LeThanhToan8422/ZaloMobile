@@ -10,6 +10,10 @@ export const SearchScreen = ({ navigation, route }) => {
    const [data, setData] = useState(null);
 
    useEffect(() => {
+      navigation.setOptions({
+         title: `Tìm kiếm: ${search}`,
+         headerTitleStyle: { fontSize: 18, fontWeight: '400' },
+      });
       (async () => {
          const res = await axios.get(`${SERVER_HOST}/users/friends/7/${search}`);
          if (res.data.length !== 0) setData(res.data);

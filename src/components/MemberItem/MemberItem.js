@@ -1,15 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Image, Pressable, Text, View } from 'react-native';
 import { Icon, IconButton, Menu } from 'react-native-paper';
-import styles from './styles';
+import { useSelector } from 'react-redux';
 import { socket } from '../../utils/socket';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchDetailChat, fetchMembersInGroup } from '../../features/detailChat/detailChatSlice';
+import styles from './styles';
 
 export const MemberItem = ({ item }) => {
    const group = useSelector((state) => state.detailChat.info);
    const { user } = useSelector((state) => state.user);
-   const dispatch = useDispatch();
    const [visible, setVisible] = useState(false);
 
    const handleRemoveMember = () => {
@@ -22,21 +20,20 @@ export const MemberItem = ({ item }) => {
    };
 
    const handlePassLeader = () => {
-      group.leader = item.id;
-      group.deputy = group.leader === group.deputy ? null : group.deputy;
       socket.emit(`Client-Change-Leader-And-Deputy-Group-Chats`, {
-         group,
+         group: {
+            ...group,
+            leader: item.id,
+            deputy: group.leader === group.deputy ? null : group.deputy,
+         },
       });
-      onFreshMember();
       setVisible(false);
    };
 
    const handleAddDeputy = () => {
-      group.deputy = item.id;
       socket.emit(`Client-Change-Leader-And-Deputy-Group-Chats`, {
-         group,
+         group: { ...group, deputy: item.id },
       });
-      onFreshMember();
       setVisible(false);
    };
 

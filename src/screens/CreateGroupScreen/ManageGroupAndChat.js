@@ -33,49 +33,51 @@ export const ManageGroupAndChat = ({ navigation, route }) => {
    const { user } = useSelector((state) => state.user);
    let searchTimeout = null;
 
-   navigation.setOptions({
-      headerTitle: type === 'addGroup' ? 'Tạo nhóm mới' : type === 'addMember' ? 'Thêm thành viên' : 'Chuyển tiếp',
-      headerLeft: () => (
-         <IconButton
-            icon="close"
-            color="#fff"
-            size={24}
-            onPress={() => {
-               navigation.goBack();
-            }}
-         />
-      ),
-      headerRight: () => (
-         <IconButton
-            icon="check"
-            color="#fff"
-            size={24}
-            onPress={async () => {
-               const dataGroup = type === 'addMember' && (await axios.get(`${SERVER_HOST}/group-chats/${data.id}`));
-               if (type === 'addGroup' && !checkValidate()) return;
-               type === 'addGroup'
-                  ? socket.emit(`Client-Group-Chats`, {
-                       name: groupName,
-                       members: JSON.stringify([user.id, ...selectMembers]),
-                       leader: user.id,
-                    })
-                  : type === 'addMember'
-                  ? socket.emit(`Client-Update-Group-Chats`, {
-                       group: dataGroup.data,
-                       // group : thông tin của group đang chat
-                       mbs: selectMembers,
-                       implementer: user.id,
-                    })
-                  : selectMembers.forEach((friendID) => sendMessage(friendID));
-               navigation.goBack();
-            }}
-         />
-      ),
-   });
-
    useEffect(() => {
       getFriends();
    }, []);
+
+   useEffect(() => {
+      navigation.setOptions({
+         headerTitle: type === 'addGroup' ? 'Tạo nhóm mới' : type === 'addMember' ? 'Thêm thành viên' : 'Chuyển tiếp',
+         headerLeft: () => (
+            <IconButton
+               icon="close"
+               color="#fff"
+               size={24}
+               onPress={() => {
+                  navigation.goBack();
+               }}
+            />
+         ),
+         headerRight: () => (
+            <IconButton
+               icon="check"
+               color="#fff"
+               size={24}
+               onPress={async () => {
+                  const dataGroup = type === 'addMember' && (await axios.get(`${SERVER_HOST}/group-chats/${data.id}`));
+                  if (type === 'addGroup' && !checkValidate()) return;
+                  type === 'addGroup'
+                     ? socket.emit(`Client-Group-Chats`, {
+                          name: groupName,
+                          members: JSON.stringify([user.id, ...selectMembers]),
+                          leader: user.id,
+                       })
+                     : type === 'addMember'
+                     ? socket.emit(`Client-Update-Group-Chats`, {
+                          group: dataGroup.data,
+                          // group : thông tin của group đang chat
+                          mbs: selectMembers,
+                          implementer: user.id,
+                       })
+                     : selectMembers.forEach((friendID) => sendMessage(friendID));
+                  navigation.goBack();
+               }}
+            />
+         ),
+      });
+   }, [groupName, selectMembers]);
 
    const checkValidate = () => {
       if (!groupName) {
@@ -119,7 +121,6 @@ export const ManageGroupAndChat = ({ navigation, route }) => {
          quality: 1,
       });
 
-      console.log(result.assets[0].uri);
       setAvatarGroup(result.assets[0].uri);
 
       // if (!result.canceled) {

@@ -6,10 +6,15 @@ import styles from './styles';
 import Constants from 'expo-constants';
 import { socket } from '../../utils/socket';
 import dayjs from 'dayjs';
+import { useDispatch } from 'react-redux';
+import { fetchChats, fetchMessagesOfChats } from '../../features/chat/chatSlice';
+import { fetchFriendRequests } from '../../features/friendRequest/friendRequestSlice';
+import { fetchFriend } from '../../features/friend/friendSlice';
 
 export const FriendRequestItem = ({ navigation, userID, data }) => {
    const [contentChat, setContentChat] = useState('');
    const SERVER_HOST = Constants.expoConfig.extra.SERVER_HOST;
+   const dispatch = useDispatch();
 
    const handleAgreeMakeFriend = async (friendRequest) => {
       const dataDelete = await axios.delete(`${SERVER_HOST}/make-friends/${friendRequest.makeFriendId}`);
@@ -29,6 +34,10 @@ export const FriendRequestItem = ({ navigation, userID, data }) => {
                chatRoom: userID > friendRequest.id ? `${friendRequest.id}${userID}` : `${userID}${friendRequest.id}`,
             });
             setContentChat(`Bạn và ${friendRequest.name} đã trở thành bạn`);
+            dispatch(fetchChats(userID));
+            dispatch(fetchMessagesOfChats(userID));
+            dispatch(fetchFriendRequests());
+            dispatch(fetchFriend(userID));
          }
       }
    };

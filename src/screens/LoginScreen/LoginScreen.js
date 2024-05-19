@@ -27,7 +27,7 @@ export const LoginScreen = ({ navigation }) => {
          .unwrap()
          .then((res) => {
             if (res) {
-               storeData('@user', { phone: res.phone, password: password, user: res.user });
+               storeData('@user', res);
                dispatch(fetchFriend(res.id));
                dispatch(fetchMessagesOfChats());
                onUserLogin(res.id, res.name);

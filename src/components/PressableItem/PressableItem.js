@@ -36,8 +36,9 @@ export const PressableItem = ({
 }) => {
    return (
       <Pressable
-         style={[props.style, styles.container]}
+         style={[props.style, styles.container, props.disabled ? { opacity: 0.6 } : {}]}
          onPress={action ? action : () => (navParams ? navigation.navigate(navParams.screen, navParams.params) : null)}
+         disabled={props.disabled}
       >
          <Icon source={icon} size={22} color="#375FD1" {...iconStyle} />
          <View style={styles.textContainer}>

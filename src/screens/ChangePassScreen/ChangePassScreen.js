@@ -1,12 +1,20 @@
-import Constants from 'expo-constants';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import Constants from 'expo-constants';
 import React, { useState } from 'react';
 import { Keyboard, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, View } from 'react-native';
+import AnimatedLoader from 'react-native-animated-loader';
 import { Button, TextInput } from 'react-native-paper';
 import Toast from 'react-native-toast-message';
 import { checkPassword } from '../../utils/func';
-import { storeData } from '../../utils/storage';
+import { getData } from '../../utils/storage';
+import { onUserLogout } from '../../utils/zego';
 var bcrypt = require('bcryptjs');
+bcrypt.setRandomFallback((len) => {
+   var buf = new Uint8Array(len);
+   return buf.map(() => Math.floor(Math.random() * 256));
+});
+var salt = bcrypt.genSaltSync(10);
 
 export const ChangePassScreen = ({ navigation, route }) => {
    const SERVER_HOST = Constants.expoConfig.extra.SERVER_HOST;
@@ -17,13 +25,26 @@ export const ChangePassScreen = ({ navigation, route }) => {
    const [securePass, setSecurePass] = useState(true);
    const [secureRePass, setSecureRePass] = useState(true);
    const { phone } = route.params;
-   const salt = bcrypt.genSaltSync(10);
+   const [visible, setVisible] = useState(false);
 
    const handleChangePass = async () => {
+      setVisible(true);
       try {
          const dataUsers = await axios.get(`${SERVER_HOST}/accounts/phone/${phone}`);
          if (bcrypt.compareSync(oldPass, dataUsers.data.password)) {
-            if (!checkPassword(password, rePassword)) return;
+            if (!checkPassword(password, rePassword)) {
+               setVisible(false);
+               return;
+            }
+            if (bcrypt.compareSync(password, dataUsers.data.password)) {
+               setVisible(false);
+               Toast.show({
+                  type: 'error',
+                  text1: 'Mật khẩu mới không được trùng với mật khẩu cũ',
+                  position: 'bottom',
+               });
+               return;
+            }
             const hashPass = bcrypt.hashSync(password, salt);
             const dataAccount = await axios.put(`${SERVER_HOST}/accounts`, {
                phone,
@@ -31,14 +52,21 @@ export const ChangePassScreen = ({ navigation, route }) => {
                id: dataUsers.data.id,
             });
             if (dataAccount.data) {
+               setVisible(false);
                Toast.show({
                   type: 'success',
                   text1: 'Đổi mật khẩu thành công',
                   position: 'bottom',
                });
-               storeData('@user', { phone, password: hashPass, id: dataUsers.data.id });
+               onUserLogout();
+               await AsyncStorage.clear();
+               navigation.reset({
+                  index: 0,
+                  routes: [{ name: 'AuthStack' }],
+               });
             }
          } else {
+            setVisible(false);
             Toast.show({
                type: 'error',
                text1: 'Mật khẩu cũ không đúng',
@@ -63,6 +91,16 @@ export const ChangePassScreen = ({ navigation, route }) => {
       >
          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
             <View>
+               <AnimatedLoader
+                  visible={visible}
+                  overlayColor="rgba(255,255,255,1)"
+                  source={require('../../../assets/lotties/loader.json')}
+                  animationStyle={{
+                     width: 200,
+                     height: 200,
+                  }}
+                  speed={2}
+               />
                <TextInput
                   label="Mật khẩu cũ"
                   secureTextEntry={secureOldPass}

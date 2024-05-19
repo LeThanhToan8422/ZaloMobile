@@ -4,6 +4,8 @@ import {
    ZegoUIKitPrebuiltCallInCallScreen,
    ZegoUIKitPrebuiltCallWaitingScreen,
 } from '@zegocloud/zego-uikit-prebuilt-call-rn';
+import axios from 'axios';
+import Constants from 'expo-constants';
 import React, { useEffect } from 'react';
 import { View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
@@ -14,16 +16,20 @@ import {
    deleteMessage,
    fetchChats,
    fetchMessages,
+   fetchMessagesOfChats,
    recallMessage,
    updateMessage,
 } from '../features/chat/chatSlice';
 import { fetchDetailChat, fetchMembersInGroup } from '../features/detailChat/detailChatSlice';
+import { fetchFriend } from '../features/friend/friendSlice';
+import { fetchFriendRequests } from '../features/friendRequest/friendRequestSlice';
 import { updateUser } from '../features/user/userSlice';
 import { ChangePassScreen } from '../screens/ChangePassScreen/ChangePassScreen';
 import ChatScreen from '../screens/ChatScreen';
 import ManageGroupAndChat from '../screens/CreateGroupScreen';
 import { DetailChatScreen } from '../screens/DetailChatScreen/DetailChatScreen';
 import { FriendRequestScreen } from '../screens/FriendRequestScreen/FriendRequestScreen';
+import InfoAppScreen from '../screens/InfoAppScreen';
 import MembersChatsScreen from '../screens/MembersChatScreen';
 import { ProfileScreen } from '../screens/ProfileScreen/ProfileScreen';
 import SearchScreen from '../screens/SearchScreen';
@@ -41,6 +47,7 @@ const AppStack = ({ navigation }) => {
    const { user } = useSelector((state) => state.user);
    const { chats, currentChat } = useSelector((state) => state.chat);
    const { friend } = useSelector((state) => state.friend);
+   const SERVER_HOST = Constants.expoConfig.extra.SERVER_HOST;
 
    useEffect(() => {
       user && onUserLogin(user.id, user.name);
@@ -103,15 +110,20 @@ const AppStack = ({ navigation }) => {
       socket.onAny((event, res) => {
          console.log(event, res);
          friend
-            .map((chat) =>
-               chat.leader ? chat.id : user.id < chat.id ? `${user.id}${chat.id}` : `${chat.id}${user.id}`
-            )
-            .forEach((id) => {
+            .map((chat) => ({
+               id: chat.leader ? chat.id : user.id < chat.id ? `${user.id}${chat.id}` : `${chat.id}${user.id}`,
+               group: chat.leader ? true : false,
+            }))
+            .forEach(({ id, group }) => {
                if (event === `Server-Chat-Room-${id}` && event.split('-').pop().length > 1) {
                   onChatEvents(res);
                }
                if (event === `Server-Status-Chat-${id}`) {
                   onStatusChatEvents(res);
+               }
+               if (group && event === `Server-Change-Leader-And-Deputy-Group-Chats-${id}`) {
+                  dispatch(fetchDetailChat({ id, type: 'group' }));
+                  dispatch(fetchMembersInGroup(id));
                }
             });
          if (event === `Server-Emotion-Chats-${currentChat.id}`) {
@@ -124,12 +136,30 @@ const AppStack = ({ navigation }) => {
             dispatch(updateUser({ ...user, image: res.data.image, background: res.data.background }));
          }
          if (event === `Server-Group-Chats-${user.id}`) {
+            dispatch(fetchFriend());
             dispatch(fetchDetailChat({ id: res.data.id, type: 'group' }));
             dispatch(fetchMembersInGroup(res.data.id));
             dispatch(fetchChats());
+            dispatch(fetchMessagesOfChats());
             if (currentChat.id === res.data.id) {
                dispatch(fetchMessages({ groupId: res.data.id, page: currentChat.messages.length + 1 }));
             }
+         }
+         if (
+            event.includes('Server-Make-Friends-') &&
+            (event.slice(-1) === `${user.id}` || event.slice(-2, -1) === `${user.id}`)
+         ) {
+            (async () => {
+               const dataUser = await axios.get(`${SERVER_HOST}/users/${res.data.giver}`);
+               if (dataUser) {
+                  onDisplayNotification(
+                     dataUser.data.name,
+                     `${dataUser.data.name} đã gửi lời mời kết bạn cho bạn`,
+                     dataUser.data.image
+                  );
+               }
+            })();
+            dispatch(fetchFriendRequests());
          }
       });
       return () => {
@@ -246,7 +276,6 @@ const AppStack = ({ navigation }) => {
             name="FriendRequest"
             component={FriendRequestScreen}
             options={{
-               headerTitle: '',
                headerBackground: () => (
                   <View
                      style={{
@@ -258,7 +287,8 @@ const AppStack = ({ navigation }) => {
                   />
                ),
                headerTintColor: '#fff',
-               headerBackTitle: 'Lời mời kết bạn',
+               headerTitle: 'Lời mời kết bạn',
+               headerTitleStyle: { fontWeight: '400' },
             }}
          />
          <Stack.Group
@@ -279,6 +309,7 @@ const AppStack = ({ navigation }) => {
             name="ZegoUIKitPrebuiltCallInCallScreen"
             component={ZegoUIKitPrebuiltCallInCallScreen}
          />
+         <Stack.Screen name="InfoApp" component={InfoAppScreen} />
       </Stack.Navigator>
    );
 };

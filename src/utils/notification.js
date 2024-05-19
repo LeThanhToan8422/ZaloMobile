@@ -1,8 +1,13 @@
-import notifee, { AndroidImportance, AndroidStyle } from '@notifee/react-native';
+import notifee, { AndroidImportance, AndroidStyle, AuthorizationStatus } from '@notifee/react-native';
+
+async function checkNotificationPermission() {
+   const settings = await notifee.requestPermission();
+   if (settings.authorizationStatus == AuthorizationStatus.DENIED) {
+      notifee.openNotificationSettings();
+   }
+}
 
 async function onDisplayNotification(title, body, largeIcon) {
-   await notifee.requestPermission();
-
    const channelId = await notifee.createChannel({
       id: 'message',
       name: 'Message Channel',
@@ -27,4 +32,4 @@ async function onDisplayNotification(title, body, largeIcon) {
    });
 }
 
-export { onDisplayNotification };
+export { onDisplayNotification, checkNotificationPermission };

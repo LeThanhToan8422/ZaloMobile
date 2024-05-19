@@ -3,17 +3,16 @@ import React, { useState } from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
 import Dialog from 'react-native-dialog';
 import { Icon } from 'react-native-paper';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { PressableItem } from '../../components/PressableItem/PressableItem';
 import { socket } from '../../utils/socket';
 import styles from './styles';
+import { storeData } from '../../utils/storage';
 
 export const DetailChatScreen = ({ navigation, route }) => {
-   const { id } = route.params;
    const [visibleRemoveHistory, setVisibleRemoveHistory] = useState(false);
    const [visibleLeave, setVisibleLeave] = useState(false);
    const [visibleDisband, setVisibleDisband] = useState(false);
-   const dispatch = useDispatch();
    const { user } = useSelector((state) => state.user);
    const { info } = useSelector((state) => state.detailChat);
 
@@ -24,17 +23,21 @@ export const DetailChatScreen = ({ navigation, route }) => {
          chat: !info?.leader ? info?.id : null,
          groupChat: info?.leader ? info?.id : null,
       });
+      storeData(`@${info?.id}`, []);
       navigation.navigate('AppTabs');
    };
 
    const handleLeaveGroup = () => {
       if (info?.leader === user.id) {
-         alert('Bạn không thể rời nhóm vì bạn là người tạo nhóm');
+         setVisibleLeave(false);
+         alert('Bạn cần chuyển quyền trưởng nhóm trước khi rời nhóm');
+         navigation.navigate('MembersChatScreen', { data: info });
          return;
       }
       socket.emit(`Client-Update-Group-Chats`, {
          group: info,
          mbs: user.id,
+         implementer: user.id,
       });
       navigation.navigate('AppTabs');
    };
@@ -70,6 +73,17 @@ export const DetailChatScreen = ({ navigation, route }) => {
          <Image source={{ uri: info?.image }} style={styles.avatar} />
          <Text style={styles.name}>{info?.name}</Text>
          <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', marginTop: 20 }}>
+            {!info?.leader && (
+               <TouchableOpacity
+                  style={{ flexDirection: 'column', alignItems: 'center', marginBottom: 12 }}
+                  onPress={() => {
+                     navigation.navigate('ProfileScreen', { friend: info?.id });
+                  }}
+               >
+                  <Icon source={'account-outline'} size={24} />
+                  <Text>Thông tin cá nhân</Text>
+               </TouchableOpacity>
+            )}
             <TouchableOpacity
                style={{ flexDirection: 'column', alignItems: 'center', marginBottom: 12 }}
                onPress={() => {}}

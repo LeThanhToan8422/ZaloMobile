@@ -7,6 +7,7 @@ const styles = StyleSheet.create({
       marginHorizontal: 10,
       maxWidth: '80%',
       marginVertical: 2,
+      alignItems: 'center',
    },
    messageContainer: {
       alignSelf: 'flex-start',

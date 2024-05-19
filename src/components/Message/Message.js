@@ -118,7 +118,7 @@ export const Message = ({ data, localUserID, replyInfo, handleModal, onPress, ha
             emojis ? { marginBottom: 12 } : {},
          ]}
       >
-         {userId !== localUserID ? (
+         {userId !== localUserID && !resultTestNotify ? (
             <FastImage
                source={{ uri: imageUser ? imageUser : imageFriend, priority: FastImage.priority.normal }}
                style={styles.avatar}
@@ -215,7 +215,7 @@ export const Message = ({ data, localUserID, replyInfo, handleModal, onPress, ha
                            style={{ width: 20, height: 20, borderRadius: 10, marginRight: 8 }}
                         />
                      )}
-                     {name && userId !== localUserID && <Text style={styles.name}>{name}</Text>}
+                     {name && !resultTestNotify && userId !== localUserID && <Text style={styles.name}>{name}</Text>}
                      {replyInfo?.name && (
                         <View style={styles.replyContainer}>
                            <View
@@ -257,7 +257,7 @@ export const Message = ({ data, localUserID, replyInfo, handleModal, onPress, ha
                      <Text style={{ fontSize: 14, color: '#444' }}>{emojis.split(',').length}</Text>
                   </View>
                )}
-               {!isRecalls && (
+               {!isRecalls && !resultTestNotify && (
                   <IconButton
                      mode="contained-tonal"
                      icon="heart-outline"

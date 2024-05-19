@@ -6,6 +6,7 @@ import Constants from 'expo-constants';
 import * as ImagePicker from 'expo-image-picker';
 import React, { useEffect, useState } from 'react';
 import {
+   Alert,
    ImageBackground,
    Keyboard,
    KeyboardAvoidingView,
@@ -23,6 +24,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { updateUser } from '../../features/user/userSlice';
 import { socket } from '../../utils/socket';
 import styles from './styles';
+import { fetchChats, fetchMessagesOfChats } from '../../features/chat/chatSlice';
+import { fetchFriendRequests } from '../../features/friendRequest/friendRequestSlice';
+import { fetchFriend } from '../../features/friend/friendSlice';
 
 export const ProfileScreen = ({ navigation, route }) => {
    const SERVER_HOST = Constants.expoConfig.extra.SERVER_HOST;
@@ -31,21 +35,26 @@ export const ProfileScreen = ({ navigation, route }) => {
    const [dob, setDob] = useState(null);
    const [gender, setGender] = useState(0);
    const friendID = route.params?.friend;
-   const [statusFriend, setStatusFriend] = useState();
+   const [statusFriend, setStatusFriend] = useState({});
    const [visible, setVisible] = React.useState(false);
 
    const dispatch = useDispatch();
    const { user } = useSelector((state) => state.user);
+   const { friendRequests } = useSelector((state) => state.friendRequest);
 
    useEffect(() => {
+      navigation.setOptions({
+         title: 'Thông tin cá nhân',
+      });
       if (friendID) {
          getInfoFriend(friendID);
+         checkIsFriend(user.id, friendID);
       } else {
+         setProfileAU(user);
          setName(user.name);
          setDob(user.dob);
          setGender(user.gender);
       }
-      checkIsFriend(user.id, friendID);
    }, []);
 
    // useEffect(() => {
@@ -168,26 +177,70 @@ export const ProfileScreen = ({ navigation, route }) => {
          recipient: friendID, // id của user muốn kết bạn hoặc block
          chatRoom: user.id > friendID ? `${friendID}${user.id}` : `${user.id}${friendID}`,
       });
+      setStatusFriend({ isFriends: 'Đã' });
    };
 
-   const handleAgreeMakeFriend = async (friendRequest) => {
-      const dataDelete = await axios.delete(`${SERVER_HOST}/make-friends/${friendRequest.makeFriendId}`);
+   const handleBlockUser = async () => {
+      let handleClickBlock = async () => {
+         let dataBlock = await axios.post(`${SERVER_HOST}/users/relationships`, {
+            relationship: 'block',
+            id: user.id, // id user của mình
+            objectId: friendID, // id của user muốn block
+         });
+      };
+      Alert.alert(
+         'Chặn người dùng',
+         'Bạn có chắc chắn muốn chặn người dùng này không?',
+         [
+            {
+               text: 'Hủy',
+               onPress: () => console.log('Cancel Pressed'),
+               style: 'cancel',
+            },
+            { text: 'Chặn', onPress: () => handleClickBlock() },
+         ],
+         { cancelable: false }
+      );
+   };
+
+   const handleRemoveFriend = async () => {};
+
+   const handleRemoveMakeFriend = async () => {
+      const makeFriendData = await axios.get(`${SERVER_HOST}/make-friends/givers/${friendID}`);
+      if (makeFriendData.data) {
+         const id = makeFriendData.data.find((item) => item.id === user.id).makeFriendId;
+         if (id) {
+            const dataDelete = await axios.delete(`${SERVER_HOST}/make-friends/${id}`);
+            if (dataDelete.data) setStatusFriend({});
+         }
+      }
+   };
+
+   const handleAgreeMakeFriend = async () => {
+      const dataDelete = await axios.delete(
+         `${SERVER_HOST}/make-friends/${friendRequests.find((item) => item.id === friendID).makeFriendId}`
+      );
       if (dataDelete.data) {
          const params = {
             relationship: 'friends',
             id: user.id, // id user của mình
-            objectId: friendRequest.id, // id của user muốn kết bạn
+            objectId: friendID, // id của user muốn kết bạn
          };
          let dataAddFriend = await axios.post(`${SERVER_HOST}/users/relationships`, params);
          if (dataAddFriend.data) {
             socket.emit(`Client-Chat-Room`, {
-               message: `Bạn và ${friendRequest.name} đã trở thành bạn`,
+               message: `Bạn và ${name} đã trở thành bạn`,
                dateTimeSend: dayjs().format('YYYY-MM-DD HH:mm:ss'),
                sender: user.id,
-               receiver: friendRequest.id,
-               chatRoom: user.id > friendRequest.id ? `${friendRequest.id}${user.id}` : `${user.id}${friendRequest.id}`,
+               receiver: friendID,
+               chatRoom: user.id > friendID ? `${friendID}${user.id}` : `${user.id}${friendID}`,
             });
-            setContentChat(`Bạn và ${friendRequest.name} đã trở thành bạn`);
+            setContentChat(`Bạn và ${name} đã trở thành bạn`);
+            dispatch(fetchChats(user.id));
+            dispatch(fetchMessagesOfChats(user.id));
+            dispatch(fetchFriendRequests());
+            dispatch(fetchFriend(user.id));
+            setIsFriend(true);
          }
       }
    };
@@ -204,15 +257,15 @@ export const ProfileScreen = ({ navigation, route }) => {
                   <View style={styles.container}>
                      <Pressable onPress={() => !friendID && pickImage('background')}>
                         <ImageBackground
-                           source={{ uri: profileAU?.background || user.background }}
+                           source={{ uri: profileAU?.background || undefined }}
                            style={styles.background}
-                        ></ImageBackground>
+                        />
                      </Pressable>
                      <View style={styles.avatarContainer}>
                         <Pressable onPress={() => !friendID && pickImage('avatar')}>
-                           <Avatar.Image size={150} source={{ uri: profileAU?.image || user.image }} />
+                           <Avatar.Image size={150} source={{ uri: profileAU?.image || undefined }} />
                         </Pressable>
-                        <Text style={{ fontSize: 25, fontWeight: '700' }}>{profileAU?.name || user.name}</Text>
+                        <Text style={{ fontSize: 25, fontWeight: '700' }}>{profileAU?.name}</Text>
                      </View>
                      {friendID && (
                         <View
@@ -223,23 +276,49 @@ export const ProfileScreen = ({ navigation, route }) => {
                               marginHorizontal: 12,
                            }}
                         >
+                           {statusFriend.isFriends === '1' && (
+                              <Button
+                                 icon={() => <Icon source={'chat-plus-outline'} size={22} />}
+                                 mode="contained"
+                                 style={[styles.btnEdit, { marginRight: 10, flex: 1, backgroundColor: '#A5C4F2' }]}
+                                 labelStyle={{ fontSize: 16, color: '#000' }}
+                                 onPress={() =>
+                                    navigation.navigate('ChatScreen', { id: friendID, name: profileAU.name })
+                                 }
+                              >
+                                 Nhắn tin
+                              </Button>
+                           )}
                            <Button
-                              icon={() => <Icon source={'chat-plus-outline'} size={22} />}
-                              mode="contained"
-                              style={[styles.btnEdit, { marginRight: 10, flex: 1, backgroundColor: '#A5C4F2' }]}
-                              labelStyle={{ fontSize: 16, color: '#000' }}
-                              onPress={() => navigation.navigate('ChatScreen', { id: friendID })}
-                           >
-                              Nhắn tin
-                           </Button>
-                           <Button
-                              icon={() => <Icon source={'account-plus-outline'} size={22} />}
+                              icon={() =>
+                                 statusFriend.isFriends === '1' || statusFriend.isFriends?.includes('Đợi') ? (
+                                    <Icon source={'account-check'} size={22} />
+                                 ) : statusFriend.isFriends?.includes('Đã') ? (
+                                    <Icon source={'account-arrow-right'} size={22} />
+                                 ) : (
+                                    <Icon source={'account-plus-outline'} size={22} />
+                                 )
+                              }
                               mode="contained"
                               style={[styles.btnEdit]}
                               labelStyle={{ fontSize: 16, color: '#000' }}
-                              onPress={statusFriend ? handleAgreeMakeFriend : handleAddFriend}
+                              onPress={
+                                 statusFriend.isFriends === '1'
+                                    ? handleRemoveFriend
+                                    : statusFriend.isFriends?.includes('Đã')
+                                    ? handleRemoveMakeFriend
+                                    : statusFriend.isFriends?.includes('Đợi')
+                                    ? handleAgreeMakeFriend
+                                    : handleAddFriend
+                              }
                            >
-                              {statusFriend ? statusFriend.isFriends : 'Kết bạn'}
+                              {statusFriend.isFriends === '1'
+                                 ? 'Bạn bè'
+                                 : statusFriend.isFriends?.includes('Đã')
+                                 ? 'Hủy lời mời'
+                                 : statusFriend.isFriends?.includes('Đợi')
+                                 ? 'Chấp nhận'
+                                 : 'Kết bạn'}
                            </Button>
                            <Menu
                               visible={visible}
@@ -258,7 +337,9 @@ export const ProfileScreen = ({ navigation, route }) => {
                               <Menu.Item
                                  leadingIcon={() => <Icon source={'account-cancel-outline'} size={22} />}
                                  title={'Chặn'}
-                                 onPress={() => {}}
+                                 onPress={() => {
+                                    handleBlockUser();
+                                 }}
                               />
                            </Menu>
                         </View>
@@ -280,7 +361,11 @@ export const ProfileScreen = ({ navigation, route }) => {
                      <View style={styles.inputContainer}>
                         <Text style={styles.labelInput}>Ngày sinh:</Text>
                         {Platform.OS === 'android' ? (
-                           <Button mode="text" onPress={showMode} labelStyle={{ color: '#000', fontSize: 16 }}>
+                           <Button
+                              mode="text"
+                              onPress={!friendID && showMode}
+                              labelStyle={{ color: '#000', fontSize: 16 }}
+                           >
                               {dayjs(profileAU?.dob || dob).format('DD/MM/YYYY') || null}
                            </Button>
                         ) : (

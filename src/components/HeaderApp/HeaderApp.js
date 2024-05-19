@@ -1,7 +1,7 @@
 import { AntDesign, Entypo, Feather, Ionicons, MaterialIcons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import { Platform, Text, TextInput, View } from 'react-native';
-import { Appbar, IconButton } from 'react-native-paper';
+import { Appbar, IconButton, Searchbar } from 'react-native-paper';
 import { useSelector } from 'react-redux';
 import styles from './styles';
 import { ZegoSendCallInvitationButton } from '@zegocloud/zego-uikit-prebuilt-call-rn';
@@ -16,7 +16,7 @@ import { ZegoSendCallInvitationButton } from '@zegocloud/zego-uikit-prebuilt-cal
 export const HeaderApp = ({ navigation, props, type, id, title }) => {
    Platform.OS === 'ios' ? (height = 44) : (height = 56);
    const [search, setSearch] = useState('');
-   const { info } = useSelector((state) => state.detailChat);
+   const { info, membersInGroup } = useSelector((state) => state.detailChat);
 
    return (
       <Appbar.Header {...props} mode="small" style={{ height: height, backgroundColor: '#4D9DF7' }}>
@@ -41,22 +41,13 @@ export const HeaderApp = ({ navigation, props, type, id, title }) => {
                      </>
                   }
                />
-               {!info?.members ? (
+               {info?.members ? (
                   <Appbar.Action
                      color="#fff"
                      size={24}
-                     icon={(props) => (
-                        <ZegoSendCallInvitationButton
-                           invitees={[{ userID: String(info.id), userName: info.name }]}
-                           key={info.id}
-                           isVideoCall={false}
-                           resourceID={'zego_call'}
-                           width={32}
-                           height={32}
-                           backgroundColor={'transparent'}
-                        />
-                     )}
+                     icon={(props) => <Ionicons {...props} name="search" />}
                      animated={false}
+                     onPress={() => {}}
                   />
                ) : null}
                <Appbar.Action
@@ -64,7 +55,39 @@ export const HeaderApp = ({ navigation, props, type, id, title }) => {
                   size={24}
                   icon={(props) => (
                      <ZegoSendCallInvitationButton
-                        invitees={[{ userID: String(info.id), userName: info.name, avatar: info.image }]}
+                        invitees={
+                           !info.leader
+                              ? [{ userID: String(info.id), userName: info.name, avatar: info.image }]
+                              : membersInGroup.map((item) => ({
+                                   userID: String(item.id),
+                                   userName: item.name,
+                                   avatar: item.image,
+                                }))
+                        }
+                        key={info.id}
+                        isVideoCall={false}
+                        resourceID={'zego_call'}
+                        width={32}
+                        height={32}
+                        backgroundColor={'transparent'}
+                     />
+                  )}
+                  animated={false}
+               />
+               <Appbar.Action
+                  color="#fff"
+                  size={24}
+                  icon={(props) => (
+                     <ZegoSendCallInvitationButton
+                        invitees={
+                           !info.leader
+                              ? [{ userID: String(info.id), userName: info.name, avatar: info.image }]
+                              : membersInGroup.map((item) => ({
+                                   userID: String(item.id),
+                                   userName: item.name,
+                                   avatar: item.image,
+                                }))
+                        }
                         key={info.id}
                         isVideoCall={true}
                         resourceID={'zego_call'}
@@ -76,15 +99,6 @@ export const HeaderApp = ({ navigation, props, type, id, title }) => {
                   animated={false}
                   onPress={() => {}}
                />
-               {info?.members ? (
-                  <Appbar.Action
-                     color="#fff"
-                     size={24}
-                     icon={(props) => <Ionicons {...props} name="search" />}
-                     animated={false}
-                     onPress={() => {}}
-                  />
-               ) : null}
                <Appbar.Action
                   color="#fff"
                   size={24}
@@ -98,18 +112,15 @@ export const HeaderApp = ({ navigation, props, type, id, title }) => {
                <Appbar.Content
                   title={
                      <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft: 12 }}>
-                        <IconButton
-                           icon={() => <Ionicons name="search-outline" size={22} color="white" />}
-                           onPress={() => search.trim() && navigation.navigate('SearchScreen', { search: search })}
-                        />
-                        <TextInput
-                           style={[styles.searchInput]}
+                        <Searchbar
                            placeholder="Tìm kiếm"
                            placeholderTextColor="#fff"
-                           color="#fff"
-                           fontSize={18}
+                           style={{ width: '100%', backgroundColor: 'transparent' }}
+                           inputStyle={{ color: '#fff' }}
+                           iconColor="#fff"
                            value={search}
                            onChangeText={(text) => setSearch(text)}
+                           onIconPress={() => search.trim() && navigation.navigate('SearchScreen', { search })}
                         />
                      </View>
                   }

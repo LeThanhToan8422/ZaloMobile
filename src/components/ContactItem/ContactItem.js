@@ -2,6 +2,7 @@ import React from 'react';
 import { Image, Pressable, Text, View } from 'react-native';
 import { IconButton } from 'react-native-paper';
 import styles from './styles';
+import { ZegoSendCallInvitationButton } from '@zegocloud/zego-uikit-prebuilt-call-rn';
 
 /**
  * Renders a contact item component.
@@ -14,7 +15,7 @@ import styles from './styles';
  * @returns {JSX.Element} The rendered contact item component.
  */
 export const ContactItem = ({ data, navigation }) => {
-   const { name, image } = data;
+   const { id, name, image } = data;
    return (
       <Pressable style={styles.container} onPress={() => navigation.navigate('ChatScreen', data)}>
          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
@@ -22,8 +23,32 @@ export const ContactItem = ({ data, navigation }) => {
             <Text style={styles.name}>{name}</Text>
          </View>
          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <IconButton icon="phone-outline" size={26} />
-            <IconButton icon="video-outline" size={28} />
+            <IconButton
+               icon={() => (
+                  <ZegoSendCallInvitationButton
+                     invitees={[{ userID: String(id), userName: name, avatar: image }]}
+                     key={id}
+                     isVideoCall={false}
+                     resourceID={'zego_call'}
+                     width={32}
+                     height={32}
+                  />
+               )}
+               onPress={() => {}}
+            />
+            <IconButton
+               icon={() => (
+                  <ZegoSendCallInvitationButton
+                     invitees={[{ userID: String(id), userName: name, avatar: image }]}
+                     key={id}
+                     isVideoCall={true}
+                     resourceID={'zego_call'}
+                     width={32}
+                     height={32}
+                  />
+               )}
+               onPress={() => {}}
+            />
          </View>
       </Pressable>
    );
