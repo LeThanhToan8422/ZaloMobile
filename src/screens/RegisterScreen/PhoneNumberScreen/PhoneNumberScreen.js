@@ -23,11 +23,11 @@ export const PhoneNumberScreen = ({ navigation, route }, props) => {
          Toast.show({ type: 'error', text1: 'Số điện thoại không hợp lệ', position: 'bottom' });
          return;
       }
-      // const checkPhone = await axios.get(`${SERVER_HOST}/accounts/phone/${phone}`);
-      // if (checkPhone.data) {
-      //    Toast.show({ type: 'error', text1: 'Số điện thoại đã tồn tại', position: 'bottom' });
-      //    return;
-      // }
+      const checkPhone = await axios.get(`${SERVER_HOST}/accounts/phone/${phone}`);
+      if (checkPhone.data) {
+         Toast.show({ type: 'error', text1: 'Số điện thoại đã được sử dụng', position: 'bottom' });
+         return;
+      }
       navigation.navigate('VerifyPhone', { code, phone: phone.replace(' ', ''), ...route.params });
    };
 
