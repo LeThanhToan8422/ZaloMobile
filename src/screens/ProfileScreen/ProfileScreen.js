@@ -57,24 +57,6 @@ export const ProfileScreen = ({ navigation, route }) => {
       }
    }, []);
 
-   // useEffect(() => {
-   //    socket.on(
-   //       `Server-Make-Friends-${user.id > friendID ? `${friendID}${user.id}` : `${user.id}${user.id}`}`,
-   //       (dataGot) => {
-   //          if (dataGot.data) {
-   //             setSendMakeFriend(true);
-   //             // setIsFriend({
-   //             //    id: dataGot.data.id,
-   //             //    isFriends: 'Đã gửi lời mời kết bạn',
-   //             // });
-   //          }
-   //       }
-   //    );
-   //    return () => {
-   //       socket.off(`Server-Make-Friends-${userID > friendID ? `${friendID}${user.id}` : `${user.id}${user.id}`}`);
-   //    };
-   // }, [user, friendID]);
-
    const checkIsFriend = async (id, friendID) => {
       try {
          const response = await axios.get(`${SERVER_HOST}/users/check-is-friend/${id}/${friendID}`);
@@ -203,7 +185,31 @@ export const ProfileScreen = ({ navigation, route }) => {
       );
    };
 
-   const handleRemoveFriend = async () => {};
+   const handleRemoveFriend = async () => {
+      Alert.alert(
+         'Hủy kết bạn',
+         `Bạn có chắc chắn muốn hủy kết bạn với ${profileAU?.name} không?`,
+         [
+            {
+               text: 'Hủy',
+               onPress: () => console.log('Cancel Pressed'),
+               style: 'cancel',
+            },
+            {
+               text: 'Hủy kết bạn',
+               onPress: async () => {
+                  socket.emit(`Client-Update-Friends`, {
+                     userId: user.id,
+                     friendId: friendID,
+                     chatRoom: user.id > friendID ? `${friendID}${user.id}` : `${user.id}${friendID}`,
+                  });
+                  setStatusFriend({ isFriends: '0' });
+               },
+            },
+         ],
+         { cancelable: false }
+      );
+   };
 
    const handleRemoveMakeFriend = async () => {
       const makeFriendData = await axios.get(`${SERVER_HOST}/make-friends/givers/${friendID}`);
@@ -239,7 +245,7 @@ export const ProfileScreen = ({ navigation, route }) => {
             dispatch(fetchChats(user.id));
             dispatch(fetchMessagesOfChats(user.id));
             dispatch(fetchFriendRequests());
-            dispatch(fetchFriend(user.id));
+            dispatch(fetchFriend());
             setIsFriend(true);
          }
       }

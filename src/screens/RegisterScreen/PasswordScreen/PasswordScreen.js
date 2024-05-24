@@ -34,7 +34,7 @@ export const PasswordScreen = ({ navigation, route }) => {
                user: dataUsers.data.id,
             });
             if (dataAccount.data) {
-               dispatch(fetchFriend(dataUsers.id));
+               dispatch(fetchFriend());
                dispatch(fetchChats());
                dispatch(fetchFriendRequests());
                storeData('@user', { phone, password: hashPass, id: dataUsers.data.id });

@@ -29,7 +29,8 @@ export const Message = ({ data, localUserID, replyInfo, handleModal, onPress, ha
    const resultTestNotify =
       message.match(/(.+) đã thêm (.+) vào nhóm\./) ||
       message.match(/(.+) đã xóa (.+) khỏi nhóm\./) ||
-      message.match('Chào mừng đến với nhóm (.+)');
+      message.match('Chào mừng đến với nhóm (.+)') ||
+      message.match(/(.+) đã phân quyền (.+)/);
    const checkImage = /(jpg|jpeg|png|bmp|bmp)$/i.test(message.split('.').pop());
    const checkVideo = /(mp4|avi|mkv|mov|wmv|flv|webm)$/i.test(message.split('.').pop());
    const checkVoice = /(m4a|wav|aac|flac|ogg)$/i.test(message.split('.').pop());
@@ -50,7 +51,7 @@ export const Message = ({ data, localUserID, replyInfo, handleModal, onPress, ha
          }
          return wordsArray.indexOf(a) - wordsArray.indexOf(b);
       });
-      return Array.from(new Set(sortedWords.slice(0, 4)));
+      return Array.from(new Set(sortedWords)).slice(0, 3);
    };
 
    const handlePlaySound = async () => {
@@ -188,11 +189,9 @@ export const Message = ({ data, localUserID, replyInfo, handleModal, onPress, ha
                                  extension={message.split('.').pop()}
                                  {...defaultStyles[message.split('.').pop()]}
                               />
-                              <Text style={{ marginTop: 2 }}>
-                                 {message.split('/').pop().substring(0, 9) + '...' + message.split('.').pop()}
-                              </Text>
                            </View>
                         )}
+                        {!checkVoice && <Text style={{ marginTop: 2 }}>{message.split('--').slice(1)}</Text>}
                         <Text style={[styles.time, checkVoice && { marginTop: 0 }]}>
                            {dateTimeSend && formatTime(dateTimeSend)}
                         </Text>
@@ -266,7 +265,16 @@ export const Message = ({ data, localUserID, replyInfo, handleModal, onPress, ha
                         { position: 'absolute', top: '50%', transform: [{ translateY: -25 }] },
                         userId === localUserID ? { left: -50 } : { right: -50 },
                      ]}
-                     onPress={() => handleReactMessage('love', (chat = id), (chatRoom = currentChat.id))}
+                     onPress={() =>
+                        handleReactMessage(
+                           'love',
+                           (chat = id),
+                           (chatRoom =
+                              currentChat.id < localUserID
+                                 ? `${currentChat.id}${localUserID}`
+                                 : `${localUserID}${currentChat.id}`)
+                        )
+                     }
                   />
                )}
             </Pressable>

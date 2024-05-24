@@ -12,7 +12,10 @@ const initialState = {
 
 const fetchFriend = createAsyncThunk('friend/fetchFriend', async (_, { getState }) => {
    const response = await axios.get(`${SERVER_HOST}/users/friends/${getState().user.user.id}`);
-   return response.data;
+   const responseGroup = await axios.get(`${SERVER_HOST}/users/group-chats/${getState().user.user.id}`);
+   return await Promise.all([response.data, responseGroup.data]).then((values) => {
+      return [...values[0], ...values[1]];
+   });
 });
 
 const friendSlice = createSlice({

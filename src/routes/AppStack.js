@@ -55,9 +55,15 @@ const AppStack = ({ navigation }) => {
 
    useEffect(() => {
       const onChatEvents = async (res) => {
-         dispatch(deleteMessage(res.data.idTemp));
+         if (res.data.idTemp) {
+            dispatch(deleteMessage(res.data.idTemp));
+         }
          dispatch(addMessage({ ...res.data, chatRoom: String(res.data.chatRoom) }));
-         if (res.data.sender !== user.id) {
+         if (
+            res.data.sender !== user.id &&
+            res.data.sender !== currentChat.id &&
+            res.data.chatRoom !== currentChat.id
+         ) {
             let message = res.data.message;
             const checkVideo = /(mp4|avi|mkv|mov|wmv|flv|webm)$/i.test(message.split('.').pop());
             const checkVoice = /(m4a|wav|aac|flac|ogg)$/i.test(message.split('.').pop());
@@ -67,6 +73,13 @@ const AppStack = ({ navigation }) => {
                res.data.nameGroup ? `${res.data.name}: ${message}` : message,
                res.data.imageGroup ? res.data.imageGroup : res.data.imageUser
             );
+         }
+         if (res.data.sender === currentChat.id || res.data.chatRoom === currentChat.id) {
+            if (res.data.groupChat) {
+               await axios.post(`${SERVER_HOST}/wait-message/update/${user.id}/Group/${res.data.groupChat}`);
+            } else {
+               await axios.post(`${SERVER_HOST}/wait-message/update/${currentChat.id}/${user.id}`);
+            }
          }
          dispatch(fetchChats());
          const messages = await getData(
@@ -126,7 +139,12 @@ const AppStack = ({ navigation }) => {
                   dispatch(fetchMembersInGroup(id));
                }
             });
-         if (event === `Server-Emotion-Chats-${currentChat.id}`) {
+         if (
+            event ===
+            `Server-Emotion-Chats-${
+               currentChat.id < user.id ? `${currentChat.id}${user.id}` : `${user.id}${currentChat.id}`
+            }`
+         ) {
             if (user.id !== res.data.implementer) {
                dispatch(updateMessage({ id: res.data.chat, emojis: res.data.type }));
             }

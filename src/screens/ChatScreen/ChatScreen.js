@@ -26,11 +26,20 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import { useDispatch, useSelector } from 'react-redux';
 import Message from '../../components/Message';
-import { addMessage, deleteMessage, fetchMessages, setMessages, updateMessage } from '../../features/chat/chatSlice';
+import {
+   addMessage,
+   deleteMessage,
+   fetchChats,
+   fetchMessages,
+   setMessages,
+   updateMessage,
+} from '../../features/chat/chatSlice';
 import { fetchDetailChat, fetchMembersInGroup } from '../../features/detailChat/detailChatSlice';
 import { socket } from '../../utils/socket';
 import { getData } from '../../utils/storage';
 import styles from './styles';
+import axios from 'axios';
+import Constants from 'expo-constants';
 
 /**
  * ChatScreen component. This component is used to render the chat screen.
@@ -43,7 +52,7 @@ export const ChatScreen = ({ navigation, route }) => {
    const urlRegex = /^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/;
    const checkImage = /(jpg|jpeg|png|bmp|bmp)$/i;
    const insets = useSafeAreaInsets();
-   const [chatInfo, setChatInfo] = useState(route.params);
+   const [chatInfo] = useState(route.params);
    const [message, setMessage] = useState('');
    const [visible, setVisible] = useState(false);
    const [replyVisible, setReplyVisible] = useState(false);
@@ -54,12 +63,14 @@ export const ChatScreen = ({ navigation, route }) => {
    const [recording, setRecording] = useState();
    const [permissionResponse, requestPermission] = Audio.usePermissions();
    const [loading, setLoading] = useState(false);
+   const SERVER_HOST = Constants.expoConfig.extra.SERVER_HOST;
 
    const dispatch = useDispatch();
    const user = useSelector((state) => state.user.user);
    const { id, messages } = useSelector((state) => state.chat.currentChat);
    const { chats } = useSelector((state) => state.chat);
    const emoji = [{ like: '👍' }, { love: '❤️' }, { haha: '😂' }, { wow: '😮' }, { sad: '😭' }, { angry: '😡' }];
+   const checkVoice = /(m4a|wav|aac|flac|ogg)$/i.test(message.split('.').pop());
 
    useEffect(() => {
       setLoading(false);
@@ -69,6 +80,14 @@ export const ChatScreen = ({ navigation, route }) => {
       (async () => {
          const messages = await getData(`@${chatInfo.id}`);
          dispatch(setMessages({ id: chatInfo.id, messages: messages }));
+         if (chatInfo.quantity) {
+            if (chatInfo.leader) {
+               await axios.post(`${SERVER_HOST}/wait-message/update/${user.id}/Group/${chatInfo.id}`);
+            } else {
+               await axios.post(`${SERVER_HOST}/wait-message/update/${chatInfo.id}/${user.id}`);
+            }
+            dispatch(fetchChats());
+         }
       })();
       const params = { page: page };
       chatInfo.leader ? (params.groupId = chatInfo.id) : (params.chatId = chatInfo.id);
@@ -302,7 +321,11 @@ export const ChatScreen = ({ navigation, route }) => {
                                        handleReactMessage(
                                           (type = Object.keys(item)[0]),
                                           (chat = modalData.id),
-                                          (chatRoom = chatInfo.leader ? chatInfo.id : id)
+                                          (chatRoom = chatInfo.leader
+                                             ? chatInfo.id
+                                             : id < user.id
+                                             ? `${id}${user.id}`
+                                             : `${user.id}${id}`)
                                        );
                                        hideModal();
                                     }}

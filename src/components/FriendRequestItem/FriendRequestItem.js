@@ -1,6 +1,6 @@
 import axios from 'axios';
 import React, { useState } from 'react';
-import { Image, Text, View } from 'react-native';
+import { Image, Pressable, Text, View } from 'react-native';
 import { Button, Icon } from 'react-native-paper';
 import styles from './styles';
 import Constants from 'expo-constants';
@@ -44,13 +44,13 @@ export const FriendRequestItem = ({ navigation, userID, data }) => {
 
    return (
       <View style={styles.container}>
-         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+         <Pressable onPress={() => {}} style={{ flexDirection: 'row', alignItems: 'center' }}>
             <Image source={{ uri: data.image }} style={styles.avatar} />
             <View style={{ marginLeft: 8, rowGap: 4 }}>
                <Text style={{ fontSize: 18, fontWeight: '500' }}>{data.name}</Text>
                <Text style={{ fontSize: 16, color: '#333' }}>{contentChat ? contentChat : data.content}</Text>
             </View>
-         </View>
+         </Pressable>
          <View style={styles.actionContainer}>
             {contentChat ? (
                <>

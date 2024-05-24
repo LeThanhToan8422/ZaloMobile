@@ -28,7 +28,7 @@ export const LoginScreen = ({ navigation }) => {
          .then((res) => {
             if (res) {
                storeData('@user', res);
-               dispatch(fetchFriend(res.id));
+               dispatch(fetchFriend());
                dispatch(fetchMessagesOfChats());
                onUserLogin(res.id, res.name);
                setVisible(false);

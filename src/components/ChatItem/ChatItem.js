@@ -20,15 +20,14 @@ import styles from './styles';
  */
 export const ChatItem = ({ navigation, data }) => {
    const urlRegex = /^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/;
-   const { name, member, message, image, dateTimeSend } = data;
-   const [numberMessageUnread, setNumberMessageUnread] = useState(data.numberMessageUnread || 0);
+   const { name, member, message, image, dateTimeSend, quantity } = data;
    return (
       <Pressable style={styles.container} onPress={() => navigation.push('ChatScreen', data)}>
          <Image source={{ uri: image }} style={styles.image} />
          <View style={styles.contentContainer}>
             <View style={{ flex: 1, marginLeft: 10, rowGap: 4 }}>
                <Text style={styles.name}>{name}</Text>
-               <Text ellipsizeMode="tail" numberOfLines={1} style={styles.message}>
+               <Text ellipsizeMode="tail" numberOfLines={1} style={[styles.message, quantity && { fontWeight: 500 }]}>
                   {urlRegex.test(message)
                      ? message.split('.').pop() === ('jpg' || 'png')
                         ? '[Hình ảnh]'
@@ -38,7 +37,7 @@ export const ChatItem = ({ navigation, data }) => {
             </View>
             <View style={{ alignItems: 'center', rowGap: 4 }}>
                <Text style={styles.time}>{formatTime(dateTimeSend)}</Text>
-               {numberMessageUnread ? (
+               {quantity ? (
                   <View
                      style={{
                         backgroundColor: '#EF4D48',
@@ -48,7 +47,7 @@ export const ChatItem = ({ navigation, data }) => {
                         height: 18,
                      }}
                   >
-                     <Text style={styles.qtyNotification}>{numberMessageUnread >= 5 ? '5+' : numberMessageUnread}</Text>
+                     <Text style={styles.qtyNotification}>{quantity >= 5 ? '5+' : quantity}</Text>
                   </View>
                ) : (
                   ''
